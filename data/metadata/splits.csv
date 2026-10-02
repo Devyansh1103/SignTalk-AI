@@ -1,0 +1,5 @@
+split,sample_count,percentage
+train,689,71.92
+val,77,8.04
+test,192,20.04
+total,958,100.0

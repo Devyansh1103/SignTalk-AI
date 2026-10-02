@@ -1,0 +1,61 @@
+sample_id,split,class_label,class_id,signer_id,processed_file,original_frames,target_frames,average_quality,classification,classification_reason,pose_detection_rate,left_hand_detection_rate,right_hand_detection_rate,face_detection_rate,elapsed_seconds,status
+raw_0001,train,hello,0,signer_01,data/processed/landmarks/train/raw_0001.npz,45,45,0.6604,ACCEPTABLE,Acceptable detection coverage for sequence modeling,100.0,42.22,51.11,0.0,3.293,COMPLETED
+raw_0002,train,hello,0,signer_01,data/processed/landmarks/train/raw_0002.npz,55,45,0.6119,ACCEPTABLE,Acceptable detection coverage for sequence modeling,100.0,41.82,41.82,0.0,3.895,COMPLETED
+raw_0003,val,hello,0,signer_02,data/processed/landmarks/val/raw_0003.npz,45,45,0.6727,ACCEPTABLE,Acceptable detection coverage for sequence modeling,100.0,44.44,53.33,0.0,4.441,COMPLETED
+raw_0004,test,hello,0,signer_02,data/processed/landmarks/test/raw_0004.npz,55,45,0.6105,ACCEPTABLE,Acceptable detection coverage for sequence modeling,100.0,41.82,41.82,0.0,4.587,COMPLETED
+raw_0005,train,hello,0,signer_03,data/processed/landmarks/train/raw_0005.npz,45,45,0.6512,ACCEPTABLE,Acceptable detection coverage for sequence modeling,100.0,42.22,48.89,0.0,3.986,COMPLETED
+raw_0006,train,hello,0,signer_03,data/processed/landmarks/train/raw_0006.npz,55,45,0.6185,ACCEPTABLE,Acceptable detection coverage for sequence modeling,100.0,41.82,43.64,0.0,5.484,COMPLETED
+raw_0007,val,thankyou,1,signer_01,data/processed/landmarks/val/raw_0007.npz,45,45,0.7548,GOOD,High landmark quality and continuous pose tracking,100.0,68.89,57.78,0.0,4.876,COMPLETED
+raw_0008,test,thankyou,1,signer_01,data/processed/landmarks/test/raw_0008.npz,55,45,0.4931,REVIEW,"Marginal landmark detection rates (12 valid frames, quality 0.49); recommended for manual inspection",100.0,20.0,21.82,0.0,4.754,COMPLETED
+raw_0009,train,thankyou,1,signer_02,data/processed/landmarks/train/raw_0009.npz,45,45,0.6886,ACCEPTABLE,Acceptable detection coverage for sequence modeling,100.0,51.11,55.56,0.0,4.554,COMPLETED
+raw_0010,train,thankyou,1,signer_02,data/processed/landmarks/train/raw_0010.npz,55,45,0.4861,REVIEW,"Marginal landmark detection rates (11 valid frames, quality 0.49); recommended for manual inspection",100.0,20.0,20.0,0.0,4.203,COMPLETED
+raw_0011,train,thankyou,1,signer_03,data/processed/landmarks/train/raw_0011.npz,45,45,0.6936,ACCEPTABLE,Acceptable detection coverage for sequence modeling,100.0,51.11,55.56,0.0,4.143,COMPLETED
+raw_0012,val,thankyou,1,signer_03,data/processed/landmarks/val/raw_0012.npz,55,45,0.4869,REVIEW,"Marginal landmark detection rates (11 valid frames, quality 0.49); recommended for manual inspection",100.0,20.0,20.0,0.0,4.28,COMPLETED
+raw_0013,train,good,2,signer_01,data/processed/landmarks/train/raw_0013.npz,45,45,0.6743,ACCEPTABLE,Acceptable detection coverage for sequence modeling,100.0,51.11,53.33,0.0,4.204,COMPLETED
+raw_0014,train,good,2,signer_01,data/processed/landmarks/train/raw_0014.npz,55,45,0.4112,REJECT,Insufficient valid frames (7 < 8),100.0,10.91,1.82,0.0,4.075,COMPLETED
+raw_0015,train,good,2,signer_02,data/processed/landmarks/train/raw_0015.npz,45,45,0.6641,ACCEPTABLE,Acceptable detection coverage for sequence modeling,100.0,51.11,51.11,0.0,3.141,COMPLETED
+raw_0016,val,good,2,signer_02,data/processed/landmarks/val/raw_0016.npz,55,45,0.3936,REJECT,Insufficient valid frames (3 < 8),100.0,3.64,3.64,0.0,4.713,COMPLETED
+raw_0017,test,good,2,signer_03,data/processed/landmarks/test/raw_0017.npz,45,45,0.6666,ACCEPTABLE,Acceptable detection coverage for sequence modeling,100.0,51.11,51.11,0.0,3.814,COMPLETED
+raw_0018,train,good,2,signer_03,data/processed/landmarks/train/raw_0018.npz,55,45,0.3945,REJECT,Insufficient valid frames (3 < 8),100.0,1.82,3.64,0.0,4.54,COMPLETED
+raw_0019,train,happy,3,signer_01,data/processed/landmarks/train/raw_0019.npz,45,45,0.5082,ACCEPTABLE,Acceptable detection coverage for sequence modeling,100.0,22.22,24.44,0.0,3.652,COMPLETED
+raw_0020,val,happy,3,signer_01,data/processed/landmarks/val/raw_0020.npz,55,45,0.427,REVIEW,"Marginal landmark detection rates (8 valid frames, quality 0.43); recommended for manual inspection",100.0,5.45,10.91,0.0,5.277,COMPLETED
+raw_0021,test,happy,3,signer_02,data/processed/landmarks/test/raw_0021.npz,45,45,0.5524,ACCEPTABLE,Acceptable detection coverage for sequence modeling,100.0,26.67,33.33,0.0,3.861,COMPLETED
+raw_0022,train,happy,3,signer_02,data/processed/landmarks/train/raw_0022.npz,55,45,0.4238,REVIEW,"Marginal landmark detection rates (8 valid frames, quality 0.42); recommended for manual inspection",100.0,5.45,10.91,0.0,3.654,COMPLETED
+raw_0023,train,happy,3,signer_03,data/processed/landmarks/train/raw_0023.npz,45,45,0.5003,ACCEPTABLE,Acceptable detection coverage for sequence modeling,100.0,22.22,22.22,0.0,3.725,COMPLETED
+raw_0024,train,happy,3,signer_03,data/processed/landmarks/train/raw_0024.npz,55,45,0.4354,REVIEW,"Marginal landmark detection rates (9 valid frames, quality 0.44); recommended for manual inspection",100.0,7.27,12.73,0.0,5.142,COMPLETED
+raw_0025,test,monday,4,signer_01,data/processed/landmarks/test/raw_0025.npz,45,45,0.3712,REJECT,Insufficient valid frames (0 < 8),100.0,0.0,0.0,0.0,3.818,COMPLETED
+raw_0026,train,monday,4,signer_01,data/processed/landmarks/train/raw_0026.npz,55,45,0.4706,REVIEW,"Marginal landmark detection rates (13 valid frames, quality 0.47); recommended for manual inspection",100.0,7.27,18.18,0.0,4.857,COMPLETED
+raw_0027,train,monday,4,signer_02,data/processed/landmarks/train/raw_0027.npz,45,45,0.372,REJECT,Insufficient valid frames (0 < 8),100.0,0.0,0.0,0.0,4.562,COMPLETED
+raw_0028,train,monday,4,signer_02,data/processed/landmarks/train/raw_0028.npz,55,45,0.5807,ACCEPTABLE,Acceptable detection coverage for sequence modeling,100.0,23.64,41.82,0.0,6.216,COMPLETED
+raw_0029,val,monday,4,signer_03,data/processed/landmarks/val/raw_0029.npz,45,45,0.3723,REJECT,Insufficient valid frames (0 < 8),100.0,0.0,0.0,0.0,3.158,COMPLETED
+raw_0030,test,monday,4,signer_03,data/processed/landmarks/test/raw_0030.npz,55,45,0.4587,REVIEW,"Marginal landmark detection rates (11 valid frames, quality 0.46); recommended for manual inspection",100.0,5.45,18.18,0.0,4.41,COMPLETED
+raw_0031,train,car,5,signer_01,data/processed/landmarks/train/raw_0031.npz,45,45,0.4247,REJECT,Insufficient valid frames (6 < 8),100.0,6.67,8.89,0.0,3.716,COMPLETED
+raw_0032,train,car,5,signer_01,data/processed/landmarks/train/raw_0032.npz,55,45,0.4616,REVIEW,"Marginal landmark detection rates (11 valid frames, quality 0.46); recommended for manual inspection",100.0,7.27,14.55,0.0,7.782,COMPLETED
+raw_0033,val,car,5,signer_02,data/processed/landmarks/val/raw_0033.npz,45,45,0.4168,REJECT,Insufficient valid frames (6 < 8),100.0,8.89,6.67,0.0,4.403,COMPLETED
+raw_0034,test,car,5,signer_02,data/processed/landmarks/test/raw_0034.npz,55,45,0.4282,REJECT,Insufficient valid frames (6 < 8),100.0,5.45,7.27,0.0,4.907,COMPLETED
+raw_0035,train,car,5,signer_03,data/processed/landmarks/train/raw_0035.npz,45,45,0.4448,REVIEW,"Marginal landmark detection rates (9 valid frames, quality 0.44); recommended for manual inspection",100.0,17.78,11.11,0.0,3.683,COMPLETED
+raw_0036,train,car,5,signer_03,data/processed/landmarks/train/raw_0036.npz,55,45,0.4425,REVIEW,"Marginal landmark detection rates (9 valid frames, quality 0.44); recommended for manual inspection",100.0,5.45,10.91,0.0,5.325,COMPLETED
+raw_0037,val,bird,6,signer_01,data/processed/landmarks/val/raw_0037.npz,45,45,0.4474,REVIEW,"Marginal landmark detection rates (8 valid frames, quality 0.45); recommended for manual inspection",100.0,6.67,13.33,0.0,4.883,COMPLETED
+raw_0038,test,bird,6,signer_01,data/processed/landmarks/test/raw_0038.npz,55,45,0.4523,REVIEW,"Marginal landmark detection rates (10 valid frames, quality 0.45); recommended for manual inspection",100.0,7.27,14.55,0.0,4.739,COMPLETED
+raw_0039,train,bird,6,signer_02,data/processed/landmarks/train/raw_0039.npz,45,45,0.4296,REJECT,Insufficient valid frames (6 < 8),100.0,6.67,8.89,0.0,4.258,COMPLETED
+raw_0040,train,bird,6,signer_02,data/processed/landmarks/train/raw_0040.npz,55,45,0.4446,REVIEW,"Marginal landmark detection rates (9 valid frames, quality 0.44); recommended for manual inspection",100.0,9.09,9.09,0.0,4.641,COMPLETED
+raw_0041,train,bird,6,signer_03,data/processed/landmarks/train/raw_0041.npz,45,45,0.4465,REVIEW,"Marginal landmark detection rates (9 valid frames, quality 0.45); recommended for manual inspection",100.0,6.67,13.33,0.0,3.878,COMPLETED
+raw_0042,val,bird,6,signer_03,data/processed/landmarks/val/raw_0042.npz,55,45,0.5594,ACCEPTABLE,Acceptable detection coverage for sequence modeling,100.0,25.45,40.0,0.0,4.468,COMPLETED
+raw_0043,train,house,7,signer_01,data/processed/landmarks/train/raw_0043.npz,45,45,0.4804,REVIEW,"Marginal landmark detection rates (11 valid frames, quality 0.48); recommended for manual inspection",100.0,8.89,17.78,0.0,4.216,COMPLETED
+raw_0044,train,house,7,signer_01,data/processed/landmarks/train/raw_0044.npz,53,45,0.3918,REJECT,Insufficient valid frames (2 < 8),100.0,0.0,3.77,0.0,3.75,COMPLETED
+raw_0045,train,house,7,signer_02,data/processed/landmarks/train/raw_0045.npz,45,45,0.4474,REJECT,Insufficient valid frames (7 < 8),100.0,6.67,11.11,0.0,4.196,COMPLETED
+raw_0046,val,house,7,signer_02,data/processed/landmarks/val/raw_0046.npz,53,45,0.3846,REJECT,Insufficient valid frames (1 < 8),100.0,0.0,1.89,0.0,4.7,COMPLETED
+raw_0047,test,house,7,signer_03,data/processed/landmarks/test/raw_0047.npz,45,45,0.4755,REVIEW,"Marginal landmark detection rates (12 valid frames, quality 0.48); recommended for manual inspection",100.0,4.44,22.22,0.0,4.839,COMPLETED
+raw_0048,train,house,7,signer_03,data/processed/landmarks/train/raw_0048.npz,53,45,0.3786,REJECT,Insufficient valid frames (0 < 8),100.0,0.0,0.0,0.0,4.438,COMPLETED
+raw_0049,train,time,8,signer_01,data/processed/landmarks/train/raw_0049.npz,45,45,0.6066,ACCEPTABLE,Acceptable detection coverage for sequence modeling,100.0,22.22,55.56,0.0,3.62,COMPLETED
+raw_0050,val,time,8,signer_01,data/processed/landmarks/val/raw_0050.npz,55,45,0.6494,ACCEPTABLE,Acceptable detection coverage for sequence modeling,100.0,41.82,49.09,0.0,4.942,COMPLETED
+raw_0051,test,time,8,signer_02,data/processed/landmarks/test/raw_0051.npz,45,45,0.4456,REJECT,Insufficient valid frames (7 < 8),100.0,4.44,15.56,0.0,4.323,COMPLETED
+raw_0052,train,time,8,signer_02,data/processed/landmarks/train/raw_0052.npz,55,45,0.6571,ACCEPTABLE,Acceptable detection coverage for sequence modeling,100.0,41.82,50.91,0.0,5.628,COMPLETED
+raw_0053,train,time,8,signer_03,data/processed/landmarks/train/raw_0053.npz,45,45,0.4603,REVIEW,"Marginal landmark detection rates (9 valid frames, quality 0.46); recommended for manual inspection",100.0,13.33,13.33,0.0,4.717,COMPLETED
+raw_0054,train,time,8,signer_03,data/processed/landmarks/train/raw_0054.npz,55,45,0.6503,ACCEPTABLE,Acceptable detection coverage for sequence modeling,100.0,41.82,47.27,0.0,5.585,COMPLETED
+raw_0055,test,teacher,9,signer_01,data/processed/landmarks/test/raw_0055.npz,45,45,0.3885,REJECT,Insufficient valid frames (1 < 8),100.0,0.0,2.22,0.0,5.26,COMPLETED
+raw_0056,train,teacher,9,signer_01,data/processed/landmarks/train/raw_0056.npz,55,45,0.6595,ACCEPTABLE,Acceptable detection coverage for sequence modeling,100.0,50.91,45.45,0.0,6.328,COMPLETED
+raw_0057,train,teacher,9,signer_02,data/processed/landmarks/train/raw_0057.npz,45,45,0.4026,REJECT,Insufficient valid frames (3 < 8),100.0,0.0,6.67,0.0,6.643,COMPLETED
+raw_0058,train,teacher,9,signer_02,data/processed/landmarks/train/raw_0058.npz,55,45,0.6148,ACCEPTABLE,Acceptable detection coverage for sequence modeling,100.0,41.82,41.82,0.0,5.892,COMPLETED
+raw_0059,val,teacher,9,signer_03,data/processed/landmarks/val/raw_0059.npz,45,45,0.3871,REJECT,Insufficient valid frames (1 < 8),100.0,0.0,2.22,0.0,4.591,COMPLETED
+raw_0060,test,teacher,9,signer_03,data/processed/landmarks/test/raw_0060.npz,55,45,0.613,ACCEPTABLE,Acceptable detection coverage for sequence modeling,100.0,41.82,40.0,0.0,4.761,COMPLETED

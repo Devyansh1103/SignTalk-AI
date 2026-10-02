@@ -1,0 +1,90 @@
+# Preprocessing Configuration: SignTalk AI
+# Phase 2 Part 2 — Landmark Extraction & Data Preprocessing
+# Version: 1.0.0
+
+dataset:
+  raw_video_dir: "data/raw/videos"
+  manifest_path: "data/metadata/raw_dataset_manifest.csv"
+  processed_output_dir: "data/processed/landmarks"
+  interim_output_dir: "data/interim/landmarks"
+  visualizations_dir: "data/interim/visualizations"
+  error_log_path: "data/metadata/preprocessing_errors.csv"
+  processed_manifest_path: "data/metadata/processed_dataset_manifest.csv"
+
+frame_processing:
+  target_fps: 25.0
+  frame_sampling_rate: 1
+  image_size: [426, 240]  # [width, height]
+  uniform_resampling: true
+  min_frame_count: 15
+  max_frame_count: 120
+
+mediapipe:
+  model_dir: "models/mediapipe"
+  pose_model_path: "models/mediapipe/pose_landmarker_full.task"
+  hand_model_path: "models/mediapipe/hand_landmarker.task"
+  face_model_path: "models/mediapipe/face_landmarker.task"
+  
+  pose_detection_confidence: 0.5
+  pose_presence_confidence: 0.5
+  pose_tracking_confidence: 0.5
+  
+  hand_detection_confidence: 0.35
+  hand_presence_confidence: 0.35
+  hand_tracking_confidence: 0.35
+  num_hands: 2
+  
+  face_detection_confidence: 0.4
+  face_presence_confidence: 0.4
+  num_faces: 1
+  enable_face_mesh: false  # Approved fallback from pilot: use robust upper-pose facial anchors unless explicitly enabled
+
+landmark_budget:
+  total_nodes: 93
+  left_hand_nodes: 21   # Indices 0 - 20
+  right_hand_nodes: 21  # Indices 21 - 41
+  pose_nodes: 11        # Indices 42 - 52
+  face_nodes: 40        # Indices 53 - 92
+
+normalization:
+  method: "torso_scale"  # Options: "torso_scale", "wrist_centered", "min_max", "none"
+  center_point: "mid_shoulder"  # (Left Shoulder + Right Shoulder) / 2
+  scale_reference: "shoulder_distance"  # L2 distance between shoulders
+  min_scale_epsilon: 1.0e-4
+  z_scale_factor: 1.0
+
+missing_landmarks:
+  strategy: "interpolate_and_mask"  # Options: "zero_mask", "carry_forward", "interpolate_and_mask", "confidence_mask"
+  max_consecutive_interpolated_frames: 10
+  visibility_threshold: 0.3
+
+sequence:
+  target_sequence_length: 45  # T = 45 frames (1.8 seconds at 25 FPS)
+  pad_mode: "zero_padding"    # Options: "zero_padding", "repeat_last"
+  stride: 15
+  minimum_valid_frames: 15
+
+quality_control:
+  min_valid_pose_ratio: 0.70
+  min_valid_hand_ratio: 0.30
+  overall_quality_threshold: 0.50
+  weights:
+    pose: 0.40
+    dominant_hand: 0.40
+    non_dominant_hand: 0.15
+    face: 0.05
+  classification_thresholds:
+    good: 0.75
+    acceptable: 0.50
+    review: 0.35
+    # Below 0.35 is REJECT
+
+execution:
+  num_workers: 2
+  batch_size: 10
+  save_visualizations: true
+  visualization_samples_per_split: 3
+  resumable: true
+  checkpoint_interval: 10
+  deterministic: true
+  seed: 42

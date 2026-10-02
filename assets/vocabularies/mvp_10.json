@@ -1,0 +1,80 @@
+{
+  "vocabulary_name": "mvp_10",
+  "version": "1.0.0",
+  "language": "ISL",
+  "num_classes": 10,
+  "special_tokens": {
+    "<PAD>": 0,
+    "<UNK>": 1,
+    "<BOS>": 2,
+    "<EOS>": 3
+  },
+  "token_to_id": {
+    "<PAD>": 0,
+    "<UNK>": 1,
+    "<BOS>": 2,
+    "<EOS>": 3,
+    "HELLO": 4,
+    "THANK_YOU": 5,
+    "GOOD": 6,
+    "HAPPY": 7,
+    "MONDAY": 8,
+    "CAR": 9,
+    "BIRD": 10,
+    "HOUSE": 11,
+    "TIME": 12,
+    "TEACHER": 13
+  },
+  "id_to_token": {
+    "0": "<PAD>",
+    "1": "<UNK>",
+    "2": "<BOS>",
+    "3": "<EOS>",
+    "4": "HELLO",
+    "5": "THANK_YOU",
+    "6": "GOOD",
+    "7": "HAPPY",
+    "8": "MONDAY",
+    "9": "CAR",
+    "10": "BIRD",
+    "11": "HOUSE",
+    "12": "TIME",
+    "13": "TEACHER"
+  },
+  "class_id_to_token_id": {
+    "0": 4,
+    "1": 5,
+    "2": 6,
+    "3": 7,
+    "4": 8,
+    "5": 9,
+    "6": 10,
+    "7": 11,
+    "8": 12,
+    "9": 13
+  },
+  "class_id_to_gloss": {
+    "0": "HELLO",
+    "1": "THANK_YOU",
+    "2": "GOOD",
+    "3": "HAPPY",
+    "4": "MONDAY",
+    "5": "CAR",
+    "6": "BIRD",
+    "7": "HOUSE",
+    "8": "TIME",
+    "9": "TEACHER"
+  },
+  "class_id_to_translation": {
+    "0": "Hello",
+    "1": "Thank you",
+    "2": "Good",
+    "3": "Happy",
+    "4": "Monday",
+    "5": "Car",
+    "6": "Bird",
+    "7": "House",
+    "8": "Time",
+    "9": "Teacher"
+  }
+}

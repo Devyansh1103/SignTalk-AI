@@ -1,0 +1,10 @@
+sample_id,video_path,error_type,error_message,timestamp
+raw_0001,data/raw/videos\hello_signer_01_rep1.mp4,TypeError,'>' not supported between instances of 'NoneType' and 'int',2026-10-02 15:08:31
+raw_0007,data/raw/videos\thankyou_signer_01_rep1.mp4,TypeError,'>' not supported between instances of 'NoneType' and 'int',2026-10-02 15:08:32
+raw_0013,data/raw/videos\good_signer_01_rep1.mp4,TypeError,'>' not supported between instances of 'NoneType' and 'int',2026-10-02 15:08:32
+raw_0019,data/raw/videos\happy_signer_01_rep1.mp4,TypeError,'>' not supported between instances of 'NoneType' and 'int',2026-10-02 15:08:32
+raw_0031,data/raw/videos\car_signer_01_rep1.mp4,TypeError,'>' not supported between instances of 'NoneType' and 'int',2026-10-02 15:08:39
+raw_0037,data/raw/videos\bird_signer_01_rep1.mp4,TypeError,'>' not supported between instances of 'NoneType' and 'int',2026-10-02 15:08:43
+raw_0043,data/raw/videos\house_signer_01_rep1.mp4,TypeError,'>' not supported between instances of 'NoneType' and 'int',2026-10-02 15:08:44
+raw_0049,data/raw/videos\time_signer_01_rep1.mp4,TypeError,'>' not supported between instances of 'NoneType' and 'int',2026-10-02 15:08:45
+raw_0055,data/raw/videos\teacher_signer_01_rep1.mp4,TypeError,'>' not supported between instances of 'NoneType' and 'int',2026-10-02 15:08:46

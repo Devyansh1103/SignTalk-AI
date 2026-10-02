@@ -1,0 +1,20 @@
+{
+  "name": "signtalk-ai",
+  "version": "1.0.0-phase1",
+  "description": "SignTalk AI: Real-Time Indian Sign Language Translation and Communication Platform",
+  "author": "Academic Engineering Team (GLA University)",
+  "license": "MIT",
+  "scripts": {
+    "frontend:dev": "cd frontend && npm run dev",
+    "frontend:build": "cd frontend && npm run build",
+    "frontend:preview": "cd frontend && npm run preview",
+    "frontend:lint": "cd frontend && npm run lint",
+    "backend:dev": "uvicorn backend.app.main:app --reload --host 0.0.0.0 --port 8000",
+    "backend:test": "pytest tests/ -v",
+    "docker:up": "docker compose up --build",
+    "docker:down": "docker compose down"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.5"
+  }
+}

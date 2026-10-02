@@ -1,0 +1,11 @@
+source_dataset,source_class_id,source_label,canonical_class_id,canonical_label,gloss,translation,notes
+INCLUDE-50,22,Greetings/48. Hello,0,hello,HELLO,Hello,Validated isolated sign
+INCLUDE-50,42,Greetings/95. thankyou,1,thankyou,THANK_YOU,Thank you,Validated isolated sign
+INCLUDE-50,18,Adjectives/94. good,2,good,GOOD,Good,Validated isolated sign
+INCLUDE-50,20,Adjectives/3. happy,3,happy,HAPPY,Happy,Validated isolated sign
+INCLUDE-50,29,Days_and_Time/67. Monday,4,monday,MONDAY,Monday,Validated isolated sign
+INCLUDE-50,6,Means_of_Transportation/11. Car,5,car,CAR,Car,Validated isolated sign
+INCLUDE-50,2,Animals/4. Bird,6,bird,BIRD,Bird,Validated isolated sign
+INCLUDE-50,24,Home/20. House,7,house,HOUSE,House,Validated isolated sign
+INCLUDE-50,43,Days_and_Time/86. Time,8,time,TIME,Time,Validated isolated sign
+INCLUDE-50,41,Jobs/84. Teacher,9,teacher,TEACHER,Teacher,Validated isolated sign

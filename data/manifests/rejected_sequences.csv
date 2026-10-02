@@ -1,0 +1,17 @@
+sequence_id,source_recording_id,source_video_id,signer_id,split,class_id,quality_score,reason,valid_frames,pipeline_version
+seq_0009,raw_0014,good_signer_01_rep2.mp4,signer_01,train,2,0.4389,Insufficient active hand frames (5 < 8) or low quality (0.44 < 0.35),5,signTalk-seq-v1.0.0
+seq_0011,raw_0018,good_signer_03_rep2.mp4,signer_03,train,2,0.4211,Insufficient active hand frames (3 < 8) or low quality (0.42 < 0.35),3,signTalk-seq-v1.0.0
+seq_0017,raw_0027,monday_signer_02_rep1.mp4,signer_02,train,4,0.4,Insufficient active hand frames (0 < 8) or low quality (0.40 < 0.35),0,signTalk-seq-v1.0.0
+seq_0019,raw_0031,car_signer_01_rep1.mp4,signer_01,train,5,0.4633,Insufficient active hand frames (6 < 8) or low quality (0.46 < 0.35),6,signTalk-seq-v1.0.0
+seq_0023,raw_0039,bird_signer_02_rep1.mp4,signer_02,train,6,0.4633,Insufficient active hand frames (6 < 8) or low quality (0.46 < 0.35),6,signTalk-seq-v1.0.0
+seq_0027,raw_0044,house_signer_01_rep2.mp4,signer_01,train,7,0.4356,Insufficient active hand frames (4 < 8) or low quality (0.44 < 0.35),4,signTalk-seq-v1.0.0
+seq_0029,raw_0048,house_signer_03_rep2.mp4,signer_03,train,7,0.4,Insufficient active hand frames (0 < 8) or low quality (0.40 < 0.35),0,signTalk-seq-v1.0.0
+seq_0035,raw_0057,teacher_signer_02_rep1.mp4,signer_02,train,9,0.4356,Insufficient active hand frames (4 < 8) or low quality (0.44 < 0.35),4,signTalk-seq-v1.0.0
+seq_0040,raw_0016,good_signer_02_rep2.mp4,signer_02,val,2,0.4333,Insufficient active hand frames (3 < 8) or low quality (0.43 < 0.35),3,signTalk-seq-v1.0.0
+seq_0042,raw_0029,monday_signer_03_rep1.mp4,signer_03,val,4,0.4,Insufficient active hand frames (0 < 8) or low quality (0.40 < 0.35),0,signTalk-seq-v1.0.0
+seq_0043,raw_0033,car_signer_02_rep1.mp4,signer_02,val,5,0.4456,Insufficient active hand frames (6 < 8) or low quality (0.45 < 0.35),6,signTalk-seq-v1.0.0
+seq_0046,raw_0046,house_signer_02_rep2.mp4,signer_02,val,7,0.4089,Insufficient active hand frames (1 < 8) or low quality (0.41 < 0.35),1,signTalk-seq-v1.0.0
+seq_0048,raw_0059,teacher_signer_03_rep1.mp4,signer_03,val,9,0.4089,Insufficient active hand frames (1 < 8) or low quality (0.41 < 0.35),1,signTalk-seq-v1.0.0
+seq_0053,raw_0025,monday_signer_01_rep1.mp4,signer_01,test,4,0.4,Insufficient active hand frames (0 < 8) or low quality (0.40 < 0.35),0,signTalk-seq-v1.0.0
+seq_0055,raw_0034,car_signer_02_rep2.mp4,signer_02,test,5,0.4544,Insufficient active hand frames (5 < 8) or low quality (0.45 < 0.35),5,signTalk-seq-v1.0.0
+seq_0059,raw_0055,teacher_signer_01_rep1.mp4,signer_01,test,9,0.4089,Insufficient active hand frames (1 < 8) or low quality (0.41 < 0.35),1,signTalk-seq-v1.0.0

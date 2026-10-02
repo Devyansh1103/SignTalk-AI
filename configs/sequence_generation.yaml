@@ -1,0 +1,50 @@
+# SignTalk AI: Sequence Generation Configuration
+# Phase 2 — Part 3: Sequence Dataset Construction & Dataset Finalization
+
+dataset_metadata:
+  dataset_version: "signTalk-seq-v1.0.0"
+  preprocessing_version: "landmarks-v1.0"
+  landmark_schema: "93-node-v1"
+  language: "ISL"
+  num_classes: 10
+
+paths:
+  input_landmarks_dir: "data/processed/landmarks"
+  raw_videos_dir: "data/raw/videos"
+  processed_manifest: "data/metadata/processed_dataset_manifest.csv"
+  raw_manifest: "data/metadata/raw_dataset_manifest.csv"
+  output_sequences_dir: "data/processed/sequences"
+  output_manifest_dir: "data/manifests"
+  label_mapping_path: "data/processed/label_mapping.csv"
+  vocabulary_path: "assets/vocabularies/mvp_10.json"
+  adjacency_path: "assets/graphs/kinematic_adjacency_93.npy"
+
+sequence_parameters:
+  generation_mode: "full_recording"      # Options: 'full_recording' (canonical 1:1) | 'sliding_window'
+  target_sequence_length: 45             # Standardized temporal sequence length (T=45 frames ~ 1.8s)
+  target_fps: 25.0                       # Frame rate
+  min_valid_frames: 8                    # Absolute minimum detected frames required
+  padding_mode: "edge"                   # Options: 'edge' | 'zero' | 'resample'
+  truncation_mode: "center_stroke"       # Options: 'center_stroke' | 'tail_crop'
+
+sliding_window:
+  enabled_for_eval: true                 # Generates auxiliary sliding windows for inference evaluation
+  window_size: 45                        # Temporal window width in frames
+  stride: 5                              # Temporal hop size in frames (~200ms)
+  overlap_ratio: 0.889                   # 40/45 overlap
+  min_frames: 40                         # Minimum unpadded frames required
+
+quality_thresholds:
+  good_min_quality: 0.75
+  acceptable_min_quality: 0.50
+  review_min_quality: 0.35
+  min_pose_detection_rate: 80.0          # Minimum pose tracking rate percentage
+
+filtering_policy:
+  training_filter_rejects: true          # Set true to exclude REJECT status samples during training DataLoader
+  rejection_threshold: 0.35              # Sequences with quality < 0.35 flagged as REJECT
+
+reproducibility:
+  random_seed: 42
+  deterministic: true
+  num_workers: 0                         # Set to 0 for Windows local execution

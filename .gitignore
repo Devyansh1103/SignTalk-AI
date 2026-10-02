@@ -1,0 +1,54 @@
+# SignTalk AI .gitignore
+
+# Python artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+.pytest_cache/
+
+# Environments
+.env
+.venv
+venv/
+ENV/
+
+# Raw video data (Strict privacy rule: NEVER commit raw human signer video)
+data/raw/
+data/raw/*
+data/external/
+
+# Interim video and visual artifacts
+data/interim/landmark_pilot/*.mp4
+data/interim/landmark_pilot/*.gif
+
+# Pre-trained models and heavy weights
+models/mediapipe/*.task
+models/*.onnx
+models/*.pt
+models/*.pth
+
+# IDE and OS
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db

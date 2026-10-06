@@ -13,6 +13,7 @@ from src.realtime.realtime_pipeline import RealtimePipeline
 from src.realtime.realtime_config import RealTimeConfig
 from src.realtime.model_runner import STGCNRunner
 from src.realtime.types import LandmarkFrame, ModalityDetection, QualityReport
+from src.realtime.prediction_history import PredictionRecord
 from src.data.node_schema import TOTAL_NODES, TARGET_SEQUENCE_LENGTH
 
 
@@ -67,19 +68,19 @@ class TestDeterministicPipeline:
                         pred = pipe.model_runner.predict_window(pipe.temporal_buffer.get_window())
                         filtered = pipe.confidence_filter.filter_prediction(pred)
                         pipe.prediction_history.add(
-                            type("Rec", (), {
-                                "timestamp": pred.timestamp,
-                                "window_start": pred.window_start_time,
-                                "window_end": pred.window_end_time,
-                                "class_id": filtered.class_id,
-                                "label": filtered.label,
-                                "gloss": filtered.gloss,
-                                "confidence": filtered.confidence,
-                                "input_quality": filtered.input_quality,
-                                "inference_latency_ms": pred.inference_latency_ms,
-                                "is_valid_quality": pred.is_valid_quality,
-                                "probabilities": pred.probabilities,
-                            })()
+                            PredictionRecord(
+                                timestamp=pred.timestamp,
+                                window_start=pred.window_start_time,
+                                window_end=pred.window_end_time,
+                                class_id=filtered.class_id,
+                                label=filtered.label,
+                                gloss=filtered.gloss,
+                                confidence=filtered.confidence,
+                                input_quality=filtered.input_quality,
+                                inference_latency_ms=pred.inference_latency_ms,
+                                is_valid_quality=pred.is_valid_quality,
+                                probabilities=pred.probabilities,
+                            )
                         )
                         smoothed = pipe.smoother.smooth(pipe.prediction_history)
                         _, evt = pipe.sign_state_machine.process(smoothed)

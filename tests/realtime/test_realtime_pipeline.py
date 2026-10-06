@@ -114,7 +114,7 @@ class TestRealtimePipelineIntegration:
         pipeline.reset()
         assert pipeline.temporal_buffer.length() == 0
         assert pipeline.latest_prediction is None
-        assert pipeline.sign_sequence.count() == 0
+        assert len(pipeline.sign_sequence.get_sequence()) == 0
 
         pipeline.close()
         assert pipeline.state == PipelineState.STOPPED

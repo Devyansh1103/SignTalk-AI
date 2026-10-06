@@ -28,13 +28,43 @@ graph LR
 
 In compliance with academic integrity guidelines, all subsystems, datasets, models, and performance metrics in SignTalk AI are classified under strict operational states:
 
-- **`IMPLEMENTED`**: None in Phase 1 *(Strictly research specification, architecture design, and engineering blueprints)*.
-- **`PLANNED`**: Complete specifications defined for Phase 2 through Phase 10 (MediaPipe extraction, ST-GCN encoder, Transformer decoder, FastAPI backend, React UI).
-- **`PROPOSED`**: Conceptual extensions under empirical evaluation (40-point salient facial marker filtering, adaptive graph adjacency, ONNX runtime quantization).
-- **`FUTURE SCOPE`**: Explicitly excluded from the current academic MVP (bidirectional 3D signing avatars, ASL/BSL translation, native mobile apps, multi-signer conversational tracking).
+- **`IMPLEMENTED`**:
+  - **Phase 1**: Research foundation, architecture design, and academic blueprints.
+  - **Phase 2**: Dataset ingestion, preprocessing, normalization, and MediaPipe landmark extraction.
+  - **Phase 3**: Spatial-Temporal Graph Convolutional Network (ST-GCN) training, validation, and benchmarking.
+  - **Phase 4**: Real-time camera streaming, sliding-window temporal inference, confidence smoothing, duplicate suppression, and bilingual linguistic translation.
+  - **Phase 5**: Web application & user experience (FastAPI WebSocket backend + React 19 / TypeScript / Vite accessible frontend).
+- **`PLANNED`**: Production Docker containerization, mobile responsiveness optimization, and multi-signer benchmark evaluation.
+- **`PROPOSED`**: Adaptive graph adjacency, ONNX runtime quantization, and continuous sentence CTC decoders.
+- **`FUTURE SCOPE`**: Unrestricted full-vocabulary ISL, 3D signing avatars, native mobile apps, and multi-signer conversational tracking.
 
 > [!IMPORTANT]
-> **Academic Integrity Commitment:** No accuracy figures, latency values, dataset sizes, or competitor capabilities are fabricated. All claims are grounded in peer-reviewed literature, verified dataset manifests, and reproducible benchmarks.
+> **Academic Integrity Commitment:** The current certified model (`SignTalk_STGCN_v1`) operates on the **MVP-10** sign vocabulary (`hello`, `thankyou`, `good`, `happy`, `monday`, `car`, `bird`, `house`, `time`, `teacher`). The system does not claim unrestricted conversational ISL translation. All latency benchmarks and accuracy metrics are reproducible on host CPU.
+
+---
+
+## 3. Quickstart: Running the Web Application (Phase 5)
+
+### Step 1: Start the FastAPI Backend Server
+In a terminal, start the Uvicorn server:
+```powershell
+uvicorn backend.app.main:app --host 0.0.0.0 --port 8000 --reload
+```
+Verify the server is running by checking `http://localhost:8000/health`.
+
+### Step 2: Start the React Frontend Application
+In a separate terminal, launch the Vite development server:
+```powershell
+cd frontend
+npm run dev
+```
+Open `http://localhost:5173` in your browser.
+
+### Step 3: Interactive Signing
+- Allow webcam permissions when prompted.
+- Position your body within the camera guide boundary.
+- Perform any of the 10 supported signs; observe real-time predictions, bilingual captions (English + Hindi), and developer telemetry.
+- Use keyboard shortcuts: `Space` (Start/Pause), `R` (Reset), `S` (Developer HUD).
 
 ---
 

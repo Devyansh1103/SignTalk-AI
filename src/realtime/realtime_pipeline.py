@@ -42,6 +42,7 @@ from typing import Optional, List, Dict, Any, Callable, Tuple, Union
 from dataclasses import dataclass, field
 import cv2
 import numpy as np
+import torch
 
 from src.realtime.types import (
     FramePacket,
@@ -537,7 +538,10 @@ class RealtimePipeline:
 
         # Base skeleton rendering from LandmarkStream
         lf = out.landmark_frame if out else None
-        canvas = self.landmark_stream.render_debug_overlay(bgr_image, lf, self._fps_estimate)
+        if lf is not None:
+            canvas = self.landmark_stream.render_debug_overlay(bgr_image, lf, self._fps_estimate)
+        else:
+            canvas = bgr_image.copy()
         h, w = canvas.shape[:2]
 
         # 1. Temporal Buffer Bar (Bottom-Left)

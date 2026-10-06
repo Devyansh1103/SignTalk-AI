@@ -49,17 +49,15 @@ class TestRealTimeTranslator:
 
     def test_low_confidence_sign_rejection(self):
         translator = RealTimeTranslator(min_confidence=0.60)
-        evt = SignEvent(
-            event_id="evt_01",
+        evt = SignEvent.create(
             class_id=0,
             label="hello",
-            gloss="HELLO",
             start_time=1.0,
             end_time=2.0,
-            duration_ms=1000.0,
             confidence=0.45,  # Sub-threshold
             input_quality=0.85,
-            stability_score=0.80
+            stability_score=0.80,
+            event_id="evt_01"
         )
         res = translator.process_event(evt)
         assert res.status == "LOW_CONFIDENCE"
@@ -67,8 +65,8 @@ class TestRealTimeTranslator:
 
     def test_pause_sentence_finalization(self):
         translator = RealTimeTranslator(pause_threshold_sec=1.0)
-        evt1 = SignEvent("evt_01", 0, "hello", "HELLO", 1.0, 1.8, 800.0, 0.90, 0.90, 0.85)
-        evt2 = SignEvent("evt_02", 9, "teacher", "TEACHER", 2.2, 3.0, 800.0, 0.92, 0.92, 0.90)
+        evt1 = SignEvent.create(class_id=0, label="hello", start_time=1.0, end_time=1.8, confidence=0.90, input_quality=0.90, stability_score=0.85, event_id="evt_01")
+        evt2 = SignEvent.create(class_id=9, label="teacher", start_time=2.2, end_time=3.0, confidence=0.92, input_quality=0.92, stability_score=0.90, event_id="evt_02")
 
         r1 = translator.process_event(evt1)
         assert r1.is_final is False
@@ -91,7 +89,7 @@ class TestRealTimeTranslator:
 
     def test_reset_behavior(self):
         translator = RealTimeTranslator()
-        evt = SignEvent("evt_01", 0, "hello", "HELLO", 1.0, 1.8, 800.0, 0.90, 0.90, 0.85)
+        evt = SignEvent.create(class_id=0, label="hello", start_time=1.0, end_time=1.8, confidence=0.90, input_quality=0.90, stability_score=0.85, event_id="evt_01")
         translator.process_event(evt)
         translator.finalize_phrase()
         assert len(translator.finalized_phrases) == 1

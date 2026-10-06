@@ -102,3 +102,56 @@ inference:
   predictions_csv: "results/realtime/predictions.csv"
   verbose_console: false
 
+# ==============================================================================
+# Phase 4 Part 3 — Confidence, Smoothing & Continuous Sign Detection
+# ==============================================================================
+
+confidence:
+  threshold: 0.65          # Empirically selected from validation set threshold evaluation
+  source: "validation"
+  uncertain_label: "UNCERTAIN"
+
+smoothing:
+  method: "majority_vote"  # Options: "majority_vote", "confidence_weighted", "temporal_stability"
+  history_size: 5          # History depth (5 predictions = 1.0s window buffer)
+  min_votes: 3             # Quorum for majority consensus
+  decay_factor: 0.85       # For confidence_weighted smoothing
+  min_consecutive: 2       # For temporal_stability smoothing
+
+stability:
+  min_consecutive_predictions: 2  # Transitions CANDIDATE -> ACTIVE
+  min_confidence: 0.65
+  min_input_quality: 0.40
+
+events:
+  minimum_gap_ms: 800.0    # Minimum temporal separation between distinct repetitions
+  unknown_timeout_ms: 1000.0 # Duration of uncertainty before resetting to IDLE
+  log_events: false        # Default disabled; enable for logging events to CSV
+  events_csv: "results/realtime/events.csv"
+
+sequence:
+  max_events: 50           # Maximum discrete sign events retained in continuous buffer
+
+# ==============================================================================
+# Phase 4 Part 4 — End-to-End Real-Time Pipeline & Translation Layer
+# ==============================================================================
+
+translation:
+  enabled: true
+  mode: "gloss_to_text"    # "gloss_to_text" (linguistic templates/lexicon) or "visual_transformer"
+  pause_threshold_sec: 1.5 # Temporal silence required to commit phrase to transcript
+  min_confidence: 0.50     # Gating threshold for sign tokens in translation
+  max_phrase_signs: 10     # Max signs per utterance before auto-committing
+  transformer_checkpoint: "experiments/transformer/checkpoints/best_checkpoint.pt"
+
+performance:
+  profiling_enabled: true  # Enables microsecond stage latency profiling
+  history_size: 500        # Rolling history depth for percentile calculations
+  benchmark_runs: 100      # Sample size for official benchmarking suite
+
+pipeline:
+  mode: "debug"            # "debug" (full HUD), "benchmark" (low overhead), "production"
+  enable_overlay: true     # Display graphical diagnostic canvas
+  enable_translation: true # Dispatch linguistic translation on finalized events
+
+

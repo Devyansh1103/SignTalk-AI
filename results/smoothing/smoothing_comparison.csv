@@ -1,0 +1,6 @@
+method,accuracy,flip_rate,stability_mean_s,stability_max_s,mean_processing_latency_ms,p95_processing_latency_ms,duplicate_rate,emitted_events,false_events
+Raw Predictions,0.75,0.0,0.873,1.6,0.001,0.001,0.0,-,-
+"Majority Vote (N=5, K=3)",0.5417,0.0,1.067,1.6,0.134,0.377,0.0,-,-
+Confidence Weighted (N=5),0.6042,0.0,1.067,1.4,0.085,0.17,0.0,-,-
+Temporal Stability (K=2),0.5833,0.0,0.505,1.4,0.051,0.085,0.0,-,-
+Full Pipeline (MV+FSM+Dedup),0.5417,0.0,1.067,1.6,0.114,0.196,0.0,9,0

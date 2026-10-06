@@ -41,6 +41,19 @@ from src.realtime.prediction_sink import (
     PredictionLoggerSink,
     CompositePredictionSink
 )
+from src.realtime.confidence_filter import ConfidenceFilter, FilteredPrediction
+from src.realtime.prediction_history import PredictionHistory, PredictionRecord
+from src.realtime.smoothing import (
+    BaseSmoother,
+    MajorityVoteSmoother,
+    ConfidenceWeightedSmoother,
+    TemporalStabilitySmoother,
+    SmoothedPrediction
+)
+from src.realtime.sign_state_machine import SignStateMachine, SignState
+from src.realtime.event_deduplicator import EventDeduplicator
+from src.realtime.sign_event import SignEvent
+from src.realtime.sign_sequence import SignSequenceBuffer
 
 logger = logging.getLogger("SignTalk.RealTime.Predictor")
 
@@ -49,7 +62,8 @@ class RealTimeSignPredictor:
     """
     Top-level real-time sliding-window sign language predictor.
     Coordinates camera acquisition, landmark streaming, temporal buffering,
-    ST-GCN inference scheduling, and prediction publishing.
+    ST-GCN inference scheduling, confidence filtering, temporal smoothing,
+    state machine tracking, duplicate suppression, and sign sequence buffering.
     """
 
     def __init__(
@@ -104,13 +118,54 @@ class RealTimeSignPredictor:
                     PredictionLoggerSink(output_path=inf_cfg.predictions_csv)
                 )
 
+        # 6. Phase 4 Part 3: Confidence Filtering, Smoothing, State Machine, & Sequence
+        self.confidence_filter = ConfidenceFilter(
+            threshold=self.config.confidence.threshold,
+            uncertain_label=self.config.confidence.uncertain_label,
+        )
+        self.prediction_history = PredictionHistory(
+            max_history=max(20, self.config.smoothing.history_size * 4)
+        )
+
+        sm_cfg = self.config.smoothing
+        if sm_cfg.method == "confidence_weighted":
+            self.smoother: BaseSmoother = ConfidenceWeightedSmoother(
+                history_size=sm_cfg.history_size,
+                decay_factor=sm_cfg.decay_factor,
+            )
+        elif sm_cfg.method == "temporal_stability":
+            self.smoother = TemporalStabilitySmoother(
+                min_consecutive=sm_cfg.min_consecutive,
+            )
+        else:
+            self.smoother = MajorityVoteSmoother(
+                history_size=sm_cfg.history_size,
+                min_votes=sm_cfg.min_votes,
+            )
+
+        self.sign_state_machine = SignStateMachine(
+            min_consecutive_predictions=self.config.stability.min_consecutive_predictions,
+            min_confidence=self.config.stability.min_confidence,
+            min_input_quality=self.config.stability.min_input_quality,
+        )
+        self.event_deduplicator = EventDeduplicator(
+            minimum_gap_ms=self.config.events.minimum_gap_ms
+        )
+        self.sign_sequence = SignSequenceBuffer(
+            max_events=self.config.sequence.max_events
+        )
+
         # Runtime State
         self.latest_prediction: Optional[PredictionResult] = None
+        self.latest_filtered: Optional[FilteredPrediction] = None
+        self.latest_smoothed: Optional[SmoothedPrediction] = None
+        self.latest_event: Optional[SignEvent] = None
         self._prediction_history: List[PredictionResult] = []
         self._inference_latencies_ms: List[float] = []
         self._total_predictions = 0
         self._last_inference_time = 0.0
         self._prediction_fps = 0.0
+
 
     def add_sink(self, sink: BasePredictionSink) -> None:
         """Registers an additional prediction sink."""
@@ -167,6 +222,43 @@ class RealTimeSignPredictor:
         self._inference_latencies_ms.append(prediction.inference_latency_ms)
         self._total_predictions += 1
 
+        # Phase 4 Part 3: Confidence Filtering
+        filtered = self.confidence_filter.filter_prediction(prediction)
+        self.latest_filtered = filtered
+
+        # Prediction History
+        record = PredictionRecord(
+            timestamp=prediction.timestamp,
+            window_start=prediction.window_start_time,
+            window_end=prediction.window_end_time,
+            class_id=filtered.class_id,
+            label=filtered.label,
+            gloss=filtered.gloss,
+            confidence=filtered.confidence,
+            input_quality=filtered.input_quality,
+            inference_latency_ms=prediction.inference_latency_ms,
+            is_valid_quality=prediction.is_valid_quality,
+            probabilities=prediction.probabilities,
+        )
+        self.prediction_history.add(record)
+
+
+        # Temporal Smoothing
+        smoothed = self.smoother.smooth(self.prediction_history)
+        self.latest_smoothed = smoothed
+
+        # Stability State Machine
+        _, completed_event = self.sign_state_machine.process(smoothed)
+
+        # Duplicate Suppression & Sign Sequence Buffer
+        if completed_event is not None:
+            deduped = self.event_deduplicator.process(completed_event)
+            if deduped is not None:
+                self.sign_sequence.append_event(deduped)
+                self.latest_event = deduped
+                if self.config.events.log_events:
+                    self.sign_sequence.save_to_csv(self.config.events.events_csv)
+
         # Publish to sinks
         self.composite_sink.publish(prediction)
 
@@ -180,7 +272,7 @@ class RealTimeSignPredictor:
     ) -> np.ndarray:
         """
         Renders landmark skeleton, tracking status, temporal buffer progress,
-        and current model prediction onto the display frame.
+        raw prediction, smoothed prediction, state, and continuous sign sequence.
         """
         # 1. First render base skeletal & landmark tracking overlay
         canvas = self.landmark_stream.render_debug_overlay(bgr_image, landmark_frame, fps_display)
@@ -211,14 +303,14 @@ class RealTimeSignPredictor:
         cv2.putText(canvas, pred_fps_text, (bar_x + bar_w + 10, bar_y + 14), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (180, 180, 180), 1, cv2.LINE_AA)
 
         # 3. Render Prediction HUD Panel (Top-Right)
-        panel_w = 340
-        panel_h = 165
+        panel_w = 370
+        panel_h = 220
         panel_x = max(10, w - panel_w - 15)
         panel_y = 10
 
         overlay = canvas.copy()
         cv2.rectangle(overlay, (panel_x, panel_y), (panel_x + panel_w, panel_y + panel_h), (25, 25, 25), -1)
-        cv2.addWeighted(overlay, 0.80, canvas, 0.20, 0, canvas)
+        cv2.addWeighted(overlay, 0.85, canvas, 0.15, 0, canvas)
         cv2.rectangle(canvas, (panel_x, panel_y), (panel_x + panel_w, panel_y + panel_h), (90, 90, 90), 1)
 
         pred = self.latest_prediction
@@ -235,7 +327,7 @@ class RealTimeSignPredictor:
             cv2.putText(
                 canvas,
                 f"ST-GCN INFERENCE ({pred.device.upper()})",
-                (panel_x + 12, panel_y + 22),
+                (panel_x + 12, panel_y + 20),
                 cv2.FONT_HERSHEY_SIMPLEX,
                 0.45,
                 (180, 180, 180),
@@ -243,34 +335,35 @@ class RealTimeSignPredictor:
                 cv2.LINE_AA
             )
 
-            # Main Prediction Label
-            pred_text = f"{pred.label.upper()}"
-            cv2.putText(
-                canvas,
-                pred_text,
-                (panel_x + 12, panel_y + 55),
-                cv2.FONT_HERSHEY_SIMPLEX,
-                0.95,
-                conf_color,
-                2,
-                cv2.LINE_AA
-            )
+            # Raw prediction line
+            raw_text = f"Raw: {pred.label.upper()} ({pred.confidence:.1%})"
+            cv2.putText(canvas, raw_text, (panel_x + 12, panel_y + 44), cv2.FONT_HERSHEY_SIMPLEX, 0.55, conf_color, 1, cv2.LINE_AA)
 
-            # Confidence & Latency
-            conf_lat_str = f"Conf: {pred.confidence:.1%} | Latency: {pred.inference_latency_ms:.1f}ms"
-            cv2.putText(
-                canvas,
-                conf_lat_str,
-                (panel_x + 12, panel_y + 80),
-                cv2.FONT_HERSHEY_SIMPLEX,
-                0.48,
-                (240, 240, 240),
-                1,
-                cv2.LINE_AA
-            )
+            # Smoothed prediction line
+            sm_lbl = self.latest_smoothed.label.upper() if self.latest_smoothed else "(NONE)"
+            sm_text = f"Smoothed: {sm_lbl}"
+            cv2.putText(canvas, sm_text, (panel_x + 12, panel_y + 68), cv2.FONT_HERSHEY_SIMPLEX, 0.55, (255, 255, 255), 2, cv2.LINE_AA)
+
+            # State & Quality
+            curr_state = self.sign_state_machine.state.value
+            state_color = (0, 255, 0) if curr_state == "ACTIVE" else (0, 200, 255) if curr_state == "CANDIDATE" else (180, 180, 180)
+            cv2.putText(canvas, f"State: {curr_state}", (panel_x + 12, panel_y + 92), cv2.FONT_HERSHEY_SIMPLEX, 0.48, state_color, 1, cv2.LINE_AA)
+
+            q_score = pred.input_quality
+            cv2.putText(canvas, f"Quality: {q_score:.2f}", (panel_x + 180, panel_y + 92), cv2.FONT_HERSHEY_SIMPLEX, 0.48, (200, 200, 200), 1, cv2.LINE_AA)
+
+            # Latest Event
+            evt_lbl = self.latest_event.label.upper() if self.latest_event else "(NONE)"
+            cv2.putText(canvas, f"Event: {evt_lbl}", (panel_x + 12, panel_y + 116), cv2.FONT_HERSHEY_SIMPLEX, 0.50, (255, 200, 50), 1, cv2.LINE_AA)
+
+            # Sequence (glosses)
+            seq_str = self.sign_sequence.format_gloss_string()
+            if len(seq_str) > 28:
+                seq_str = "..." + seq_str[-25:]
+            cv2.putText(canvas, f"Seq: {seq_str}", (panel_x + 12, panel_y + 140), cv2.FONT_HERSHEY_SIMPLEX, 0.48, (0, 255, 255), 1, cv2.LINE_AA)
 
             # Top-3 predictions breakdown
-            top_y = panel_y + 104
+            top_y = panel_y + 162
             for rank, (cid, lbl, prob) in enumerate(pred.top_k[:3], 1):
                 top_line = f"#{rank} {lbl.upper():<10} {prob:.1%}"
                 cv2.putText(
@@ -278,12 +371,13 @@ class RealTimeSignPredictor:
                     top_line,
                     (panel_x + 15, top_y),
                     cv2.FONT_HERSHEY_SIMPLEX,
-                    0.42,
+                    0.40,
                     (200, 200, 200) if rank > 1 else conf_color,
                     1,
                     cv2.LINE_AA
                 )
                 top_y += 18
+
 
         else:
             # Buffer warming / Waiting state

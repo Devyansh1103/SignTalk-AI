@@ -127,6 +127,66 @@ class InferenceConfig:
 
 
 @dataclass
+class ConfidenceFilterConfig:
+    threshold: float = 0.65
+    source: str = "validation"
+    uncertain_label: str = "UNCERTAIN"
+
+
+@dataclass
+class SmoothingConfig:
+    method: str = "majority_vote"
+    history_size: int = 5
+    min_votes: int = 3
+    decay_factor: float = 0.85
+    min_consecutive: int = 2
+
+
+@dataclass
+class StabilityConfig:
+    min_consecutive_predictions: int = 2
+    min_confidence: float = 0.65
+    min_input_quality: float = 0.40
+
+
+@dataclass
+class EventsConfig:
+    minimum_gap_ms: float = 800.0
+    unknown_timeout_ms: float = 1000.0
+    log_events: bool = False
+    events_csv: str = "results/realtime/events.csv"
+
+
+@dataclass
+class SequenceConfig:
+    max_events: int = 50
+
+
+@dataclass
+class TranslationConfig:
+    enabled: bool = True
+    mode: str = "gloss_to_text"  # "gloss_to_text" or "visual_transformer"
+    pause_threshold_sec: float = 1.5
+    min_confidence: float = 0.50
+    max_phrase_signs: int = 10
+    transformer_checkpoint: str = "experiments/transformer/checkpoints/best_checkpoint.pt"
+
+
+@dataclass
+class PerformanceConfig:
+    profiling_enabled: bool = True
+    history_size: int = 500
+    benchmark_runs: int = 100
+
+
+@dataclass
+class PipelineConfig:
+    mode: str = "debug"  # "debug", "benchmark", "production"
+    enable_overlay: bool = True
+    enable_translation: bool = True
+
+
+@dataclass
 class RealTimeConfig:
     camera: CameraConfig = field(default_factory=CameraConfig)
     processing: ProcessingConfig = field(default_factory=ProcessingConfig)
@@ -139,6 +199,14 @@ class RealTimeConfig:
     buffer: TemporalBufferConfig = field(default_factory=TemporalBufferConfig)
     scheduler: SchedulerConfig = field(default_factory=SchedulerConfig)
     inference: InferenceConfig = field(default_factory=InferenceConfig)
+    confidence: ConfidenceFilterConfig = field(default_factory=ConfidenceFilterConfig)
+    smoothing: SmoothingConfig = field(default_factory=SmoothingConfig)
+    stability: StabilityConfig = field(default_factory=StabilityConfig)
+    events: EventsConfig = field(default_factory=EventsConfig)
+    sequence: SequenceConfig = field(default_factory=SequenceConfig)
+    translation: TranslationConfig = field(default_factory=TranslationConfig)
+    performance: PerformanceConfig = field(default_factory=PerformanceConfig)
+    pipeline: PipelineConfig = field(default_factory=PipelineConfig)
 
     @classmethod
     def from_yaml(cls, yaml_path: str = "configs/realtime.yaml") -> "RealTimeConfig":
@@ -271,4 +339,73 @@ class RealTimeConfig:
                 verbose_console=bool(inf.get("verbose_console", cfg.inference.verbose_console))
             )
 
+        if "confidence" in raw:
+            conf = raw["confidence"]
+            cfg.confidence = ConfidenceFilterConfig(
+                threshold=float(conf.get("threshold", cfg.confidence.threshold)),
+                source=str(conf.get("source", cfg.confidence.source)),
+                uncertain_label=str(conf.get("uncertain_label", cfg.confidence.uncertain_label)),
+            )
+
+        if "smoothing" in raw:
+            sm = raw["smoothing"]
+            cfg.smoothing = SmoothingConfig(
+                method=str(sm.get("method", cfg.smoothing.method)),
+                history_size=int(sm.get("history_size", cfg.smoothing.history_size)),
+                min_votes=int(sm.get("min_votes", cfg.smoothing.min_votes)),
+                decay_factor=float(sm.get("decay_factor", cfg.smoothing.decay_factor)),
+                min_consecutive=int(sm.get("min_consecutive", cfg.smoothing.min_consecutive)),
+            )
+
+        if "stability" in raw:
+            st = raw["stability"]
+            cfg.stability = StabilityConfig(
+                min_consecutive_predictions=int(st.get("min_consecutive_predictions", cfg.stability.min_consecutive_predictions)),
+                min_confidence=float(st.get("min_confidence", cfg.stability.min_confidence)),
+                min_input_quality=float(st.get("min_input_quality", cfg.stability.min_input_quality)),
+            )
+
+        if "events" in raw:
+            ev = raw["events"]
+            cfg.events = EventsConfig(
+                minimum_gap_ms=float(ev.get("minimum_gap_ms", cfg.events.minimum_gap_ms)),
+                unknown_timeout_ms=float(ev.get("unknown_timeout_ms", cfg.events.unknown_timeout_ms)),
+                log_events=bool(ev.get("log_events", cfg.events.log_events)),
+                events_csv=str(ev.get("events_csv", cfg.events.events_csv)),
+            )
+
+        if "sequence" in raw:
+            sq = raw["sequence"]
+            cfg.sequence = SequenceConfig(
+                max_events=int(sq.get("max_events", cfg.sequence.max_events)),
+            )
+
+        if "translation" in raw:
+            tr = raw["translation"]
+            cfg.translation = TranslationConfig(
+                enabled=bool(tr.get("enabled", cfg.translation.enabled)),
+                mode=str(tr.get("mode", cfg.translation.mode)),
+                pause_threshold_sec=float(tr.get("pause_threshold_sec", cfg.translation.pause_threshold_sec)),
+                min_confidence=float(tr.get("min_confidence", cfg.translation.min_confidence)),
+                max_phrase_signs=int(tr.get("max_phrase_signs", cfg.translation.max_phrase_signs)),
+                transformer_checkpoint=str(tr.get("transformer_checkpoint", cfg.translation.transformer_checkpoint)),
+            )
+
+        if "performance" in raw:
+            perf = raw["performance"]
+            cfg.performance = PerformanceConfig(
+                profiling_enabled=bool(perf.get("profiling_enabled", cfg.performance.profiling_enabled)),
+                history_size=int(perf.get("history_size", cfg.performance.history_size)),
+                benchmark_runs=int(perf.get("benchmark_runs", cfg.performance.benchmark_runs)),
+            )
+
+        if "pipeline" in raw:
+            pip = raw["pipeline"]
+            cfg.pipeline = PipelineConfig(
+                mode=str(pip.get("mode", cfg.pipeline.mode)),
+                enable_overlay=bool(pip.get("enable_overlay", cfg.pipeline.enable_overlay)),
+                enable_translation=bool(pip.get("enable_translation", cfg.pipeline.enable_translation)),
+            )
+
         return cfg
+

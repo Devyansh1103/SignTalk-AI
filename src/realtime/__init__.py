@@ -49,6 +49,30 @@ from src.realtime.prediction_sink import (
 )
 from src.realtime.realtime_predictor import RealTimeSignPredictor
 
+from src.realtime.prediction_history import PredictionRecord, PredictionHistory
+from src.realtime.confidence_filter import FilteredPrediction, ConfidenceFilter
+from src.realtime.smoothing import (
+    BaseSmoother,
+    SmoothedPrediction,
+    MajorityVoteSmoother,
+    ConfidenceWeightedSmoother,
+    TemporalStabilitySmoother,
+)
+from src.realtime.sign_event import SignEvent
+from src.realtime.sign_state_machine import SignState, SignStateMachine
+from src.realtime.event_deduplicator import EventDeduplicator
+from src.realtime.sign_sequence import SignSequenceBuffer
+from src.realtime.temporal_metrics import (
+    compute_prediction_flip_rate,
+    compute_stability_durations,
+    compute_duplicate_rate,
+    compute_event_detection_latency,
+    evaluate_temporal_pipeline,
+)
+from src.realtime.performance import PerformanceProfiler, StageTimer
+from src.realtime.translator import RealTimeTranslator, TranslationResult
+from src.realtime.realtime_pipeline import RealtimePipeline, PipelineOutput, PipelineState
+
 __all__ = [
     # Types
     "FramePacket",
@@ -90,5 +114,37 @@ __all__ = [
     "CallbackPredictionSink",
     "CompositePredictionSink",
     # Pipeline Coordinator
-    "RealTimeSignPredictor"
+    "RealTimeSignPredictor",
+    # Confidence & History
+    "PredictionRecord",
+    "PredictionHistory",
+    "FilteredPrediction",
+    "ConfidenceFilter",
+    # Smoothing
+    "BaseSmoother",
+    "SmoothedPrediction",
+    "MajorityVoteSmoother",
+    "ConfidenceWeightedSmoother",
+    "TemporalStabilitySmoother",
+    # Events & Sequence
+    "SignEvent",
+    "SignState",
+    "SignStateMachine",
+    "EventDeduplicator",
+    "SignSequenceBuffer",
+    # Metrics
+    "compute_prediction_flip_rate",
+    "compute_stability_durations",
+    "compute_duplicate_rate",
+    "compute_event_detection_latency",
+    "evaluate_temporal_pipeline",
+    # Phase 4 Part 4 - End-to-End Orchestration, Translation & Profiling
+    "PerformanceProfiler",
+    "StageTimer",
+    "RealTimeTranslator",
+    "TranslationResult",
+    "RealtimePipeline",
+    "PipelineOutput",
+    "PipelineState",
 ]
+

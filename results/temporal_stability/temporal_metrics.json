@@ -1,0 +1,23 @@
+{
+  "flip_rate": {
+    "raw": 0.0,
+    "smoothed": 0.0,
+    "flip_reduction_percent": 0.0
+  },
+  "duplicate_rate": 0.0,
+  "total_candidates": 9,
+  "emitted_events_count": 9,
+  "stability_duration_s": {
+    "mean_s": 1.0667,
+    "median_s": 1.2,
+    "max_s": 1.6,
+    "min_s": 0.8
+  },
+  "event_latency_ms": {
+    "mean_ms": 3244.44,
+    "median_ms": 3200.0,
+    "p95_ms": 3680.0,
+    "max_ms": 4000.0
+  },
+  "formal_evaluation_note": "Formal event-level evaluation (precision, recall, F1 against continuous ground truth) is not currently supported by the available annotations because the dataset contains isolated sign sequences."
+}

@@ -281,6 +281,8 @@ class Camera:
         else:
             return self._grab_frame_internal()
 
+    read_frame = read
+
     def is_running(self) -> bool:
         """Checks if camera is actively capturing."""
         return self._is_running

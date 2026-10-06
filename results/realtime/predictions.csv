@@ -1,0 +1,2 @@
+timestamp,window_start,window_end,prediction,class_id,confidence,input_quality,inference_latency_ms,buffer_length,device
+1791296758.1134,305736.4033,305741.9662,thankyou,1,0.4007,0.6775,118.60,45,cpu

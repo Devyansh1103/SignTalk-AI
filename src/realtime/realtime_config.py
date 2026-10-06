@@ -101,6 +101,32 @@ class DebugConfig:
 
 
 @dataclass
+class TemporalBufferConfig:
+    max_length: int = 45
+    min_valid_frames: int = 15
+    interpolate_missing_frames: bool = True
+    max_consecutive_interpolated: int = 10
+
+
+@dataclass
+class SchedulerConfig:
+    stride: int = 5
+    drop_stale_windows: bool = True
+
+
+@dataclass
+class InferenceConfig:
+    enabled: bool = True
+    checkpoint_path: str = "experiments/stgcn/checkpoints/best_checkpoint.pt"
+    device: str = "auto"
+    top_k: int = 3
+    warmup_iterations: int = 5
+    record_predictions: bool = False
+    predictions_csv: str = "results/realtime/predictions.csv"
+    verbose_console: bool = False
+
+
+@dataclass
 class RealTimeConfig:
     camera: CameraConfig = field(default_factory=CameraConfig)
     processing: ProcessingConfig = field(default_factory=ProcessingConfig)
@@ -110,6 +136,9 @@ class RealTimeConfig:
     stream: StreamConfig = field(default_factory=StreamConfig)
     runtime: RuntimeConfig = field(default_factory=RuntimeConfig)
     debug: DebugConfig = field(default_factory=DebugConfig)
+    buffer: TemporalBufferConfig = field(default_factory=TemporalBufferConfig)
+    scheduler: SchedulerConfig = field(default_factory=SchedulerConfig)
+    inference: InferenceConfig = field(default_factory=InferenceConfig)
 
     @classmethod
     def from_yaml(cls, yaml_path: str = "configs/realtime.yaml") -> "RealTimeConfig":
@@ -211,6 +240,35 @@ class RealTimeConfig:
                 record_landmarks=bool(d.get("record_landmarks", cfg.debug.record_landmarks)),
                 record_video=bool(d.get("record_video", cfg.debug.record_video)),
                 record_dir=str(d.get("record_dir", cfg.debug.record_dir))
+            )
+
+        if "buffer" in raw:
+            b = raw["buffer"]
+            cfg.buffer = TemporalBufferConfig(
+                max_length=int(b.get("max_length", cfg.buffer.max_length)),
+                min_valid_frames=int(b.get("min_valid_frames", cfg.buffer.min_valid_frames)),
+                interpolate_missing_frames=bool(b.get("interpolate_missing_frames", cfg.buffer.interpolate_missing_frames)),
+                max_consecutive_interpolated=int(b.get("max_consecutive_interpolated", cfg.buffer.max_consecutive_interpolated))
+            )
+
+        if "scheduler" in raw:
+            sc = raw["scheduler"]
+            cfg.scheduler = SchedulerConfig(
+                stride=int(sc.get("stride", cfg.scheduler.stride)),
+                drop_stale_windows=bool(sc.get("drop_stale_windows", cfg.scheduler.drop_stale_windows))
+            )
+
+        if "inference" in raw:
+            inf = raw["inference"]
+            cfg.inference = InferenceConfig(
+                enabled=bool(inf.get("enabled", cfg.inference.enabled)),
+                checkpoint_path=str(inf.get("checkpoint_path", cfg.inference.checkpoint_path)),
+                device=str(inf.get("device", cfg.inference.device)),
+                top_k=int(inf.get("top_k", cfg.inference.top_k)),
+                warmup_iterations=int(inf.get("warmup_iterations", cfg.inference.warmup_iterations)),
+                record_predictions=bool(inf.get("record_predictions", cfg.inference.record_predictions)),
+                predictions_csv=str(inf.get("predictions_csv", cfg.inference.predictions_csv)),
+                verbose_console=bool(inf.get("verbose_console", cfg.inference.verbose_console))
             )
 
         return cfg

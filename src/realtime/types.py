@@ -145,3 +145,55 @@ class StreamMetrics:
     p95_total_latency_ms: float = 0.0
     max_total_latency_ms: float = 0.0
     valid_frame_ratio: float = 0.0
+
+
+@dataclass
+class PredictionResult:
+    """
+    Structured sign classification prediction emitted from a sliding temporal window.
+    """
+    class_id: int
+    label: str
+    gloss: str
+    translation: str
+    confidence: float
+    probabilities: np.ndarray               # Full probability distribution [num_classes]
+    logits: np.ndarray                      # Raw unnormalized model logits [num_classes]
+    top_k: List[Tuple[int, str, float]]     # List of (class_id, label, probability)
+    timestamp: float                        # Prediction timestamp
+    window_start_time: float                # Timestamp of earliest frame in window
+    window_end_time: float                  # Timestamp of latest frame in window
+    window_frame_count: int                 # Number of frames in window (e.g. 45)
+    inference_start_time: float             # When model forward pass started
+    inference_end_time: float               # When model forward pass completed
+    inference_latency_ms: float             # ST-GCN inference computation time
+    input_quality: float                    # Mean landmark quality score across window
+    is_valid_quality: bool                  # Whether window satisfies quality gate
+    buffer_length: int                      # Current buffer length when inference ran
+    device: str                             # Device used for inference ('cpu', 'cuda')
+
+    def to_dict(self) -> Dict[str, Any]:
+        """Serializes prediction result into dictionary representation."""
+        return {
+            "class_id": self.class_id,
+            "label": self.label,
+            "gloss": self.gloss,
+            "translation": self.translation,
+            "confidence": round(float(self.confidence), 4),
+            "top_k": [(cid, lbl, round(float(p), 4)) for cid, lbl, p in self.top_k],
+            "timestamp": round(self.timestamp, 4),
+            "window_duration_s": round(self.window_end_time - self.window_start_time, 3),
+            "inference_latency_ms": round(self.inference_latency_ms, 2),
+            "input_quality": round(self.input_quality, 4),
+            "is_valid_quality": self.is_valid_quality,
+            "device": self.device
+        }
+
+    def format_console(self) -> str:
+        """Formatted single-line string for console logging."""
+        top_str = " | ".join([f"{lbl}: {p:.1%}" for _, lbl, p in self.top_k])
+        return (
+            f"Prediction: {self.label.upper()} ({self.confidence:.1%}) | "
+            f"Latency: {self.inference_latency_ms:.1f}ms | Top-3: [{top_str}]"
+        )
+

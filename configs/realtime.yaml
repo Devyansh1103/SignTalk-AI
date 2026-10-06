@@ -81,3 +81,24 @@ debug:
   record_landmarks: false  # Privacy-first default: Never record without explicit opt-in
   record_video: false      # Privacy-first default: Never store raw video frames
   record_dir: "experiments/realtime_debug"
+
+buffer:
+  max_length: 45           # Fixed temporal window size matching ST-GCN training (45 frames @ 25 FPS = 1.8s)
+  min_valid_frames: 15     # Minimum valid frames for window quality gate
+  interpolate_missing_frames: true
+  max_consecutive_interpolated: 10
+
+scheduler:
+  stride: 5                # Slide stride: trigger inference every 5 new frames (200ms update cadence @ 25 FPS)
+  drop_stale_windows: true # Discard queued windows if ST-GCN is currently processing
+
+inference:
+  enabled: true
+  checkpoint_path: "experiments/stgcn/checkpoints/best_checkpoint.pt"
+  device: "auto"           # "auto", "cpu", or "cuda"
+  top_k: 3                 # Top-K prediction ranks
+  warmup_iterations: 5     # Warm-up cycles before measurement
+  record_predictions: false # Whether to record predictions to CSV
+  predictions_csv: "results/realtime/predictions.csv"
+  verbose_console: false
+

@@ -1,0 +1,63 @@
+# ==============================================================================
+# SignTalk AI — Spatial-Temporal Graph Convolutional Network (ST-GCN) Config
+# ==============================================================================
+
+experiment_name: "stgcn_v1"
+seed: 42
+device: "auto"
+
+dataset:
+  version: "signTalk-seq-v1.0.0"
+  num_classes: 10
+  sequence_length: 45
+  num_nodes: 93
+  in_channels: 3
+  include_velocity: false
+  filter_rejects_train: false
+  filter_rejects_val: false
+  augment_train: false
+
+graph:
+  type: "anatomical_multimodal"
+  strategy: "spatial"          # Spatial Configuration Partitioning (K=3)
+  max_hop: 1
+  num_subsets: 3
+
+model:
+  block_channels: [64, 64, 128, 128, 256, 256]
+  block_strides: [1, 1, 2, 1, 2, 1]
+  temporal_kernel_size: 9
+  dropout: 0.3
+  residual: true
+  use_learnable_edge_weights: true
+
+training:
+  batch_size: 8
+  epochs: 80
+  learning_rate: 0.001
+  weight_decay: 0.0001
+  clip_norm: 1.0
+  optimizer: "AdamW"
+  scheduler: "CosineAnnealingLR"
+  early_stopping_patience: 20
+  early_stopping_metric: "val_macro_f1"
+
+evaluation:
+  metrics:
+    - "accuracy"
+    - "top3_accuracy"
+    - "macro_precision"
+    - "macro_recall"
+    - "macro_f1"
+    - "weighted_f1"
+    - "confusion_matrix"
+
+paths:
+  train_manifest: "data/manifests/train.csv"
+  val_manifest: "data/manifests/val.csv"
+  test_manifest: "data/manifests/test.csv"
+  vocabulary_file: "assets/vocabularies/mvp_10.json"
+  checkpoint_dir: "experiments/stgcn/checkpoints"
+  log_dir: "experiments/stgcn/logs"
+  metrics_dir: "experiments/stgcn/metrics"
+  plot_dir: "experiments/stgcn/plots"

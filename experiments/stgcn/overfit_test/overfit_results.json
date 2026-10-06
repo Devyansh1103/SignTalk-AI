@@ -1,0 +1,218 @@
+{
+  "test_status": "PASSED",
+  "samples_tested": 4,
+  "final_loss": 0.0035707494243979454,
+  "final_accuracy": 1.0,
+  "history": [
+    {
+      "epoch": 1,
+      "loss": 2.301276922225952,
+      "accuracy": 0.25,
+      "correct": 1,
+      "total": 4
+    },
+    {
+      "epoch": 2,
+      "loss": 1.834782600402832,
+      "accuracy": 0.5,
+      "correct": 2,
+      "total": 4
+    },
+    {
+      "epoch": 3,
+      "loss": 1.4700921773910522,
+      "accuracy": 0.5,
+      "correct": 2,
+      "total": 4
+    },
+    {
+      "epoch": 4,
+      "loss": 1.2101049423217773,
+      "accuracy": 0.5,
+      "correct": 2,
+      "total": 4
+    },
+    {
+      "epoch": 5,
+      "loss": 1.026103138923645,
+      "accuracy": 0.5,
+      "correct": 2,
+      "total": 4
+    },
+    {
+      "epoch": 6,
+      "loss": 0.8817477226257324,
+      "accuracy": 1.0,
+      "correct": 4,
+      "total": 4
+    },
+    {
+      "epoch": 7,
+      "loss": 0.7595123648643494,
+      "accuracy": 1.0,
+      "correct": 4,
+      "total": 4
+    },
+    {
+      "epoch": 8,
+      "loss": 0.6559107303619385,
+      "accuracy": 1.0,
+      "correct": 4,
+      "total": 4
+    },
+    {
+      "epoch": 9,
+      "loss": 0.5675472021102905,
+      "accuracy": 1.0,
+      "correct": 4,
+      "total": 4
+    },
+    {
+      "epoch": 10,
+      "loss": 0.49199026823043823,
+      "accuracy": 1.0,
+      "correct": 4,
+      "total": 4
+    },
+    {
+      "epoch": 11,
+      "loss": 0.42430925369262695,
+      "accuracy": 1.0,
+      "correct": 4,
+      "total": 4
+    },
+    {
+      "epoch": 12,
+      "loss": 0.3656492531299591,
+      "accuracy": 1.0,
+      "correct": 4,
+      "total": 4
+    },
+    {
+      "epoch": 13,
+      "loss": 0.31480371952056885,
+      "accuracy": 1.0,
+      "correct": 4,
+      "total": 4
+    },
+    {
+      "epoch": 14,
+      "loss": 0.26812034845352173,
+      "accuracy": 1.0,
+      "correct": 4,
+      "total": 4
+    },
+    {
+      "epoch": 15,
+      "loss": 0.22345693409442902,
+      "accuracy": 1.0,
+      "correct": 4,
+      "total": 4
+    },
+    {
+      "epoch": 16,
+      "loss": 0.17984487116336823,
+      "accuracy": 1.0,
+      "correct": 4,
+      "total": 4
+    },
+    {
+      "epoch": 17,
+      "loss": 0.13866625726222992,
+      "accuracy": 1.0,
+      "correct": 4,
+      "total": 4
+    },
+    {
+      "epoch": 18,
+      "loss": 0.10245312750339508,
+      "accuracy": 1.0,
+      "correct": 4,
+      "total": 4
+    },
+    {
+      "epoch": 19,
+      "loss": 0.07391362637281418,
+      "accuracy": 1.0,
+      "correct": 4,
+      "total": 4
+    },
+    {
+      "epoch": 20,
+      "loss": 0.053245242685079575,
+      "accuracy": 1.0,
+      "correct": 4,
+      "total": 4
+    },
+    {
+      "epoch": 21,
+      "loss": 0.038477297872304916,
+      "accuracy": 1.0,
+      "correct": 4,
+      "total": 4
+    },
+    {
+      "epoch": 22,
+      "loss": 0.02779935859143734,
+      "accuracy": 1.0,
+      "correct": 4,
+      "total": 4
+    },
+    {
+      "epoch": 23,
+      "loss": 0.020249497145414352,
+      "accuracy": 1.0,
+      "correct": 4,
+      "total": 4
+    },
+    {
+      "epoch": 24,
+      "loss": 0.014915038831532001,
+      "accuracy": 1.0,
+      "correct": 4,
+      "total": 4
+    },
+    {
+      "epoch": 25,
+      "loss": 0.011175943538546562,
+      "accuracy": 1.0,
+      "correct": 4,
+      "total": 4
+    },
+    {
+      "epoch": 26,
+      "loss": 0.008572468534111977,
+      "accuracy": 1.0,
+      "correct": 4,
+      "total": 4
+    },
+    {
+      "epoch": 27,
+      "loss": 0.00669862562790513,
+      "accuracy": 1.0,
+      "correct": 4,
+      "total": 4
+    },
+    {
+      "epoch": 28,
+      "loss": 0.005333215929567814,
+      "accuracy": 1.0,
+      "correct": 4,
+      "total": 4
+    },
+    {
+      "epoch": 29,
+      "loss": 0.004328432958573103,
+      "accuracy": 1.0,
+      "correct": 4,
+      "total": 4
+    },
+    {
+      "epoch": 30,
+      "loss": 0.0035707494243979454,
+      "accuracy": 1.0,
+      "correct": 4,
+      "total": 4
+    }
+  ]
+}

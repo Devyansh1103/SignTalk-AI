@@ -1,0 +1,8 @@
+true_label,pred_label,confidence,primary_category,explanation,quality_status,valid_frames,quality_score,sample_index
+thankyou,happy,0.6444,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'thankyou' and 'happy' share similar articulatory trajectory.,ACCEPTABLE,45,0.5278,1
+good,hello,0.3529,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'good' and 'hello' share similar articulatory trajectory.,ACCEPTABLE,45,0.6811,2
+monday,happy,0.4653,VISUAL_DETECTION_FAILURE,"Severe hand landmark dropouts in source recording: valid frames=45, LH rate=50.0%, RH rate=50.0%.",REJECT,45,0.4,4
+bird,car,0.3186,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'bird' and 'car' share similar articulatory trajectory.,ACCEPTABLE,45,0.5611,7
+time,car,0.3843,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'time' and 'car' share similar articulatory trajectory.,ACCEPTABLE,45,0.5133,9
+teacher,car,0.3812,VISUAL_DETECTION_FAILURE,"Severe hand landmark dropouts in source recording: valid frames=45, LH rate=50.0%, RH rate=50.0%.",REJECT,45,0.4089,10
+teacher,hello,0.3565,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'teacher' and 'hello' share similar articulatory trajectory.,ACCEPTABLE,45,0.62,11

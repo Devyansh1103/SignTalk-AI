@@ -1,0 +1,68 @@
+# ==============================================================================
+# SignTalk AI — Robustness Stress-Testing Configuration
+# ==============================================================================
+
+experiment_name: "robustness_tests_p3p4"
+seed: 42
+device: "auto"
+batch_size: 8
+test_manifest: "data/manifests/test.csv"
+checkpoint: "experiments/stgcn/checkpoints/best_checkpoint.pt"
+output_dir: "results/robustness"
+
+tests:
+  baseline_clean:
+    type: "clean"
+    description: "Standard clean test inputs without perturbations"
+
+  gaussian_noise:
+    type: "coordinate_noise"
+    description: "Additive zero-mean Gaussian jitter simulating MediaPipe tracking jitter"
+    levels:
+      - name: "noise_sigma_0.01"
+        sigma: 0.01
+      - name: "noise_sigma_0.03"
+        sigma: 0.03
+      - name: "noise_sigma_0.05"
+        sigma: 0.05
+      - name: "noise_sigma_0.10"
+        sigma: 0.10
+
+  frame_dropout:
+    type: "temporal_dropout"
+    description: "Random temporal frame omission simulating camera frame drops and bandwidth throttling"
+    levels:
+      - name: "drop_10pct"
+        drop_rate: 0.10
+      - name: "drop_25pct"
+        drop_rate: 0.25
+      - name: "drop_50pct"
+        drop_rate: 0.50
+
+  signing_speed:
+    type: "temporal_speed"
+    description: "Resampling sequences to simulate slow vs fast signing cadence"
+    levels:
+      - name: "speed_0.75x_slow"
+        factor: 0.75
+      - name: "speed_1.25x_fast"
+        factor: 1.25
+      - name: "speed_1.50x_rapid"
+        factor: 1.50
+
+  subsystem_occlusion:
+    type: "node_occlusion"
+    description: "Simulating physical occlusion or landmark tracking dropouts on specific subsystems"
+    levels:
+      - name: "occlude_left_hand"
+        nodes: [0, 21]       # Left Hand nodes 0-20
+      - name: "occlude_right_hand"
+        nodes: [21, 42]      # Right Hand nodes 21-41
+      - name: "occlude_face"
+        nodes: [53, 93]      # Face contour nodes 53-92
+
+  mirroring:
+    type: "horizontal_mirror"
+    description: "Horizontal sign inversion testing left-handed vs right-handed variance"
+    invert_x: true
+    swap_hands: true

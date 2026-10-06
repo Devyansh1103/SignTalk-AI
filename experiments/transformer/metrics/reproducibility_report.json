@@ -1,0 +1,19 @@
+{
+  "seed": 42,
+  "epochs": 3,
+  "run1_losses": [
+    2.3881508509318032,
+    1.5828700462977092,
+    1.2273203399446275
+  ],
+  "run2_losses": [
+    2.3881508509318032,
+    1.5828700462977092,
+    1.2273203399446275
+  ],
+  "max_loss_difference": 0.0,
+  "max_parameter_difference": 0.0,
+  "is_strictly_deterministic": true,
+  "pytorch_version": "2.13.0+cpu",
+  "python_version": "3.13.12 | packaged by Anaconda, Inc. | (main, Feb 24 2026, 16:05:56) [MSC v.1942 64 bit (AMD64)]"
+}

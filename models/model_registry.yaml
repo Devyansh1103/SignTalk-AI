@@ -1,0 +1,150 @@
+# ==============================================================================
+# SignTalk AI — Official Model Registry
+# ==============================================================================
+# All metrics recorded in this registry are empirically measured from
+# Phase 3 Part 4 standardized evaluations on data/manifests/test.csv.
+# NO FABRICATED OR PROJECTED VALUES ARE PERMITTED.
+# ==============================================================================
+
+models:
+  - model_id: "signtalk_baseline_bilstm_v1"
+    name: "SignTalk Baseline BiLSTM"
+    version: "1.0.0"
+    status: "archived_baseline"
+    role: "Proof-of-Concept Baseline"
+    date_evaluated: "2026-10-03"
+
+    task:
+      type: "isolated_sign_classification"
+      num_classes: 10
+      dataset_version: "signTalk-seq-v1.0.0"
+
+    architecture:
+      backbone: "Linear Spatial Projection (279 -> 128) + 2-layer BiLSTM (128)"
+      language_layer: "Linear Classification Head (10 classes)"
+      pooling: "mean_max"
+      input_shape: [1, 3, 45, 93]
+
+    modalities:
+      - "left_hand"
+      - "right_hand"
+      - "upper_pose"
+      - "face_contours"
+
+    checkpoint:
+      path: "experiments/baseline/checkpoints/best_checkpoint.pt"
+      format: "PyTorch State Dict"
+      size_mb: 6.88
+
+    metrics:
+      accuracy: 0.4167
+      macro_f1: 0.3067
+      weighted_f1: 0.3111
+      top3_accuracy: 0.7500
+      translation_metric: null
+
+    runtime:
+      device: "CPU"
+      mean_latency_ms: 12.61
+      throughput_fps: 79.30
+      total_parameters: 597898
+      meets_realtime_25fps: true
+
+  - model_id: "signtalk_stgcn_v1"
+    name: "SignTalk ST-GCN Multimodal"
+    version: "1.0.0"
+    status: "selected_production_candidate"
+    role: "Primary Research and Real-Time Inference Model (Phase 4 Candidate)"
+    date_evaluated: "2026-10-03"
+
+    task:
+      type: "isolated_sign_classification"
+      num_classes: 10
+      dataset_version: "signTalk-seq-v1.0.0"
+
+    architecture:
+      backbone: "Spatial-Temporal Graph Convolutional Network (ST-GCN)"
+      blocks: 6
+      block_channels: [64, 64, 128, 128, 256, 256]
+      block_strides: [1, 1, 2, 1, 2, 1]
+      temporal_kernel_size: 9
+      graph_topology: "93-node Multimodal Graph"
+      adjacency_partitioning: "Spatial Configuration Partitioning (K=3)"
+      language_layer: "Global Average Pooling + Linear Head"
+      input_shape: [1, 3, 45, 93]
+
+    modalities:
+      - "left_hand"      # 21 nodes
+      - "right_hand"     # 21 nodes
+      - "upper_pose"     # 11 nodes
+      - "face_contours"  # 40 nodes
+
+    checkpoint:
+      path: "experiments/stgcn/checkpoints/best_checkpoint.pt"
+      format: "PyTorch State Dict"
+      size_mb: 24.68
+
+    metrics:
+      accuracy: 0.8333
+      macro_f1: 0.7667
+      weighted_f1: 0.7778
+      top3_accuracy: 0.9167
+      translation_metric: null
+      expected_calibration_error: 0.2713
+
+    runtime:
+      device: "CPU"
+      mean_latency_ms: 89.06
+      throughput_fps: 11.23
+      total_parameters: 2137818
+      meets_realtime_25fps: false
+
+  - model_id: "signtalk_transformer_v1"
+    name: "SignTalk Translation Transformer"
+    version: "1.0.0"
+    status: "candidate_nlp_layer"
+    role: "Linguistic Alignment and Sequence Generation Prototype"
+    date_evaluated: "2026-10-03"
+
+    task:
+      type: "sequence_gloss_generation"
+      vocabulary_size: 14
+      dataset_version: "signTalk-seq-v1.0.0"
+
+    architecture:
+      backbone: "Frozen Pretrained ST-GCN (256-dim spatiotemporal embeddings)"
+      language_layer: "2-layer Autoregressive Transformer Decoder (embed=256, heads=4, d_ff=512)"
+      input_shape: [1, 3, 45, 93]
+
+    modalities:
+      - "left_hand"
+      - "right_hand"
+      - "upper_pose"
+      - "face_contours"
+
+    checkpoint:
+      path: "experiments/transformer/checkpoints/best_checkpoint.pt"
+      format: "PyTorch State Dict"
+      size_mb: 19.46
+
+    metrics:
+      accuracy: 0.8333       # Sequence exact match
+      macro_f1: 0.9167       # Token accuracy
+      weighted_f1: 0.9000
+      top3_accuracy: null
+      translation_metric: "BLEU-1=0.8485, ROUGE-L=0.8333"
+
+    runtime:
+      device: "CPU"
+      mean_latency_ms: 162.40
+      throughput_fps: 6.16
+      total_parameters: 3100776
+      meets_realtime_25fps: false
+
+selected_final_model: "signtalk_stgcn_v1"
+selection_justification: |
+  ST-GCN delivers +100% relative accuracy improvement over the baseline (0.8333 vs 0.4167) 
+  and +150% macro F1 improvement (0.7667 vs 0.3067). While ST-GCN + Transformer matches 
+  sequence accuracy (0.8333), its autoregressive decoding introduces substantial latency overhead 
+  (162 ms vs 89 ms on CPU) without yielding higher accuracy on the isolated dataset. ST-GCN is therefore 
+  selected as the optimal candidate for Phase 4 real-time inference.

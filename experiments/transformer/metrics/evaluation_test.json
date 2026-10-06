@@ -1,0 +1,25 @@
+{
+  "evaluation_partition": "test",
+  "sample_count": 12,
+  "test_loss": 0.4973,
+  "token_accuracy": 0.9167,
+  "teacher_forced_sequence_accuracy": 0.8333,
+  "generated_sequence_accuracy": 0.8333,
+  "macro_precision": 0.8333,
+  "macro_recall": 0.8636,
+  "macro_f1": 0.8303,
+  "weighted_f1": 0.9,
+  "bleu": {
+    "bleu_1": 0.8462,
+    "bleu_2": 0.9199,
+    "bleu_4": 0.0
+  },
+  "rouge": {
+    "rouge_l_precision": 0.8333,
+    "rouge_l_recall": 0.8333,
+    "rouge_l_f1": 0.8333
+  },
+  "mean_latency_ms": 394.06,
+  "median_latency_ms": 215.62,
+  "p95_latency_ms": 1187.59
+}

@@ -1,0 +1,5 @@
+model,accuracy,macro_precision,macro_recall,macro_f1,weighted_f1,latency_ms,fps,parameters,model_size_mb
+Baseline (BiLSTM),0.4167,0.2917,0.45,0.3067,0.3111,14.07,71.1,597898.0,6.88
+ST-GCN (Graph Conv),0.8333,0.75,0.8,0.7667,0.7778,105.69,9.46,2137818.0,24.68
+Absolute Improvement (ST-GCN - Baseline),0.4166,0.4583,0.35,0.46,0.4667,91.62,-61.64,1539920.0,17.8
+Relative Improvement (%),99.98,157.11,77.78,149.98,150.02,651.17,-86.69,257.56,258.72

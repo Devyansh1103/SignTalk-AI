@@ -1,0 +1,71 @@
+{
+  "hardware": {
+    "os": "Windows-11-10.0.26200-SP0",
+    "processor": "Intel64 Family 6 Model 142 Stepping 12, GenuineIntel",
+    "machine": "AMD64",
+    "python_version": "3.13.12",
+    "pytorch_version": "2.13.0+cpu",
+    "cuda_available": false,
+    "device_count": 0,
+    "device_name": "CPU"
+  },
+  "models": {
+    "Baseline (BiLSTM)": {
+      "checkpoint": "experiments/baseline/checkpoints/best_checkpoint.pt",
+      "model_size_mb": 6.88,
+      "benchmark": {
+        "num_iterations": 50,
+        "mean_latency_ms": 8.27,
+        "median_latency_ms": 7.77,
+        "std_latency_ms": 1.06,
+        "p95_latency_ms": 10.18,
+        "p99_latency_ms": 10.51,
+        "min_latency_ms": 7.23,
+        "max_latency_ms": 10.58,
+        "throughput_fps": 120.98,
+        "real_time_budget_ms": 40.0,
+        "meets_realtime_target": true,
+        "total_parameters": 597898,
+        "trainable_parameters": 597898
+      }
+    },
+    "ST-GCN (Graph Conv)": {
+      "checkpoint": "experiments/stgcn/checkpoints/best_checkpoint.pt",
+      "model_size_mb": 24.68,
+      "benchmark": {
+        "num_iterations": 50,
+        "mean_latency_ms": 77.85,
+        "median_latency_ms": 76.48,
+        "std_latency_ms": 7.29,
+        "p95_latency_ms": 90.16,
+        "p99_latency_ms": 94.61,
+        "min_latency_ms": 64.7,
+        "max_latency_ms": 96.92,
+        "throughput_fps": 12.85,
+        "real_time_budget_ms": 40.0,
+        "meets_realtime_target": false,
+        "total_parameters": 2137818,
+        "trainable_parameters": 2137818
+      }
+    },
+    "ST-GCN + Transformer": {
+      "checkpoint": "experiments/transformer/checkpoints/best_checkpoint.pt",
+      "model_size_mb": 19.46,
+      "benchmark": {
+        "num_iterations": 50,
+        "mean_latency_ms": 85.49,
+        "median_latency_ms": 83.93,
+        "std_latency_ms": 6.74,
+        "p95_latency_ms": 100.13,
+        "p99_latency_ms": 101.21,
+        "min_latency_ms": 74.59,
+        "max_latency_ms": 101.32,
+        "throughput_fps": 11.7,
+        "real_time_budget_ms": 40.0,
+        "meets_realtime_target": false,
+        "total_parameters": 3100776,
+        "trainable_parameters": 962958
+      }
+    }
+  }
+}

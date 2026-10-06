@@ -1,0 +1,13 @@
+sample_id,signer_id,ground_truth_gloss,ground_truth_translation,predicted_gloss,predicted_translation,primary_token_id,confidence,is_uncertain,status,is_correct,latency_ms
+seq_0049,signer_02,HELLO,Hello,HELLO,Hello,4,0.9896,False,ACCEPTED,True,741.901
+seq_0050,signer_01,THANK_YOU,Thank you,THANK_YOU,Thank you,5,0.9077,False,ACCEPTED,True,111.859
+seq_0051,signer_03,GOOD,Good,GOOD,Good,6,0.9701,False,ACCEPTED,True,112.972
+seq_0052,signer_02,HAPPY,Happy,TEACHER,Teacher,13,0.8912,False,ACCEPTED,False,102.57
+seq_0053,signer_01,MONDAY,Monday,MONDAY,Monday,8,0.925,False,ACCEPTED,True,110.578
+seq_0054,signer_03,MONDAY,Monday,BIRD,Bird,10,0.6892,False,ACCEPTED,False,118.052
+seq_0055,signer_02,CAR,Car,CAR,Car,9,0.9846,False,ACCEPTED,True,105.84
+seq_0056,signer_01,BIRD,Bird,BIRD,Bird,10,0.7504,False,ACCEPTED,True,89.34
+seq_0057,signer_03,HOUSE,House,HOUSE,House,11,0.8742,False,ACCEPTED,True,87.947
+seq_0058,signer_02,TIME,Time,TIME,Time,12,0.9399,False,ACCEPTED,True,113.389
+seq_0059,signer_01,TEACHER,Teacher,TEACHER,Teacher,13,0.7563,False,ACCEPTED,True,119.295
+seq_0060,signer_03,TEACHER,Teacher,TEACHER,Teacher,13,0.9616,False,ACCEPTED,True,96.974

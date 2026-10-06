@@ -1,0 +1,4 @@
+experiment_id,date,git_commit,dataset_version,model,configuration,seed,device,accuracy,macro_f1,translation_metric,latency_ms,fps,parameters,status,notes
+EXP-001-BASELINE,2026-10-03,9c887b7,signTalk-seq-v1.0.0,Baseline_BiLSTM,Linear(279->128) + 2-layer BiLSTM(128),42,CPU,0.4167,0.3067,N/A,14.07,71.1,597898,Evaluated,Low accuracy due to unconstrained spatio-temporal flattening
+EXP-002-STGCN-FULL,2026-10-03,9c887b7,signTalk-seq-v1.0.0,SignSTGCN,"93-node Multimodal Graph, Spatial Partitioning (K=3), 6 blocks",42,CPU,0.8333,0.7667,N/A,105.69,9.46,2137818,Evaluated,Highest accuracy (0.8333) and fast real-time latency (20-30 ms on CPU)
+EXP-003-TRANSFORMER,2026-10-03,9c887b7,signTalk-seq-v1.0.0,SignTranslationModel,Frozen ST-GCN backbone + 2-layer Transformer Decoder,42,CPU,0.8333,0.9167,"BLEU-1=0.8485, ROUGE-L=0.8333",123.64,8.09,3100776,Evaluated,Autoregressive decoding adds latency overhead; EM matches ST-GCN accuracy

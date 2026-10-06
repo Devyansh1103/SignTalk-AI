@@ -1,0 +1,42 @@
+{
+  "model_type": "transformer",
+  "checkpoint": "experiments/transformer/checkpoints/best_checkpoint.pt",
+  "split": "test",
+  "sample_count": 12,
+  "metrics": {
+    "token_accuracy": 0.9167,
+    "sequence_exact_match": 0.8333,
+    "bleu": {
+      "bleu_1": 0.8485,
+      "bleu_2": 0.0,
+      "bleu_3": 0.0,
+      "bleu_4": 0.0
+    },
+    "rouge": {
+      "rouge_l_precision": 0.8333,
+      "rouge_l_recall": 0.8333,
+      "rouge_l_f1": 0.8333
+    },
+    "chrf": 0.6882,
+    "wer": 0.1667
+  },
+  "benchmark": {
+    "mean_latency_ms": 123.64,
+    "median_latency_ms": 123.64,
+    "p95_latency_ms": 160.58,
+    "throughput_fps": 8.09,
+    "total_parameters": 3100776,
+    "trainable_parameters": 962958
+  },
+  "model_size_mb": 19.46,
+  "hardware": {
+    "os": "Windows-11-10.0.26200-SP0",
+    "processor": "Intel64 Family 6 Model 142 Stepping 12, GenuineIntel",
+    "machine": "AMD64",
+    "python_version": "3.13.12",
+    "pytorch_version": "2.13.0+cpu",
+    "cuda_available": false,
+    "device_count": 0,
+    "device_name": "CPU"
+  }
+}

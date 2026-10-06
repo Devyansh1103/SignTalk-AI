@@ -1,0 +1,8 @@
+{
+  "mean_latency_ms": 123.64,
+  "median_latency_ms": 123.64,
+  "p95_latency_ms": 160.58,
+  "throughput_fps": 8.09,
+  "total_parameters": 3100776,
+  "trainable_parameters": 962958
+}

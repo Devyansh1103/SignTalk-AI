@@ -1,0 +1,13 @@
+sample_idx,sequence_id,signer_id,true_class_id,true_label,pred_class_id,pred_label,is_correct,confidence,quality_status,valid_frames
+0,seq_0049,signer_02,0,hello,0,hello,True,0.9987,ACCEPTABLE,45
+1,seq_0050,signer_01,1,thankyou,1,thankyou,True,0.5516,ACCEPTABLE,45
+2,seq_0051,signer_03,2,good,2,good,True,0.9929,ACCEPTABLE,45
+3,seq_0052,signer_02,3,happy,9,teacher,False,0.453,ACCEPTABLE,45
+4,seq_0053,signer_01,4,monday,4,monday,True,0.773,REJECT,45
+5,seq_0054,signer_03,4,monday,4,monday,True,0.6963,ACCEPTABLE,45
+6,seq_0055,signer_02,5,car,5,car,True,0.9527,REJECT,45
+7,seq_0056,signer_01,6,bird,6,bird,True,0.685,ACCEPTABLE,45
+8,seq_0057,signer_03,7,house,7,house,True,0.6067,ACCEPTABLE,45
+9,seq_0058,signer_02,8,time,9,teacher,False,0.3677,ACCEPTABLE,45
+10,seq_0059,signer_01,9,teacher,9,teacher,True,0.526,REJECT,45
+11,seq_0060,signer_03,9,teacher,9,teacher,True,0.7827,ACCEPTABLE,45

@@ -1,0 +1,572 @@
+{
+  "model_type": "baseline",
+  "checkpoint": "experiments/baseline/checkpoints/best_checkpoint.pt",
+  "split": "test",
+  "sample_count": 12,
+  "metrics": {
+    "sample_count": 12,
+    "accuracy": 0.4167,
+    "macro_precision": 0.2917,
+    "macro_recall": 0.45,
+    "macro_f1": 0.3067,
+    "weighted_precision": 0.3264,
+    "weighted_recall": 0.4167,
+    "weighted_f1": 0.3111,
+    "top3_accuracy": 0.75,
+    "confusion_matrix": [
+      [
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        1,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0
+      ]
+    ],
+    "confusion_matrix_normalized": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        0.5,
+        0.5,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.5,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.5,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    ],
+    "per_class": {
+      "hello": {
+        "class_id": 0,
+        "precision": 0.3333,
+        "recall": 1.0,
+        "f1_score": 0.5,
+        "support": 1
+      },
+      "thankyou": {
+        "class_id": 1,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1_score": 0.0,
+        "support": 1
+      },
+      "good": {
+        "class_id": 2,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1_score": 0.0,
+        "support": 1
+      },
+      "happy": {
+        "class_id": 3,
+        "precision": 0.3333,
+        "recall": 1.0,
+        "f1_score": 0.5,
+        "support": 1
+      },
+      "monday": {
+        "class_id": 4,
+        "precision": 1.0,
+        "recall": 0.5,
+        "f1_score": 0.6667,
+        "support": 2
+      },
+      "car": {
+        "class_id": 5,
+        "precision": 0.25,
+        "recall": 1.0,
+        "f1_score": 0.4,
+        "support": 1
+      },
+      "bird": {
+        "class_id": 6,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1_score": 0.0,
+        "support": 1
+      },
+      "house": {
+        "class_id": 7,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1_score": 1.0,
+        "support": 1
+      },
+      "time": {
+        "class_id": 8,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1_score": 0.0,
+        "support": 1
+      },
+      "teacher": {
+        "class_id": 9,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1_score": 0.0,
+        "support": 2
+      }
+    },
+    "loss": 1.8946
+  },
+  "calibration": {
+    "ece": 0.2108,
+    "brier_score": 0.7712,
+    "confidence_distribution": {
+      "overall": {
+        "mean": 0.4087,
+        "median": 0.3827,
+        "std": 0.0892,
+        "min": 0.2914,
+        "max": 0.6444
+      },
+      "correct_predictions": {
+        "count": 5,
+        "mean": 0.4003,
+        "median": 0.3994,
+        "min": 0.2914
+      },
+      "incorrect_predictions": {
+        "count": 7,
+        "mean": 0.4147,
+        "median": 0.3812,
+        "max": 0.6444
+      }
+    },
+    "threshold_rejection": [
+      {
+        "threshold": 0.1,
+        "accepted_count": 12,
+        "rejected_count": 0,
+        "acceptance_rate": 1.0,
+        "rejection_rate": 0.0,
+        "accepted_accuracy": 0.4167,
+        "false_accept_count": 7,
+        "false_accept_rate": 0.5833,
+        "false_reject_count": 0,
+        "false_reject_rate": 0.0
+      },
+      {
+        "threshold": 0.2,
+        "accepted_count": 12,
+        "rejected_count": 0,
+        "acceptance_rate": 1.0,
+        "rejection_rate": 0.0,
+        "accepted_accuracy": 0.4167,
+        "false_accept_count": 7,
+        "false_accept_rate": 0.5833,
+        "false_reject_count": 0,
+        "false_reject_rate": 0.0
+      },
+      {
+        "threshold": 0.3,
+        "accepted_count": 11,
+        "rejected_count": 1,
+        "acceptance_rate": 0.9167,
+        "rejection_rate": 0.0833,
+        "accepted_accuracy": 0.3636,
+        "false_accept_count": 7,
+        "false_accept_rate": 0.5833,
+        "false_reject_count": 1,
+        "false_reject_rate": 0.0833
+      },
+      {
+        "threshold": 0.4,
+        "accepted_count": 4,
+        "rejected_count": 8,
+        "acceptance_rate": 0.3333,
+        "rejection_rate": 0.6667,
+        "accepted_accuracy": 0.5,
+        "false_accept_count": 2,
+        "false_accept_rate": 0.1667,
+        "false_reject_count": 3,
+        "false_reject_rate": 0.25
+      },
+      {
+        "threshold": 0.5,
+        "accepted_count": 1,
+        "rejected_count": 11,
+        "acceptance_rate": 0.0833,
+        "rejection_rate": 0.9167,
+        "accepted_accuracy": 0.0,
+        "false_accept_count": 1,
+        "false_accept_rate": 0.0833,
+        "false_reject_count": 5,
+        "false_reject_rate": 0.4167
+      },
+      {
+        "threshold": 0.6,
+        "accepted_count": 1,
+        "rejected_count": 11,
+        "acceptance_rate": 0.0833,
+        "rejection_rate": 0.9167,
+        "accepted_accuracy": 0.0,
+        "false_accept_count": 1,
+        "false_accept_rate": 0.0833,
+        "false_reject_count": 5,
+        "false_reject_rate": 0.4167
+      },
+      {
+        "threshold": 0.7,
+        "accepted_count": 0,
+        "rejected_count": 12,
+        "acceptance_rate": 0.0,
+        "rejection_rate": 1.0,
+        "accepted_accuracy": 0.0,
+        "false_accept_count": 0,
+        "false_accept_rate": 0.0,
+        "false_reject_count": 5,
+        "false_reject_rate": 0.4167
+      },
+      {
+        "threshold": 0.8,
+        "accepted_count": 0,
+        "rejected_count": 12,
+        "acceptance_rate": 0.0,
+        "rejection_rate": 1.0,
+        "accepted_accuracy": 0.0,
+        "false_accept_count": 0,
+        "false_accept_rate": 0.0,
+        "false_reject_count": 5,
+        "false_reject_rate": 0.4167
+      },
+      {
+        "threshold": 0.85,
+        "accepted_count": 0,
+        "rejected_count": 12,
+        "acceptance_rate": 0.0,
+        "rejection_rate": 1.0,
+        "accepted_accuracy": 0.0,
+        "false_accept_count": 0,
+        "false_accept_rate": 0.0,
+        "false_reject_count": 5,
+        "false_reject_rate": 0.4167
+      },
+      {
+        "threshold": 0.9,
+        "accepted_count": 0,
+        "rejected_count": 12,
+        "acceptance_rate": 0.0,
+        "rejection_rate": 1.0,
+        "accepted_accuracy": 0.0,
+        "false_accept_count": 0,
+        "false_accept_rate": 0.0,
+        "false_reject_count": 5,
+        "false_reject_rate": 0.4167
+      },
+      {
+        "threshold": 0.95,
+        "accepted_count": 0,
+        "rejected_count": 12,
+        "acceptance_rate": 0.0,
+        "rejection_rate": 1.0,
+        "accepted_accuracy": 0.0,
+        "false_accept_count": 0,
+        "false_accept_rate": 0.0,
+        "false_reject_count": 5,
+        "false_reject_rate": 0.4167
+      }
+    ]
+  },
+  "top_confusions": [
+    {
+      "true_class_id": 1,
+      "true_label": "thankyou",
+      "pred_class_id": 3,
+      "pred_label": "happy",
+      "count": 1,
+      "probable_cause": "Shared spatial coordinate trajectory or MediaPipe landmark tracking variance."
+    },
+    {
+      "true_class_id": 2,
+      "true_label": "good",
+      "pred_class_id": 0,
+      "pred_label": "hello",
+      "count": 1,
+      "probable_cause": "Shared spatial coordinate trajectory or MediaPipe landmark tracking variance."
+    },
+    {
+      "true_class_id": 4,
+      "true_label": "monday",
+      "pred_class_id": 3,
+      "pred_label": "happy",
+      "count": 1,
+      "probable_cause": "Shared spatial coordinate trajectory or MediaPipe landmark tracking variance."
+    },
+    {
+      "true_class_id": 6,
+      "true_label": "bird",
+      "pred_class_id": 5,
+      "pred_label": "car",
+      "count": 1,
+      "probable_cause": "Shared spatial coordinate trajectory or MediaPipe landmark tracking variance."
+    },
+    {
+      "true_class_id": 8,
+      "true_label": "time",
+      "pred_class_id": 5,
+      "pred_label": "car",
+      "count": 1,
+      "probable_cause": "Shared spatial coordinate trajectory or MediaPipe landmark tracking variance."
+    }
+  ],
+  "error_analysis": {
+    "total_errors": 7,
+    "category_counts": {
+      "SEMANTIC_KINEMATIC_SIMILARITY": 5,
+      "VISUAL_DETECTION_FAILURE": 2
+    },
+    "category_proportions": {
+      "SEMANTIC_KINEMATIC_SIMILARITY": 0.7143,
+      "VISUAL_DETECTION_FAILURE": 0.2857
+    }
+  },
+  "benchmark": {
+    "num_iterations": 50,
+    "mean_latency_ms": 14.07,
+    "median_latency_ms": 12.16,
+    "std_latency_ms": 6.69,
+    "p95_latency_ms": 30.63,
+    "p99_latency_ms": 34.2,
+    "min_latency_ms": 7.41,
+    "max_latency_ms": 34.51,
+    "throughput_fps": 71.1,
+    "real_time_budget_ms": 40.0,
+    "meets_realtime_target": true,
+    "total_parameters": 597898,
+    "trainable_parameters": 597898
+  },
+  "model_size_mb": 6.88,
+  "hardware": {
+    "os": "Windows-11-10.0.26200-SP0",
+    "processor": "Intel64 Family 6 Model 142 Stepping 12, GenuineIntel",
+    "machine": "AMD64",
+    "python_version": "3.13.12",
+    "pytorch_version": "2.13.0+cpu",
+    "cuda_available": false,
+    "device_count": 0,
+    "device_name": "CPU"
+  }
+}

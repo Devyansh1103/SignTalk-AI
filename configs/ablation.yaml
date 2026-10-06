@@ -1,0 +1,93 @@
+# ==============================================================================
+# SignTalk AI — Controlled Ablation Study Configuration
+# ==============================================================================
+
+experiment_name: "ablation_study_p3p4"
+seed: 42
+device: "auto"
+batch_size: 8
+test_manifest: "data/manifests/test.csv"
+vocabulary_file: "assets/vocabularies/mvp_10.json"
+output_dir: "results/ablation"
+
+ablations:
+  modality:
+    description: "Evaluates the marginal contribution of anatomical landmark subsystems"
+    target_checkpoint: "experiments/stgcn/checkpoints/best_checkpoint.pt"
+    configurations:
+      - name: "hand_only"
+        active_nodes: [0, 42]   # Left Hand (0-20) + Right Hand (21-41) = 42 nodes
+        mask_other_nodes: true
+        description: "Manual articulators only (42 nodes)"
+      - name: "hand_pose"
+        active_nodes: [0, 53]   # Hands (0-41) + Upper Pose (42-52) = 53 nodes
+        mask_other_nodes: true
+        description: "Hands + Upper Body frame-of-reference (53 nodes)"
+      - name: "hand_pose_face"
+        active_nodes: [0, 93]   # Complete multimodal schema = 93 nodes
+        mask_other_nodes: false
+        description: "Full multimodal graph: Hands + Pose + Facial contours (93 nodes)"
+
+  graph_topology:
+    description: "Evaluates the spatial graph partitioning strategy"
+    target_checkpoint: "experiments/stgcn/checkpoints/best_checkpoint.pt"
+    configurations:
+      - name: "uniform"
+        strategy: "uniform"
+        subsets: 1
+        description: "Uniform Partitioning: Symmetrically normalized adjacency (K=1)"
+      - name: "distance"
+        strategy: "distance"
+        subsets: 2
+        description: "Distance Partitioning: Self-loops vs 1-hop physical neighbors (K=2)"
+      - name: "spatial"
+        strategy: "spatial"
+        subsets: 3
+        description: "Spatial Configuration Partitioning: Root/Centripetal/Centrifugal (K=3)"
+
+  temporal_modeling:
+    description: "Evaluates the effect of temporal convolutions vs spatial-only vs recurrent baselines"
+    configurations:
+      - name: "stgcn_temporal_conv_k9"
+        model: "stgcn"
+        checkpoint: "experiments/stgcn/checkpoints/best_checkpoint.pt"
+        temporal_kernel_size: 9
+        description: "ST-GCN with temporal receptive field kernel=9"
+      - name: "spatial_only_gcn"
+        model: "stgcn"
+        checkpoint: "experiments/stgcn/checkpoints/best_checkpoint.pt"
+        temporal_kernel_size: 1
+        description: "Spatial-only Graph Conv (temporal kernel=1, no temporal mixing)"
+      - name: "bilstm_baseline"
+        model: "baseline"
+        checkpoint: "experiments/baseline/checkpoints/best_checkpoint.pt"
+        description: "Linear projection + BiLSTM recurrent temporal modeling"
+
+  sequence_length:
+    description: "Evaluates model behavior and latency across temporal frame budgets"
+    target_checkpoint: "experiments/stgcn/checkpoints/best_checkpoint.pt"
+    configurations:
+      - name: "T15"
+        frames: 15
+        description: "Truncated short sequence (15 frames)"
+      - name: "T30"
+        frames: 30
+        description: "Intermediate sequence (30 frames)"
+      - name: "T45"
+        frames: 45
+        description: "Standard canonical sequence (45 frames)"
+      - name: "T60"
+        frames: 60
+        description: "Extended sequence via interpolation (60 frames)"
+
+  stgcn_freezing:
+    description: "Evaluates frozen ST-GCN encoder vs joint fine-tuning in translation pipeline"
+    configurations:
+      - name: "frozen_stgcn"
+        freeze_stgcn: true
+        checkpoint: "experiments/transformer/checkpoints/best_checkpoint.pt"
+        description: "ST-GCN weights frozen; only Transformer decoder trained"
+      - name: "joint_finetuned"
+        freeze_stgcn: false
+        checkpoint: "experiments/transformer/checkpoints/best_checkpoint.pt"
+        description: "Joint end-to-end gradient updates across both ST-GCN and Transformer"

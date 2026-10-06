@@ -1,0 +1,15 @@
+{
+  "num_iterations": 50,
+  "mean_latency_ms": 14.07,
+  "median_latency_ms": 12.16,
+  "std_latency_ms": 6.69,
+  "p95_latency_ms": 30.63,
+  "p99_latency_ms": 34.2,
+  "min_latency_ms": 7.41,
+  "max_latency_ms": 34.51,
+  "throughput_fps": 71.1,
+  "real_time_budget_ms": 40.0,
+  "meets_realtime_target": true,
+  "total_parameters": 597898,
+  "trainable_parameters": 597898
+}

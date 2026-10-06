@@ -1,0 +1,37 @@
+{
+  "hardware": {
+    "cuda_available": false,
+    "mps_available": false,
+    "gpu_name": null,
+    "device_count": 0,
+    "allocated_device": "cpu"
+  },
+  "parameters": {
+    "total": 3100776,
+    "stgcn_frozen": 2137818,
+    "feature_projection": 33152,
+    "transformer": 929806,
+    "trainable": 962958,
+    "checkpoint_size_mb": 19.46
+  },
+  "benchmark": {
+    "num_runs": 100,
+    "batch_size": 1,
+    "visual_encoder_latency_ms": {
+      "mean": 117.667,
+      "median": 101.061,
+      "p95": 189.282
+    },
+    "decoder_latency_ms": {
+      "mean": 12.631,
+      "median": 7.27,
+      "p95": 16.482
+    },
+    "total_latency_ms": {
+      "mean": 130.313,
+      "median": 109.125,
+      "p95": 203.046
+    },
+    "throughput_seq_per_sec": 7.67
+  }
+}

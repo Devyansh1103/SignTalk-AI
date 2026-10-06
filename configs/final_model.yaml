@@ -1,0 +1,64 @@
+# ==============================================================================
+# SignTalk AI — Final Selected Model Configuration (Phase 4 Handoff)
+# ==============================================================================
+
+model_name: "SignTalk_STGCN_v1"
+version: "1.0.0"
+phase: "Phase 4 Ready"
+status: "selected_production_candidate"
+
+task:
+  type: "isolated_sign_classification"
+  vocabulary_size: 10
+  classes:
+    - "hello"
+    - "thankyou"
+    - "good"
+    - "happy"
+    - "monday"
+    - "car"
+    - "bird"
+    - "house"
+    - "time"
+    - "teacher"
+
+architecture:
+  backbone: "ST-GCN"
+  in_channels: 3
+  num_nodes: 93
+  sequence_length: 45
+  graph_strategy: "spatial"
+  block_channels: [64, 64, 128, 128, 256, 256]
+  block_strides: [1, 1, 2, 1, 2, 1]
+  temporal_kernel_size: 9
+  dropout: 0.3
+  residual: true
+  use_learnable_edge_weights: true
+
+checkpoint:
+  path: "experiments/stgcn/checkpoints/best_checkpoint.pt"
+  format: "PyTorch State Dict"
+  epoch: 34
+
+inference_contract:
+  input_tensor:
+    name: "landmark_sequence"
+    shape: [1, 3, 45, 93]
+    dtype: "torch.float32"
+    coordinate_space: "MediaPipe Normalized (0.0 to 1.0) with Root-relative centering"
+  output_tensor:
+    name: "class_probabilities"
+    shape: [1, 10]
+    dtype: "torch.float32"
+
+runtime:
+  device: "auto"
+  confidence_threshold: 0.70
+  low_confidence_fallback: "UNKNOWN_SIGN"
+  smoothing_window: 3
+
+preprocessing:
+  fps: 25.0
+  target_frames: 45
+  interpolation: "linear"
+  landmark_schema: "93-node-v1"

@@ -1,0 +1,13 @@
+sequence_id,source_recording_id,signer_id,quality_status,quality_score,true_class_id,true_label,pred_class_id,pred_label,confidence,correct,error_type
+seq_0049,raw_0004,signer_02,ACCEPTABLE,0.6322,0,HELLO,0,HELLO,0.3994,True,None
+seq_0050,raw_0008,signer_01,ACCEPTABLE,0.5278,1,THANK_YOU,3,HAPPY,0.6444,False,High_Confidence_Error
+seq_0051,raw_0017,signer_03,ACCEPTABLE,0.6811,2,GOOD,0,HELLO,0.3529,False,Standard_Error
+seq_0052,raw_0021,signer_02,ACCEPTABLE,0.6167,3,HAPPY,3,HAPPY,0.2914,True,None
+seq_0053,raw_0025,signer_01,REJECT,0.4,4,MONDAY,3,HAPPY,0.4653,False,Standard_Error
+seq_0054,raw_0030,signer_03,ACCEPTABLE,0.6167,4,MONDAY,4,MONDAY,0.4554,True,None
+seq_0055,raw_0034,signer_02,REJECT,0.4544,5,CAR,5,CAR,0.4755,True,None
+seq_0056,raw_0038,signer_01,ACCEPTABLE,0.5611,6,BIRD,5,CAR,0.3186,False,Standard_Error
+seq_0057,raw_0047,signer_03,ACCEPTABLE,0.5844,7,HOUSE,7,HOUSE,0.3798,True,None
+seq_0058,raw_0051,signer_02,ACCEPTABLE,0.5133,8,TIME,5,CAR,0.3843,False,Standard_Error
+seq_0059,raw_0055,signer_01,REJECT,0.4089,9,TEACHER,5,CAR,0.3812,False,Standard_Error
+seq_0060,raw_0060,signer_03,ACCEPTABLE,0.62,9,TEACHER,0,HELLO,0.3565,False,Standard_Error

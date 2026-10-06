@@ -1,0 +1,110 @@
+# ==============================================================================
+# SignTalk AI — Unified Evaluation Configuration
+# ==============================================================================
+
+experiment_name: "evaluation_p3p4"
+seed: 42
+device: "auto"
+num_workers: 0
+
+dataset:
+  version: "signTalk-seq-v1.0.0"
+  num_classes: 10
+  sequence_length: 45
+  num_nodes: 93
+  in_channels: 3
+  manifests:
+    train: "data/manifests/train.csv"
+    val: "data/manifests/val.csv"
+    test: "data/manifests/test.csv"
+  vocabulary_file: "assets/vocabularies/mvp_10.json"
+  label_mapping: "data/processed/label_mapping.csv"
+
+models:
+  baseline:
+    name: "Baseline_BiLSTM"
+    checkpoint: "experiments/baseline/checkpoints/best_checkpoint.pt"
+    architecture: "BiLSTM"
+    num_classes: 10
+    in_channels: 3
+    num_nodes: 93
+    sequence_length: 45
+    proj_dim: 128
+    hidden_dim: 128
+    num_layers: 2
+    dropout: 0.3
+    bidirectional: true
+    pooling_type: "mean_max"
+    task_type: "classification"
+
+  stgcn:
+    name: "SignSTGCN"
+    checkpoint: "experiments/stgcn/checkpoints/best_checkpoint.pt"
+    architecture: "ST-GCN"
+    num_classes: 10
+    in_channels: 3
+    num_nodes: 93
+    sequence_length: 45
+    graph_strategy: "spatial"
+    block_channels: [64, 64, 128, 128, 256, 256]
+    block_strides: [1, 1, 2, 1, 2, 1]
+    temporal_kernel_size: 9
+    dropout: 0.3
+    residual: true
+    use_learnable_edge_weights: true
+    task_type: "classification"
+
+  transformer:
+    name: "SignTranslationModel"
+    checkpoint: "experiments/transformer/checkpoints/best_checkpoint.pt"
+    architecture: "ST-GCN_Transformer"
+    task_type: "translation"
+    vocab_size: 14
+    max_decode_len: 10
+    beam_size: 1
+
+evaluation:
+  batch_size: 8
+  default_split: "test"
+  confidence_threshold: 0.70
+  metrics:
+    classification:
+      - "accuracy"
+      - "macro_precision"
+      - "macro_recall"
+      - "macro_f1"
+      - "weighted_f1"
+      - "top3_accuracy"
+      - "confusion_matrix"
+      - "per_class_f1"
+    translation:
+      - "token_accuracy"
+      - "sequence_accuracy"
+      - "macro_f1"
+      - "weighted_f1"
+      - "bleu_1"
+      - "bleu_2"
+      - "rouge_l"
+    confidence:
+      - "expected_calibration_error"
+      - "brier_score"
+      - "threshold_rejection_rate"
+    benchmark:
+      - "mean_latency_ms"
+      - "median_latency_ms"
+      - "p95_latency_ms"
+      - "throughput_fps"
+      - "param_count"
+      - "model_size_mb"
+
+output:
+  base_dir: "results"
+  experiments_dir: "results/experiments"
+  baseline_dir: "results/baseline"
+  stgcn_dir: "results/stgcn"
+  translation_dir: "results/translation"
+  ablation_dir: "results/ablation"
+  robustness_dir: "results/robustness"
+  confidence_dir: "results/confidence"
+  benchmarks_dir: "results/benchmarks"
+  error_dir: "results/error_analysis"

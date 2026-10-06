@@ -1,0 +1,4 @@
+model,checkpoint,mean_latency_ms,median_latency_ms,p95_latency_ms,min_latency_ms,max_latency_ms,throughput_fps,total_parameters,trainable_parameters,model_size_mb,meets_realtime_25fps
+Baseline (BiLSTM),experiments/baseline/checkpoints/best_checkpoint.pt,8.27,7.77,10.18,7.23,10.58,120.98,597898,597898,6.88,True
+ST-GCN (Graph Conv),experiments/stgcn/checkpoints/best_checkpoint.pt,77.85,76.48,90.16,64.7,96.92,12.85,2137818,2137818,24.68,False
+ST-GCN + Transformer,experiments/transformer/checkpoints/best_checkpoint.pt,85.49,83.93,100.13,74.59,101.32,11.7,3100776,962958,19.46,False

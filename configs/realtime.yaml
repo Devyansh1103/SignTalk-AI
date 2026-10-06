@@ -1,0 +1,83 @@
+# ==============================================================================
+# SignTalk AI — Real-Time Camera & Landmark Streaming Configuration
+# Phase 4 Part 1 — Real-Time Ingestion Layer
+# ==============================================================================
+
+camera:
+  device_index: 0
+  width: 640
+  height: 480
+  target_fps: 25.0
+  auto_reconnect: true
+  max_reconnect_attempts: 3
+  reconnect_delay_sec: 1.0
+
+processing:
+  flip_horizontal: true
+  color_format: "RGB"
+  target_width: null
+  target_height: null
+
+mediapipe:
+  pose_model_path: "models/mediapipe/pose_landmarker_full.task"
+  hand_model_path: "models/mediapipe/hand_landmarker.task"
+  face_model_path: "models/mediapipe/face_landmarker.task"
+  pose_detection_confidence: 0.50
+  pose_presence_confidence: 0.50
+  pose_tracking_confidence: 0.50
+  hand_detection_confidence: 0.35
+  hand_presence_confidence: 0.35
+  hand_tracking_confidence: 0.35
+  face_detection_confidence: 0.40
+  face_presence_confidence: 0.40
+  enable_hands: true
+  enable_pose: true
+  enable_face: false  # Face mesh optional; upper-facial pose anchors provide stable cranial reference
+
+landmark_budget:
+  total_nodes: 93
+  left_hand_nodes: 21
+  right_hand_nodes: 21
+  pose_nodes: 11
+  face_nodes: 40
+
+normalization:
+  method: "torso_scale"
+  center_point: "mid_shoulder"
+  scale_reference: "shoulder_distance"
+  min_scale_epsilon: 1.0e-4
+  z_scale_factor: 1.0
+  use_temporal_anchor_smoothing: true
+  anchor_smoothing_alpha: 0.25  # Exponential moving average factor for torso center & scale
+
+quality:
+  min_valid_pose_ratio: 0.70
+  min_valid_hand_ratio: 0.30
+  overall_quality_threshold: 0.50
+  max_consecutive_missing: 10
+  min_valid_frames_in_sequence: 15
+  jump_distance_threshold: 0.35  # Maximum plausible normalized displacement per frame before flagging jump warning
+  weights:
+    pose: 0.40
+    dominant_hand: 0.40
+    non_dominant_hand: 0.15
+    face: 0.05
+  classification_thresholds:
+    good: 0.75
+    acceptable: 0.50
+    review: 0.35
+
+stream:
+  buffer_capacity: 120
+  drop_policy: "drop_oldest"
+  warmup_frames: 10
+
+runtime:
+  display_preview: true
+  preview_window_name: "SignTalk AI — Real-Time Landmark Stream"
+  save_debug_frames: false
+
+debug:
+  record_landmarks: false  # Privacy-first default: Never record without explicit opt-in
+  record_video: false      # Privacy-first default: Never store raw video frames
+  record_dir: "experiments/realtime_debug"

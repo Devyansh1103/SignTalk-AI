@@ -1,0 +1,38 @@
+{
+  "test_status": "PASSED",
+  "seed": 42,
+  "epochs_tested": 3,
+  "max_discrepancy": 0.0,
+  "trials": [
+    {
+      "epoch": 1,
+      "train_loss_1": 2.3102513949076333,
+      "train_loss_2": 2.3102513949076333,
+      "train_loss_diff": 0.0,
+      "val_loss_1": 2.3016753991444907,
+      "val_loss_2": 2.3016753991444907,
+      "val_loss_diff": 0.0,
+      "preds_match": true
+    },
+    {
+      "epoch": 2,
+      "train_loss_1": 2.2814239660898843,
+      "train_loss_2": 2.2814239660898843,
+      "train_loss_diff": 0.0,
+      "val_loss_1": 2.29838490486145,
+      "val_loss_2": 2.29838490486145,
+      "val_loss_diff": 0.0,
+      "preds_match": true
+    },
+    {
+      "epoch": 3,
+      "train_loss_1": 2.264489756690131,
+      "train_loss_2": 2.264489756690131,
+      "train_loss_diff": 0.0,
+      "val_loss_1": 2.2934634685516357,
+      "val_loss_2": 2.2934634685516357,
+      "val_loss_diff": 0.0,
+      "preds_match": true
+    }
+  ]
+}

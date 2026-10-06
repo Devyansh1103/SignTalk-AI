@@ -1,0 +1,52 @@
+# SignTalk AI: Baseline Model & Training Configuration
+# Phase 3 — Part 1: Baseline Model & Training Infrastructure
+
+dataset_metadata:
+  dataset_version: "signTalk-seq-v1.0.0"
+  preprocessing_version: "landmarks-v1.0"
+  num_classes: 10
+  sequence_length: 45
+  num_nodes: 93
+  channels: 3
+
+model:
+  architecture: "BiGRU"
+  in_channels: 3
+  num_nodes: 93
+  sequence_length: 45
+  proj_dim: 128
+  hidden_dim: 128
+  num_layers: 2
+  dropout: 0.3
+  bidirectional: true
+  num_classes: 10
+  pooling_type: "mean_max"
+
+training:
+  experiment_name: "baseline_bigru_v1"
+  batch_size: 8
+  epochs: 45
+  learning_rate: 0.001
+  weight_decay: 0.0001
+  optimizer: "adamw"             # Options: 'adamw' | 'adam' | 'sgd'
+  scheduler: "cosine"            # Options: 'cosine' | 'plateau' | 'step' | 'none'
+  min_lr: 0.00001
+  gradient_clip_norm: 1.0
+  early_stopping_patience: 15
+  early_stopping_metric: "val_macro_f1"
+  early_stopping_mode: "max"
+  filter_rejects: true           # Excludes samples flagged as REJECT during training
+  augment_train: true            # Enables training-time coordinate jitter and scaling
+  seed: 42
+  device: "auto"                 # Options: 'auto' | 'cuda' | 'cpu'
+
+paths:
+  manifest_path: "data/manifests/sequence_manifest.csv"
+  train_manifest: "data/manifests/train.csv"
+  val_manifest: "data/manifests/val.csv"
+  test_manifest: "data/manifests/test.csv"
+  experiment_dir: "experiments/baseline"
+  checkpoint_dir: "experiments/baseline/checkpoints"
+  log_dir: "experiments/baseline/logs"
+  metrics_dir: "experiments/baseline/metrics"
+  plots_dir: "experiments/baseline/plots"

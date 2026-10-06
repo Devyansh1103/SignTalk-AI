@@ -1,0 +1,84 @@
+# ==============================================================================
+# SignTalk AI — Transformer Translation Layer Configuration
+# ==============================================================================
+
+experiment_name: "transformer_v1"
+seed: 42
+device: "auto"
+
+dataset:
+  version: "signTalk-seq-v1.0.0"
+  num_classes: 10
+  sequence_length: 45
+  num_nodes: 93
+  in_channels: 3
+  augment_train: false
+
+stgcn:
+  checkpoint: "experiments/stgcn/checkpoints/best_checkpoint.pt"
+  freeze: true
+  in_channels: 3
+  num_classes: 10
+  num_nodes: 93
+  sequence_length: 45
+  graph_strategy: "spatial"
+  block_channels: [64, 64, 128, 128, 256, 256]
+  block_strides: [1, 1, 2, 1, 2, 1]
+  temporal_kernel_size: 9
+  dropout: 0.3
+  residual: true
+  use_learnable_edge_weights: true
+
+transformer:
+  vocabulary_file: "assets/vocabularies/mvp_10.json"
+  vocabulary_size: 14
+  embedding_dim: 128
+  num_heads: 4
+  encoder_layers: 2
+  decoder_layers: 2
+  ff_dim: 512
+  dropout: 0.1
+  max_visual_len: 64
+  max_target_len: 16
+  pad_idx: 0
+  bos_idx: 2
+  eos_idx: 3
+
+training:
+  batch_size: 8
+  epochs: 60
+  learning_rate: 0.001
+  weight_decay: 0.0001
+  clip_norm: 1.0
+  optimizer: "AdamW"
+  scheduler: "CosineAnnealingLR"
+  teacher_forcing: true
+  label_smoothing: 0.0
+  early_stopping_patience: 20
+  early_stopping_metric: "val_seq_acc"
+
+decoding:
+  strategy: "greedy"
+  beam_width: 3
+  max_decode_len: 5
+  confidence_threshold: 0.50
+  uncertain_sign_text: "Uncertain sign"
+  uncertain_translation_text: "Please repeat"
+
+evaluation:
+  metrics:
+    - "token_accuracy"
+    - "sequence_accuracy"
+    - "macro_f1"
+    - "bleu_1"
+    - "bleu_2"
+    - "rouge_l"
+
+paths:
+  train_manifest: "data/manifests/train.csv"
+  val_manifest: "data/manifests/val.csv"
+  test_manifest: "data/manifests/test.csv"
+  checkpoint_dir: "experiments/transformer/checkpoints"
+  log_dir: "experiments/transformer/logs"
+  metrics_dir: "experiments/transformer/metrics"
+  plot_dir: "experiments/transformer/plots"

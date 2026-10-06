@@ -1,0 +1,13 @@
+sample_id,signer_id,ground_truth_gloss,predicted_gloss,ground_truth_translation,predicted_translation,gt_token_id,pred_token_id,confidence,is_correct,latency_ms
+seq_0049,signer_02,HELLO,HELLO,Hello,Hello,4,4,0.9896,True,1235.86
+seq_0050,signer_01,THANK_YOU,THANK_YOU,Thank you,Thank you,5,5,0.9077,True,203.65
+seq_0051,signer_03,GOOD,GOOD,Good,Good,6,6,0.9701,True,183.83
+seq_0052,signer_02,HAPPY,TEACHER,Happy,Teacher,7,13,0.8912,False,190.81
+seq_0053,signer_01,MONDAY,MONDAY,Monday,Monday,8,8,0.925,True,484.3
+seq_0054,signer_03,MONDAY,BIRD,Monday,Bird,8,10,0.6892,False,1148.1
+seq_0055,signer_02,CAR,CAR,Car,Car,9,9,0.9846,True,217.1
+seq_0056,signer_01,BIRD,BIRD,Bird,Bird,10,10,0.7504,True,242.12
+seq_0057,signer_03,HOUSE,HOUSE,House,House,11,11,0.8742,True,214.14
+seq_0058,signer_02,TIME,TIME,Time,Time,12,12,0.9399,True,222.07
+seq_0059,signer_01,TEACHER,TEACHER,Teacher,Teacher,13,13,0.7563,True,178.02
+seq_0060,signer_03,TEACHER,TEACHER,Teacher,Teacher,13,13,0.9616,True,208.74

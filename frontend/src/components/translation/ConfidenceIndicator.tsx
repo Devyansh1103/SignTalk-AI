@@ -4,13 +4,22 @@ import type { ConfidenceTier } from '../../types/realtime';
 interface Props {
   confidence: number; // 0.0 to 1.0
   isUncertain?: boolean;
+  isIdle?: boolean;
 }
 
-export const ConfidenceIndicator: React.FC<Props> = ({ confidence, isUncertain }) => {
+export const ConfidenceIndicator: React.FC<Props> = ({ confidence, isUncertain, isIdle }) => {
   const percentage = Math.round(confidence * 100);
 
   const getTier = (): { tier: ConfidenceTier; label: string; colorClass: string; barColor: string } => {
-    if (isUncertain || confidence < 0.40) {
+    if (isIdle) {
+      return {
+        tier: 'uncertain',
+        label: 'Idle / Ready',
+        colorClass: 'bg-slate-500/10 text-slate-500 dark:text-slate-400 border-slate-500/30',
+        barColor: 'bg-slate-300 dark:bg-slate-600',
+      };
+    }
+    if (isUncertain || confidence < 0.65) {
       return {
         tier: 'uncertain',
         label: 'Uncertain',
@@ -18,7 +27,7 @@ export const ConfidenceIndicator: React.FC<Props> = ({ confidence, isUncertain }
         barColor: 'bg-amber-500',
       };
     }
-    if (confidence >= 0.65) {
+    if (confidence >= 0.75) {
       return {
         tier: 'high',
         label: 'High Confidence',
@@ -26,23 +35,16 @@ export const ConfidenceIndicator: React.FC<Props> = ({ confidence, isUncertain }
         barColor: 'bg-emerald-500',
       };
     }
-    if (confidence >= 0.50) {
-      return {
-        tier: 'moderate',
-        label: 'Moderate',
-        colorClass: 'bg-teal-500/10 text-teal-700 dark:text-teal-400 border-teal-500/30',
-        barColor: 'bg-teal-500',
-      };
-    }
     return {
-      tier: 'low',
-      label: 'Low',
-      colorClass: 'bg-rose-500/10 text-rose-700 dark:text-rose-400 border-rose-500/30',
-      barColor: 'bg-rose-500',
+      tier: 'moderate',
+      label: 'Moderate',
+      colorClass: 'bg-teal-500/10 text-teal-700 dark:text-teal-400 border-teal-500/30',
+      barColor: 'bg-teal-500',
     };
   };
 
   const { label, colorClass, barColor } = getTier();
+  const shouldZeroBar = isIdle || isUncertain || confidence < 0.65;
 
   return (
     <div id="confidence-indicator-container" className="flex flex-col gap-1.5 w-full">
@@ -50,7 +52,7 @@ export const ConfidenceIndicator: React.FC<Props> = ({ confidence, isUncertain }
         <span className="text-slate-500 dark:text-slate-400 font-medium">Confidence Score</span>
         <div className="flex items-center gap-2">
           <span className="font-mono font-semibold text-slate-800 dark:text-slate-200">
-            {isUncertain ? '--%' : `${percentage}%`}
+            {shouldZeroBar ? '--%' : `${percentage}%`}
           </span>
           <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium border ${colorClass}`}>
             {label}
@@ -62,9 +64,9 @@ export const ConfidenceIndicator: React.FC<Props> = ({ confidence, isUncertain }
       <div className="w-full h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
         <div
           className={`h-full transition-all duration-300 rounded-full ${barColor}`}
-          style={{ width: `${isUncertain ? 0 : Math.min(100, percentage)}%` }}
+          style={{ width: `${shouldZeroBar ? 0 : Math.min(100, percentage)}%` }}
           role="progressbar"
-          aria-valuenow={percentage}
+          aria-valuenow={shouldZeroBar ? 0 : percentage}
           aria-valuemin={0}
           aria-valuemax={100}
         />

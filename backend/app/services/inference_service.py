@@ -73,9 +73,9 @@ class SessionInferenceService:
         self._frame_count += 1
         output = self.pipeline.step(bgr_frame)
 
-        # Build response payload
+        # Build response payload only when actively detecting or confirming a gesture
         pred_payload = None
-        if output.prediction is not None:
+        if output.prediction is not None and output.state in ("CANDIDATE", "ACTIVE", "ENDING"):
             pred_payload = ServerPredictionPayload(
                 class_id=output.prediction.class_id,
                 label=output.prediction.label,
@@ -96,13 +96,20 @@ class SessionInferenceService:
                 is_final=output.translation.is_final
             )
 
+        # Only expose smoothed label when in an active gesture state
+        active_smoothed_label = (
+            output.smoothed.label 
+            if output.smoothed and output.state in ("CANDIDATE", "ACTIVE", "ENDING") 
+            else None
+        )
+
         return ServerRealtimeMessage(
             type="prediction",
             session_id=self.session_id,
             timestamp=output.timestamp,
             pipeline_state=output.pipeline_state,
             prediction=pred_payload,
-            smoothed_label=output.smoothed.label if output.smoothed else None,
+            smoothed_label=active_smoothed_label,
             state_machine=output.state,
             sign_sequence=list(output.sign_sequence),
             translation=trans_payload,

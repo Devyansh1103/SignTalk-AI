@@ -1,0 +1,36 @@
+sample_id,split,class_label,class_id,signer_id,processed_file,original_frames,target_frames,average_quality,classification,classification_reason,pose_detection_rate,left_hand_detection_rate,right_hand_detection_rate,face_detection_rate,elapsed_seconds,status
+raw_0061,train,happy,3,signer_51,data/processed/landmarks/train/raw_0061.npz,71,45,0.7888,GOOD,High landmark quality and continuous pose tracking,100.0,63.38,78.87,0.0,6.934,COMPLETED
+raw_0062,train,happy,3,signer_51,data/processed/landmarks/train/raw_0062.npz,69,45,0.804,GOOD,High landmark quality and continuous pose tracking,100.0,68.12,79.71,0.0,6.977,COMPLETED
+raw_0063,train,happy,3,signer_51,data/processed/landmarks/train/raw_0063.npz,78,45,0.7896,GOOD,High landmark quality and continuous pose tracking,100.0,57.69,84.62,0.0,7.726,COMPLETED
+raw_0064,train,happy,3,signer_52,data/processed/landmarks/train/raw_0064.npz,53,45,0.7817,GOOD,High landmark quality and continuous pose tracking,100.0,66.04,73.58,0.0,5.931,COMPLETED
+raw_0065,test,happy,3,signer_52,data/processed/landmarks/test/raw_0065.npz,56,45,0.7636,GOOD,High landmark quality and continuous pose tracking,100.0,62.5,67.86,0.0,5.899,COMPLETED
+raw_0066,test,happy,3,signer_52,data/processed/landmarks/test/raw_0066.npz,48,45,0.7427,ACCEPTABLE,Acceptable detection coverage for sequence modeling,100.0,56.25,66.67,0.0,4.941,COMPLETED
+raw_0067,train,happy,3,signer_53,data/processed/landmarks/train/raw_0067.npz,41,45,0.7698,GOOD,High landmark quality and continuous pose tracking,100.0,65.85,68.29,0.0,4.633,COMPLETED
+raw_0068,test,happy,3,signer_53,data/processed/landmarks/test/raw_0068.npz,53,45,0.8091,GOOD,High landmark quality and continuous pose tracking,100.0,73.58,71.7,0.0,7.358,COMPLETED
+raw_0069,train,happy,3,signer_53,data/processed/landmarks/train/raw_0069.npz,73,45,0.8657,GOOD,High landmark quality and continuous pose tracking,100.0,84.93,87.67,0.0,9.041,COMPLETED
+raw_0070,train,happy,3,signer_92,data/processed/landmarks/train/raw_0070.npz,48,45,0.6644,ACCEPTABLE,Acceptable detection coverage for sequence modeling,100.0,58.33,43.75,0.0,6.533,COMPLETED
+raw_0071,train,happy,3,signer_92,data/processed/landmarks/train/raw_0071.npz,50,45,0.6926,ACCEPTABLE,Acceptable detection coverage for sequence modeling,100.0,64.0,46.0,0.0,6.478,COMPLETED
+raw_0072,train,happy,3,signer_92,data/processed/landmarks/train/raw_0072.npz,48,45,0.6685,ACCEPTABLE,Acceptable detection coverage for sequence modeling,100.0,56.25,43.75,0.0,5.087,COMPLETED
+raw_0073,train,happy,3,signer_93,data/processed/landmarks/train/raw_0073.npz,45,45,0.6049,ACCEPTABLE,Acceptable detection coverage for sequence modeling,97.78,42.22,31.11,0.0,5.33,COMPLETED
+raw_0074,val,happy,3,signer_93,data/processed/landmarks/val/raw_0074.npz,41,45,0.6174,ACCEPTABLE,Acceptable detection coverage for sequence modeling,97.56,46.34,34.15,0.0,4.423,COMPLETED
+raw_0075,train,happy,3,signer_93,data/processed/landmarks/train/raw_0075.npz,36,45,0.6364,ACCEPTABLE,Acceptable detection coverage for sequence modeling,97.22,50.0,33.33,0.0,4.829,COMPLETED
+raw_0076,train,happy,3,signer_94,data/processed/landmarks/train/raw_0076.npz,44,45,0.7233,ACCEPTABLE,Acceptable detection coverage for sequence modeling,100.0,65.91,54.55,0.0,5.305,COMPLETED
+raw_0077,train,happy,3,signer_94,data/processed/landmarks/train/raw_0077.npz,51,45,0.7275,ACCEPTABLE,Acceptable detection coverage for sequence modeling,100.0,58.82,56.86,0.0,5.468,COMPLETED
+raw_0078,val,happy,3,signer_94,data/processed/landmarks/val/raw_0078.npz,43,45,0.7031,ACCEPTABLE,Acceptable detection coverage for sequence modeling,100.0,58.14,51.16,0.0,4.377,COMPLETED
+raw_0079,train,happy,3,signer_95,data/processed/landmarks/train/raw_0079.npz,50,45,0.79,GOOD,High landmark quality and continuous pose tracking,100.0,76.0,70.0,0.0,5.215,COMPLETED
+raw_0080,train,happy,3,signer_95,data/processed/landmarks/train/raw_0080.npz,57,45,0.7976,GOOD,High landmark quality and continuous pose tracking,100.0,80.7,66.67,0.0,5.63,COMPLETED
+raw_0081,test,happy,3,signer_95,data/processed/landmarks/test/raw_0081.npz,58,45,0.785,GOOD,High landmark quality and continuous pose tracking,100.0,75.86,65.52,0.0,5.73,COMPLETED
+raw_0082,train,teacher,9,signer_44,data/processed/landmarks/train/raw_0082.npz,67,45,0.706,ACCEPTABLE,Acceptable detection coverage for sequence modeling,97.01,20.9,76.12,0.0,7.28,COMPLETED
+raw_0083,train,teacher,9,signer_44,data/processed/landmarks/train/raw_0083.npz,73,45,0.6343,ACCEPTABLE,Acceptable detection coverage for sequence modeling,89.04,10.96,69.86,0.0,7.459,COMPLETED
+raw_0084,train,teacher,9,signer_44,data/processed/landmarks/train/raw_0084.npz,79,45,0.6984,ACCEPTABLE,Acceptable detection coverage for sequence modeling,97.47,8.86,79.75,0.0,8.358,COMPLETED
+raw_0085,train,teacher,9,signer_44,data/processed/landmarks/train/raw_0085.npz,68,45,0.6861,ACCEPTABLE,Acceptable detection coverage for sequence modeling,95.59,26.47,67.65,0.0,9.331,COMPLETED
+raw_0086,train,teacher,9,signer_47,data/processed/landmarks/train/raw_0086.npz,53,45,0.6124,ACCEPTABLE,Acceptable detection coverage for sequence modeling,100.0,26.42,39.62,0.0,7.357,COMPLETED
+raw_0087,train,teacher,9,signer_47,data/processed/landmarks/train/raw_0087.npz,64,45,0.6269,ACCEPTABLE,Acceptable detection coverage for sequence modeling,100.0,7.81,53.12,0.0,8.011,COMPLETED
+raw_0088,val,teacher,9,signer_47,data/processed/landmarks/val/raw_0088.npz,59,45,0.6709,ACCEPTABLE,Acceptable detection coverage for sequence modeling,100.0,18.64,55.93,0.0,8.295,COMPLETED
+raw_0089,test,teacher,9,signer_53,data/processed/landmarks/test/raw_0089.npz,61,45,0.758,GOOD,High landmark quality and continuous pose tracking,100.0,54.1,63.93,0.0,8.135,COMPLETED
+raw_0090,train,teacher,9,signer_53,data/processed/landmarks/train/raw_0090.npz,50,45,0.7844,GOOD,High landmark quality and continuous pose tracking,100.0,46.0,74.0,0.0,6.902,COMPLETED
+raw_0091,train,teacher,9,signer_53,data/processed/landmarks/train/raw_0091.npz,51,45,0.7658,GOOD,High landmark quality and continuous pose tracking,100.0,45.1,68.63,0.0,6.761,COMPLETED
+raw_0092,test,teacher,9,signer_53,data/processed/landmarks/test/raw_0092.npz,55,45,0.8011,GOOD,High landmark quality and continuous pose tracking,100.0,49.09,76.36,0.0,7.416,COMPLETED
+raw_0093,train,teacher,9,signer_88,data/processed/landmarks/train/raw_0093.npz,73,45,0.7807,GOOD,High landmark quality and continuous pose tracking,100.0,58.9,78.08,0.0,10.522,COMPLETED
+raw_0094,train,teacher,9,signer_88,data/processed/landmarks/train/raw_0094.npz,60,45,0.7523,GOOD,High landmark quality and continuous pose tracking,100.0,43.33,75.0,0.0,7.818,COMPLETED
+raw_0095,test,teacher,9,signer_88,data/processed/landmarks/test/raw_0095.npz,61,45,0.7553,GOOD,High landmark quality and continuous pose tracking,100.0,52.46,75.41,0.0,8.92,COMPLETED

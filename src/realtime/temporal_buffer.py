@@ -151,7 +151,7 @@ class TemporalBuffer:
             "end_frame_id": self._buffer[-1].frame_id
         }
 
-    def is_window_valid(self) -> bool:
+    def is_window_valid(self, min_hand_ratio: float = 0.20) -> bool:
         """
         Applies upstream quality gate: checks whether the window contains
         sufficient valid frames and active hand detections.
@@ -163,12 +163,58 @@ class TemporalBuffer:
         if meta["valid_frames"] < self.min_valid_frames:
             return False
 
-        # Active hand requirement (at least 15% of frames have an active hand)
+        # Active hand requirement (at least 20% of frames have an active hand detected)
         hand_count = sum(1 for f in self._buffer if f.modality_stats.either_hand_detected)
-        if (hand_count / self.max_length) < 0.15:
+        if (hand_count / self.max_length) < min_hand_ratio:
             return False
 
         return True
+
+    def has_hand_movement(self, min_velocity: float = 0.018) -> bool:
+        """
+        Checks whether hands exhibit kinematic signing movement across the window.
+        Returns False if hands are completely stationary (e.g. resting on lap/desk).
+        """
+        if len(self._buffer) < 5:
+            return False
+
+        frames = list(self._buffer)
+        displacements = []
+        for i in range(0, len(frames) - 2, 2):
+            f1 = frames[i]
+            f2 = frames[i + 2]
+            # Hand nodes: 0 through 41
+            shared_hands = f1.mask[:42] & f2.mask[:42]
+            if np.any(shared_hands):
+                d = np.linalg.norm(
+                    f2.normalized_coords[:42][shared_hands] - f1.normalized_coords[:42][shared_hands],
+                    axis=1
+                )
+                displacements.append(float(np.mean(d)))
+
+        if not displacements:
+            return False
+        return float(np.mean(displacements)) >= min_velocity
+
+    def hands_in_signing_space(self, max_y: float = 1.35) -> bool:
+        """
+        Checks whether detected hands are elevated within the signing space
+        (chest/neck/face area, where normalized y relative to mid-shoulder <= max_y).
+        Hands resting in lap or on desk typically have y > 1.35.
+        """
+        if len(self._buffer) < 5:
+            return False
+
+        recent_frames = list(self._buffer)[-10:]
+        y_positions = []
+        for f in recent_frames:
+            valid_hand_indices = np.where(f.mask[:42])[0]
+            if len(valid_hand_indices) > 0:
+                y_positions.extend(f.normalized_coords[valid_hand_indices, 1].tolist())
+
+        if not y_positions:
+            return False
+        return float(np.min(y_positions)) <= max_y
 
     def clear(self) -> None:
         """Clears all frames from buffer."""

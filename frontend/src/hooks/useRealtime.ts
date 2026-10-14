@@ -22,11 +22,16 @@ export function useRealtime(videoRef: React.RefObject<HTMLVideoElement | null>, 
   const captureIntervalRef = useRef<number | null>(null);
   const isStreamingRef = useRef<boolean>(false);
 
-  // Initialize offscreen canvas for frame capture
+  // Backpressure & Deduplication guards
+  const inFlightRef = useRef<number>(0);
+  const lastSendTimeRef = useRef<number>(0);
+  const lastFinalizedTimestampRef = useRef<number | null>(null);
+
+  // Initialize offscreen canvas for frame capture (320x240 optimized for CPU MediaPipe extraction)
   useEffect(() => {
     canvasRef.current = document.createElement('canvas');
-    canvasRef.current.width = 640;
-    canvasRef.current.height = 480;
+    canvasRef.current.width = 320;
+    canvasRef.current.height = 240;
   }, []);
 
   // Initialize Realtime WebSocket Client
@@ -39,13 +44,22 @@ export function useRealtime(videoRef: React.RefObject<HTMLVideoElement | null>, 
     });
 
     const unsubMsg = client.subscribeMessage((msg) => {
+      // Decrement in-flight tracker on server response
+      inFlightRef.current = Math.max(0, inFlightRef.current - 1);
+
       setLatestMessage(msg);
       if (msg.fps) {
         setFps(msg.fps);
       }
 
-      // Check for committed phrases
-      if (msg.translation && msg.translation.is_final && msg.translation.text) {
+      // Check for committed phrases (guaranteed idempotent by timestamp)
+      if (
+        msg.translation &&
+        msg.translation.is_final &&
+        msg.translation.text &&
+        msg.timestamp !== lastFinalizedTimestampRef.current
+      ) {
+        lastFinalizedTimestampRef.current = msg.timestamp;
         setTranscript((prev) => [
           ...prev,
           {
@@ -69,10 +83,11 @@ export function useRealtime(videoRef: React.RefObject<HTMLVideoElement | null>, 
     };
   }, []);
 
-  // Frame Capture Pacer Loop (15–20 FPS to prevent socket saturation)
+  // Frame Capture Pacer Loop with Backpressure Gating
   const startStreaming = useCallback(() => {
     if (isStreamingRef.current) return;
     isStreamingRef.current = true;
+    inFlightRef.current = 0;
 
     // Send start command to backend
     clientRef.current?.sendControl('start');
@@ -80,6 +95,17 @@ export function useRealtime(videoRef: React.RefObject<HTMLVideoElement | null>, 
     captureIntervalRef.current = window.setInterval(() => {
       if (!isCameraRunning || !videoRef.current || !canvasRef.current || !clientRef.current) {
         return;
+      }
+
+      // Backpressure guard: allow up to 2 frames in-flight to prevent pipeline starvation
+      // while preventing unbounded buffer buildup if processing spikes.
+      const now = Date.now();
+      if (inFlightRef.current >= 2) {
+        if (now - lastSendTimeRef.current > 600) {
+          inFlightRef.current = 0;
+        } else {
+          return;
+        }
       }
 
       const video = videoRef.current;
@@ -91,26 +117,32 @@ export function useRealtime(videoRef: React.RefObject<HTMLVideoElement | null>, 
       const ctx = canvas.getContext('2d');
       if (!ctx) return;
 
-      // Draw video frame to canvas
+      // Draw video frame to canvas at 320x240
       ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-      // Convert to blob and send binary frame
+      inFlightRef.current += 1;
+      lastSendTimeRef.current = now;
+
+      // Convert to blob and send binary frame (quality 0.65 for fast network transfer)
       canvas.toBlob(
         (blob) => {
           if (blob && clientRef.current) {
             blob.arrayBuffer().then((buffer) => {
               clientRef.current?.sendFrameBytes(buffer);
             });
+          } else {
+            inFlightRef.current = Math.max(0, inFlightRef.current - 1);
           }
         },
         'image/jpeg',
-        0.80
+        0.65
       );
-    }, 60); // ~16.6 FPS (60ms intervals)
+    }, 40); // 25 FPS target cadence matching ST-GCN training data
   }, [isCameraRunning, videoRef]);
 
   const stopStreaming = useCallback(() => {
     isStreamingRef.current = false;
+    inFlightRef.current = 0;
     if (captureIntervalRef.current) {
       clearInterval(captureIntervalRef.current);
       captureIntervalRef.current = null;
@@ -120,6 +152,7 @@ export function useRealtime(videoRef: React.RefObject<HTMLVideoElement | null>, 
 
   const pauseStreaming = useCallback(() => {
     isStreamingRef.current = false;
+    inFlightRef.current = 0;
     if (captureIntervalRef.current) {
       clearInterval(captureIntervalRef.current);
       captureIntervalRef.current = null;
@@ -132,6 +165,8 @@ export function useRealtime(videoRef: React.RefObject<HTMLVideoElement | null>, 
   }, [startStreaming]);
 
   const resetSession = useCallback(() => {
+    lastFinalizedTimestampRef.current = null;
+    inFlightRef.current = 0;
     clientRef.current?.sendControl('reset');
     setTranscript([]);
     setLatestMessage(null);

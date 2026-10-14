@@ -373,6 +373,7 @@ class RealtimePipeline:
         # -------------------------------------------------------------
         # Stage 4: Sliding Window & ST-GCN Model Inference
         # -------------------------------------------------------------
+        output_translation = None
         if self.scheduler.should_infer(self.temporal_buffer):
             self.scheduler.record_inference_start()
             window = self.temporal_buffer.get_window()
@@ -399,19 +400,23 @@ class RealtimePipeline:
             pred_conf = float(probs_np[pred_cid])
 
             top_indices = np.argsort(probs_np)[::-1][:self.config.inference.top_k]
-            top_k_list = [
-                (int(idx), self.model_runner.model.graph_strategy, float(probs_np[idx]))  # placeholder
-                for idx in top_indices
-            ]
-            # Replace placeholder label with canonical label
             from src.data.label_map import get_label, get_gloss, get_translation
             top_k_list = [
                 (int(idx), get_label(int(idx)), float(probs_np[idx]))
                 for idx in top_indices
             ]
 
+            # Upstream Activity Gate: verify sufficient active hand presence, movement, and signing space elevation
+            is_valid_kinematics = (
+                self.temporal_buffer.is_window_valid()
+                and self.temporal_buffer.has_hand_movement()
+                and self.temporal_buffer.hands_in_signing_space()
+            )
+
             qualities = [f.quality.quality_score for f in window]
-            input_quality = float(np.mean(qualities)) if qualities else 0.0
+            raw_quality = float(np.mean(qualities)) if qualities else 0.0
+            input_quality = raw_quality if is_valid_kinematics else 0.0
+            is_valid_quality = (sum(1 for f in window if f.quality.is_valid) >= 15) and is_valid_kinematics
 
             prediction = PredictionResult(
                 class_id=pred_cid,
@@ -430,7 +435,7 @@ class RealtimePipeline:
                 inference_end_time=time.perf_counter(),
                 inference_latency_ms=round(latencies["stgcn_inference"], 2),
                 input_quality=round(input_quality, 4),
-                is_valid_quality=(sum(1 for f in window if f.quality.is_valid) >= 15),
+                is_valid_quality=is_valid_quality,
                 buffer_length=len(window),
                 device=str(self.model_runner.device)
             )
@@ -490,6 +495,18 @@ class RealtimePipeline:
                     t_trans = time.perf_counter()
                     trans_res = self.translator.process_event(deduped)
                     self.latest_translation = trans_res
+                    if trans_res.is_final and trans_res.text:
+                        output_translation = trans_res
+                        self.latest_translation = TranslationResult(
+                            text=trans_res.text,
+                            hindi_text=trans_res.hindi_text,
+                            confidence=trans_res.confidence,
+                            tokens=trans_res.tokens,
+                            source_signs=trans_res.source_signs,
+                            timestamp=trans_res.timestamp,
+                            status=trans_res.status,
+                            is_final=False
+                        )
                     latencies["translation"] = (time.perf_counter() - t_trans) * 1000.0
                     self.profiler.record_stage("translation", latencies["translation"])
 
@@ -498,8 +515,22 @@ class RealtimePipeline:
 
         # Check for pause-based sentence finalization in translation layer
         pause_trans = self.translator.check_pause(ts)
-        if pause_trans is not None:
+        if pause_trans is not None and pause_trans.text:
             self.latest_translation = pause_trans
+            output_translation = pause_trans
+            # One-shot finalization guarantee: downgrade is_final so future frames do not re-emit is_final=True
+            self.latest_translation = TranslationResult(
+                text=pause_trans.text,
+                hindi_text=pause_trans.hindi_text,
+                confidence=pause_trans.confidence,
+                tokens=pause_trans.tokens,
+                source_signs=pause_trans.source_signs,
+                timestamp=pause_trans.timestamp,
+                status=pause_trans.status,
+                is_final=False
+            )
+        elif output_translation is None:
+            output_translation = self.latest_translation
 
         # Compute End-to-End Latency
         latencies["end_to_end"] = (time.perf_counter() - t_e2e_start) * 1000.0
@@ -514,7 +545,7 @@ class RealtimePipeline:
             state=self.sign_state_machine.state.value,
             latest_event=self.latest_event,
             sign_sequence=self.sign_sequence.get_labels(),
-            translation=self.latest_translation,
+            translation=output_translation,
             stage_latencies_ms=latencies,
             fps=self._fps_estimate,
             pipeline_state=self._state.value,
@@ -659,12 +690,14 @@ class RealtimePipeline:
         self.sign_sequence.clear()
         self.translator.reset()
         self.profiler.reset()
+        self.scheduler.reset()
 
         self.latest_prediction = None
         self.latest_filtered = None
         self.latest_smoothed = None
         self.latest_event = None
         self.latest_translation = None
+        self._last_frame_time = 0.0
         logger.info("RealtimePipeline RESET complete.")
 
     def stop(self) -> None:

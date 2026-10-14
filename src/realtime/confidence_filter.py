@@ -64,6 +64,7 @@ class ConfidenceFilter:
         min_input_quality: float = 0.40,
         threshold: Optional[float] = None,
         uncertain_label: str = UNCERTAIN_LABEL,
+        min_margin: float = 0.15,
     ):
         """
         Args:
@@ -71,12 +72,14 @@ class ConfidenceFilter:
             min_input_quality: Minimum landmark quality score required (default: 0.40).
             threshold: Alias for confidence_threshold.
             uncertain_label: Label to assign to uncertain predictions.
+            min_margin: Minimum margin between top-1 and top-2 softmax probabilities (default: 0.15).
         """
         if threshold is not None:
             confidence_threshold = threshold
         self.confidence_threshold = float(confidence_threshold)
         self.min_input_quality = float(min_input_quality)
         self.uncertain_label = uncertain_label
+        self.min_margin = float(min_margin)
 
     def filter(self, prediction: Union[PredictionResult, PredictionRecord]) -> FilteredPrediction:
         """
@@ -92,7 +95,6 @@ class ConfidenceFilter:
 
         conf = rec.confidence
         qual = rec.input_quality
-
 
         # Quality check first
         if qual < self.min_input_quality:
@@ -125,6 +127,25 @@ class ConfidenceFilter:
                 window_start=rec.window_start,
                 window_end=rec.window_end
             )
+
+        # Softmax margin check: ensure top-1 probability clearly dominates top-2
+        if rec.probabilities is not None and len(rec.probabilities) > 1:
+            sorted_probs = np.sort(rec.probabilities)[::-1]
+            margin = float(sorted_probs[0] - sorted_probs[1])
+            if margin < self.min_margin:
+                return FilteredPrediction(
+                    class_id=UNCERTAIN_CLASS_ID,
+                    label=UNCERTAIN_LABEL,
+                    gloss=UNCERTAIN_GLOSS,
+                    translation="Uncertain",
+                    confidence=conf,
+                    input_quality=qual,
+                    is_accepted=False,
+                    rejection_reason="low_softmax_margin",
+                    timestamp=rec.timestamp,
+                    window_start=rec.window_start,
+                    window_end=rec.window_end
+                )
 
         # Accepted prediction
         return FilteredPrediction(

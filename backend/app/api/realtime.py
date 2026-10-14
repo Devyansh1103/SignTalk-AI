@@ -4,7 +4,9 @@ Phase 5: Bidirectional Streaming for Frame Ingestion & Telemetry Distribution.
 """
 
 import json
+import asyncio
 import logging
+import traceback
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 
 from backend.app.services.session_manager import SessionManager
@@ -50,18 +52,27 @@ async def websocket_realtime_endpoint(websocket: WebSocket):
             if "bytes" in message and message["bytes"]:
                 # Binary frame ingestion (fastest path)
                 try:
-                    res = session.process_frame_bytes(message["bytes"])
+                    res = await asyncio.to_thread(session.process_frame_bytes, message["bytes"])
                     await websocket.send_text(res.model_dump_json())
+                except WebSocketDisconnect:
+                    # Client disconnected mid-frame — let the outer handler catch it
+                    raise
                 except Exception as e:
-                    logger.error(f"Error processing binary frame: {e}")
-                    err_msg = ServerRealtimeMessage(
-                        type="error",
-                        session_id=session.session_id,
-                        timestamp=0.0,
-                        pipeline_state="ERROR",
-                        message=f"Frame processing error: {str(e)}"
-                    )
-                    await websocket.send_text(err_msg.model_dump_json())
+                    tb = traceback.format_exc()
+                    logger.error(f"Error processing binary frame: {type(e).__name__}: {e}\n{tb}")
+                    # Only attempt to send error if socket is still open
+                    try:
+                        err_msg = ServerRealtimeMessage(
+                            type="error",
+                            session_id=session.session_id,
+                            timestamp=0.0,
+                            pipeline_state="ERROR",
+                            state_machine="IDLE",
+                            message=f"Frame processing error: {type(e).__name__}: {str(e)}"
+                        )
+                        await websocket.send_text(err_msg.model_dump_json())
+                    except Exception:
+                        pass  # Socket already closed; don't crash the outer loop
 
             elif "text" in message and message["text"]:
                 try:
@@ -126,14 +137,29 @@ async def websocket_realtime_endpoint(websocket: WebSocket):
                     b64 = data.get("image_base64", "")
                     if b64:
                         try:
-                            res = session.process_base64_frame(b64)
+                            res = await asyncio.to_thread(session.process_base64_frame, b64)
                             await websocket.send_text(res.model_dump_json())
+                        except WebSocketDisconnect:
+                            raise
                         except Exception as e:
-                            logger.error(f"Error processing base64 frame: {e}")
+                            tb = traceback.format_exc()
+                            logger.error(f"Error processing base64 frame: {type(e).__name__}: {e}\n{tb}")
+                            try:
+                                err_msg = ServerRealtimeMessage(
+                                    type="error",
+                                    session_id=session.session_id,
+                                    timestamp=0.0,
+                                    pipeline_state="ERROR",
+                                    state_machine="IDLE",
+                                    message=f"Base64 frame error: {type(e).__name__}: {str(e)}"
+                                )
+                                await websocket.send_text(err_msg.model_dump_json())
+                            except Exception:
+                                pass
 
     except WebSocketDisconnect:
         logger.info(f"WebSocket client disconnected: {session.session_id}")
     except Exception as e:
-        logger.error(f"WebSocket exception in session {session.session_id}: {e}")
+        logger.error(f"WebSocket exception in session {session.session_id}: {type(e).__name__}: {e}")
     finally:
         sm.close_session(session.session_id)

@@ -43,6 +43,7 @@ export interface TranslationPayload {
   tokens: string[];
   source_signs: string[];
   is_final: boolean;
+  timestamp?: number;
 }
 
 export interface ServerRealtimeMessage {

@@ -73,20 +73,33 @@ class SessionInferenceService:
         self._frame_count += 1
         output = self.pipeline.step(bgr_frame)
 
-        # Build response payload only when actively detecting or confirming a gesture
+        # Build response payload only when actively detecting or confirming a valid gesture
         pred_payload = None
-        if output.prediction is not None and output.state in ("CANDIDATE", "ACTIVE", "ENDING"):
+        if (
+            output.state in ("CANDIDATE", "ACTIVE", "ENDING")
+            and output.smoothed is not None
+            and output.smoothed.is_valid
+            and output.smoothed.label not in ("UNCERTAIN", "UNSTABLE", "IDLE", "NO_SIGN", "UNKNOWN")
+            and output.smoothed.confidence >= 0.65
+        ):
+            top_k_list = []
+            if output.prediction and output.prediction.top_k:
+                top_k_list = [[idx, lbl, round(conf, 4)] for idx, lbl, conf in output.prediction.top_k]
+
             pred_payload = ServerPredictionPayload(
-                class_id=output.prediction.class_id,
-                label=output.prediction.label,
-                gloss=output.prediction.gloss,
-                confidence=round(output.prediction.confidence, 4),
-                input_quality=round(output.prediction.input_quality, 4),
-                top_k=[[idx, lbl, round(conf, 4)] for idx, lbl, conf in output.prediction.top_k]
+                class_id=output.smoothed.class_id,
+                label=output.smoothed.label,
+                gloss=getattr(output.smoothed, "gloss", output.smoothed.label),
+                confidence=round(output.smoothed.confidence, 4),
+                input_quality=round(
+                    output.smoothed.input_quality if hasattr(output.smoothed, "input_quality") else (output.prediction.input_quality if output.prediction else 0.0),
+                    4
+                ),
+                top_k=top_k_list
             )
 
         trans_payload = None
-        if output.translation is not None:
+        if output.translation is not None and output.translation.text:
             trans_payload = ServerTranslationPayload(
                 text=output.translation.text,
                 hindi_text=output.translation.hindi_text,
@@ -96,10 +109,10 @@ class SessionInferenceService:
                 is_final=output.translation.is_final
             )
 
-        # Only expose smoothed label when in an active gesture state
+        # Only expose smoothed label when in an active gesture state and valid
         active_smoothed_label = (
             output.smoothed.label 
-            if output.smoothed and output.state in ("CANDIDATE", "ACTIVE", "ENDING") 
+            if output.smoothed and output.smoothed.is_valid and output.state in ("CANDIDATE", "ACTIVE", "ENDING") 
             else None
         )
 

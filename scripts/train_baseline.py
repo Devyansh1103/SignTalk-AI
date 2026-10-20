@@ -136,7 +136,7 @@ def main():
 
     # Load class names from vocabulary if available
     class_names = None
-    vocab_path = "assets/vocabularies/mvp_10.json"
+    vocab_path = "assets/vocabularies/signtalk_vocab.json"
     if os.path.exists(vocab_path):
         with open(vocab_path, "r", encoding="utf-8") as vf:
             vocab = json.load(vf)

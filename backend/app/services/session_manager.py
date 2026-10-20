@@ -25,7 +25,7 @@ class SessionManager:
     """
 
     def __init__(self, config: Optional[RealTimeConfig] = None):
-        self.config = config or RealTimeConfig()
+        self.config = config or RealTimeConfig.from_yaml("configs/realtime.yaml")
         self._sessions: Dict[str, SessionInferenceService] = {}
         self._shared_model_runner: Optional[STGCNRunner] = None
         self._initialize_shared_model()
@@ -39,7 +39,8 @@ class SessionManager:
                 checkpoint_path=chk,
                 device=self.config.inference.device,
                 top_k=self.config.inference.top_k,
-                warmup_iterations=self.config.inference.warmup_iterations
+                warmup_iterations=self.config.inference.warmup_iterations,
+                num_threads=self.config.inference.num_threads
             )
         else:
             logger.warning(f"Checkpoint not found at {chk}. Model will load on demand if created.")

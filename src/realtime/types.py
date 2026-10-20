@@ -94,6 +94,9 @@ class LandmarkFrame:
     quality_check_latency_ms: float = 0.0
     total_latency_ms: float = 0.0
 
+    # Factor applied to raw y for model input so a 4:3 frame matches 16:9 training geometry
+    aspect_y_scale: float = 1.0
+
     def __post_init__(self):
         # Validate shapes and numerical safety
         if self.raw_coords.shape != (TOTAL_NODES, CHANNELS):

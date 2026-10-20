@@ -22,6 +22,8 @@ from src.data.label_map import (
     get_translation
 )
 from src.realtime.types import LandmarkFrame, PredictionResult
+from src.preprocessing.normalizer import CoordinateNormalizer
+from src.preprocessing.sequence_utils import handle_missing_landmarks
 
 logger = logging.getLogger("SignTalk.RealTime.ModelRunner")
 
@@ -46,7 +48,8 @@ class STGCNRunner:
         checkpoint_path: str = "experiments/stgcn/checkpoints/best_checkpoint.pt",
         device: str = "auto",
         top_k: int = 3,
-        warmup_iterations: int = 5
+        warmup_iterations: int = 5,
+        num_threads: int = 0
     ):
         """
         Args:
@@ -54,10 +57,16 @@ class STGCNRunner:
             device: Target execution device ('auto', 'cpu', 'cuda').
             top_k: Number of ranked predictions to return (default: 3).
             warmup_iterations: Number of dummy inference cycles during initialization.
+            num_threads: torch CPU intra-op threads (0 = torch default). On a 12-thread laptop
+                CPU the default 8 took 67 ms per forward vs 42 ms with 4, and competed with
+                the MediaPipe threads.
         """
+        if int(num_threads) > 0:
+            torch.set_num_threads(int(num_threads))
         self.checkpoint_path = checkpoint_path
         self.top_k = max(1, min(NUM_CLASSES, int(top_k)))
         self.device = self._resolve_device(device)
+        self._sequence_normalizer = CoordinateNormalizer(method="torso_scale")
 
         self.expected_channels = CHANNELS                # 3
         self.expected_sequence_length = TARGET_SEQUENCE_LENGTH  # 45
@@ -156,7 +165,8 @@ class STGCNRunner:
 
     def window_to_tensor(
         self,
-        window: List[LandmarkFrame]
+        window: List[LandmarkFrame],
+        offline_postprocess: bool = False
     ) -> Tuple[torch.Tensor, torch.Tensor]:
         """
         Converts a list of T LandmarkFrame objects into ST-GCN input tensors.
@@ -188,6 +198,9 @@ class STGCNRunner:
             coords_array[t_idx] = lf.normalized_coords
             mask_array[t_idx] = lf.mask
 
+        if offline_postprocess:
+            coords_array, mask_array = self._offline_postprocess(window)
+
         # Numerical safety check
         if np.isnan(coords_array).any() or np.isinf(coords_array).any():
             raise ModelRunnerError("NaN or Infinite values detected in window landmark tensor")
@@ -207,6 +220,33 @@ class STGCNRunner:
             )
 
         return tensor_x.to(self.device), tensor_mask.to(self.device)
+
+    def _offline_postprocess(self, window: List[LandmarkFrame]) -> Tuple[np.ndarray, np.ndarray]:
+        """Same steps as src/preprocessing/pipeline.py (training data): bridge landmark gaps
+        of up to 10 frames, then torso-normalize with the window-wide shoulder anchor."""
+        raw = np.stack([lf.raw_coords for lf in window]).astype(np.float32)
+        raw[:, :, 1] *= np.asarray([lf.aspect_y_scale for lf in window], dtype=np.float32)[:, None]
+        mask = np.stack([lf.mask for lf in window]).astype(bool)
+        vis = np.stack([lf.visibility for lf in window]).astype(np.float32)
+        coords, mask = handle_missing_landmarks(
+            raw, mask, strategy="interpolate_and_mask", max_consecutive_missing=10, visibility=vis
+        )
+        coords = self._normalize_window(coords, mask)
+        return coords.astype(np.float32), mask.astype(bool)
+
+    def _normalize_window(self, coords: np.ndarray, mask: np.ndarray) -> np.ndarray:
+        """Vectorized CoordinateNormalizer.normalize_sequence (torso_scale). The reference
+        implementation loops over every frame and node in Python (~45 ms per window)."""
+        both = mask[:, 47] & mask[:, 48]
+        if not np.any(both):
+            return self._sequence_normalizer.normalize_sequence(coords, mask)[0]
+        ls, rs = coords[both, 47], coords[both, 48]
+        center = np.mean((ls + rs) / 2.0, axis=0)
+        scale = max(float(np.mean(np.linalg.norm(ls - rs, axis=1))), self._sequence_normalizer.min_scale_epsilon)
+        out = (coords - center) / scale
+        out[..., 2] *= self._sequence_normalizer.z_scale_factor
+        out[~mask] = 0.0
+        return out
 
     @torch.no_grad()
     def predict(

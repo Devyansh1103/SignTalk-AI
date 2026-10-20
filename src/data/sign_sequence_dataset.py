@@ -38,7 +38,8 @@ class SignSequenceDataset(Dataset):
         min_quality: float = 0.0,
         include_velocity: bool = False,
         augment: bool = False,
-        transform_seed: Optional[int] = None
+        transform_seed: Optional[int] = None,
+        restrict_to_vocab: bool = False
     ):
         """
         Args:
@@ -49,11 +50,23 @@ class SignSequenceDataset(Dataset):
             include_velocity: If True, expands channels from C=3 to C=6 with temporal differences.
             augment: If True, applies training-time spatial augmentation (jitter, scaling, rotation).
             transform_seed: Deterministic random seed for reproducibility.
+            restrict_to_vocab: If True, keeps only rows whose 'label' is in the canonical
+                10-class vocabulary and takes class_id from the label (not from the .npz),
+                so stale/colliding class ids from the full INCLUDE manifests cannot leak in.
         """
         if not os.path.exists(manifest_path):
             raise FileNotFoundError(f"Manifest not found: {manifest_path}")
 
         df = pd.read_csv(manifest_path)
+
+        self.restrict_to_vocab = restrict_to_vocab
+        if restrict_to_vocab:
+            from src.data.label_map import LABEL_TO_ID
+            before = len(df)
+            df = df[df["label"].astype(str).isin(LABEL_TO_ID)].copy()
+            print(f"[DATA] restrict_to_vocab: kept {len(df)}/{before} rows from {manifest_path}")
+            if len(df) == 0:
+                raise ValueError(f"No rows with a canonical label in {manifest_path}")
 
         if split is not None:
             df = df[df["split"] == split].copy()
@@ -100,6 +113,49 @@ class SignSequenceDataset(Dataset):
         
         return c
 
+    def _temporal_crop(self, data: np.ndarray, mask: np.ndarray, p: float = 0.5,
+                       min_frac: float = 0.7) -> Tuple[np.ndarray, np.ndarray]:
+        """With probability p, keep a random contiguous 70-100% span of the clip and
+        resample it back to T frames (nearest frame). Training clips are whole recordings
+        squeezed into 45 frames; the live app feeds 1.8 s sliding windows that can start
+        or end mid-sign, so the model should not rely on seeing the full clip.
+        data: (3, T, V), mask: (1, T, V)"""
+        if self.rng.random() >= p:
+            return data, mask
+        T = data.shape[1]
+        span = int(round(T * float(self.rng.uniform(min_frac, 1.0))))
+        start = int(self.rng.integers(0, T - span + 1))
+        idx = np.round(np.linspace(start, start + span - 1, T)).astype(int)
+        return data[:, idx, :].copy(), mask[:, idx, :].copy()
+
+    def _drop_rest_hands(self, data: np.ndarray, mask: np.ndarray, p: float = 0.5,
+                         rest_y: float = 1.35) -> Tuple[np.ndarray, np.ndarray]:
+        """With probability p, hide hands that are resting below signing space (normalized
+        y > rest_y). INCLUDE signers stand with their hands visible at the hips before and after
+        a sign; a seated webcam user's resting hands are out of frame. Measured on 150 test clips
+        through the live extractor: removing resting hands drops accuracy 81% -> 71%."""
+        if self.rng.random() >= p:
+            return data, mask
+        data, mask = data.copy(), mask.copy()
+        for a, b in ((0, 21), (21, 42)):
+            hand_mask = mask[0, :, a:b] > 0                                        # (T, 21)
+            highest = np.where(hand_mask, data[1, :, a:b], np.inf).min(axis=1)     # smallest y = highest point
+            resting = hand_mask.any(axis=1) & (highest > rest_y)
+            data[:, resting, a:b] = 0.0
+            mask[:, resting, a:b] = 0
+        return data, mask
+
+    def _low_fps(self, data: np.ndarray, mask: np.ndarray, p: float = 0.5) -> Tuple[np.ndarray, np.ndarray]:
+        """With probability p, sample-and-hold every k-th frame (k = 2..4). The CPU backend
+        delivers 5-10 FPS, so a live sign resampled to 45 frames repeats each real frame
+        2-4 times; at 6 FPS accuracy dropped 81% -> 67% on test clips."""
+        if self.rng.random() >= p:
+            return data, mask
+        k = int(self.rng.integers(2, 5))
+        T = data.shape[1]
+        idx = np.minimum((np.arange(T) + int(self.rng.integers(0, k))) // k * k, T - 1)
+        return data[:, idx, :].copy(), mask[:, idx, :].copy()
+
     def __getitem__(self, idx: int) -> Dict[str, Any]:
         row = self.df.iloc[idx]
         file_path = str(row["file_path"])
@@ -116,11 +172,17 @@ class SignSequenceDataset(Dataset):
             data = arc["data"]  # (3, 45, 93)
             mask = arc["mask"]  # (1, 45, 93)
             class_id = int(arc["label"])
+            if self.restrict_to_vocab:
+                from src.data.label_map import LABEL_TO_ID
+                class_id = LABEL_TO_ID[str(row["label"])]
             gloss_id = int(arc["gloss_id"]) if "gloss_id" in arc else class_id + 4
 
         # Apply augmentation if requested (training mode only)
         if self.augment:
-            data = self._apply_augmentation(data)
+            data, mask = self._temporal_crop(data, mask)
+            data, mask = self._low_fps(data, mask)
+            data, mask = self._drop_rest_hands(data, mask)
+            data = self._apply_augmentation(data) * (mask > 0)  # keep missing nodes at exactly 0, like live input
 
         # Convert to PyTorch tensors
         tensor_x, tensor_mask = landmarks_to_stgcn_tensor(data, mask)

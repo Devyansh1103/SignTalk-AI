@@ -135,3 +135,24 @@ class TestTemporalBuffer:
         assert buf.is_ready()
         # Should fail quality gate due to lack of hand activity
         assert not buf.is_window_valid()
+
+    def test_time_based_readiness_at_low_fps(self):
+        # 8 FPS on CPU: 1.8 s of history is only ~15 frames, far short of 45
+        buf = TemporalBuffer(max_length=45, min_valid_frames=15, ready_window_sec=1.8)
+        for i in range(14):
+            buf.append(make_dummy_landmark_frame(i, i * 0.125))
+        assert not buf.is_ready()  # 14 frames < min_valid_frames
+
+        buf.append(make_dummy_landmark_frame(14, 14 * 0.125))
+        assert not buf.is_ready()  # 15 frames but only 1.75 s span
+        buf.append(make_dummy_landmark_frame(15, 15 * 0.125))
+        assert buf.is_ready()  # 16 frames, 1.875 s span
+        assert buf.is_window_valid()
+        assert len(buf.get_time_aligned_window(duration_sec=1.8)) == 45
+
+    def test_time_based_readiness_needs_min_frames(self):
+        # Long span but too few frames (e.g. a stalled camera) is not ready
+        buf = TemporalBuffer(max_length=45, min_valid_frames=15, ready_window_sec=1.8)
+        for i in range(5):
+            buf.append(make_dummy_landmark_frame(i, i * 1.0))
+        assert not buf.is_ready()

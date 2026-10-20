@@ -20,7 +20,7 @@ class SignLanguageTokenizer:
 
     def __init__(
         self,
-        vocab_path: str = "assets/vocabularies/mvp_10.json",
+        vocab_path: str = "assets/vocabularies/signtalk_vocab.json",
         normalizer: Optional[TextNormalizer] = None
     ):
         """

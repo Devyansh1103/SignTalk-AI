@@ -26,7 +26,8 @@ class TemporalBuffer:
         max_length: int = TARGET_SEQUENCE_LENGTH,
         min_valid_frames: int = 15,
         interpolate_missing_frames: bool = True,
-        max_consecutive_interpolated: int = 10
+        max_consecutive_interpolated: int = 10,
+        ready_window_sec: Optional[float] = None
     ):
         """
         Args:
@@ -34,11 +35,15 @@ class TemporalBuffer:
             min_valid_frames: Minimum required valid frames in window for quality check.
             interpolate_missing_frames: Whether to interpolate dropped frame gaps.
             max_consecutive_interpolated: Max dropped frames to bridge via linear interpolation.
+            ready_window_sec: If set (time-aligned windows), the buffer is ready once it
+                spans this many seconds with at least min_valid_frames frames, instead of
+                waiting for max_length frames (which takes ~7 s at 6-7 FPS on CPU).
         """
         self.max_length = int(max_length)
         self.min_valid_frames = int(min_valid_frames)
         self.interpolate_missing = interpolate_missing_frames
         self.max_consecutive_interpolated = max_consecutive_interpolated
+        self.ready_window_sec = float(ready_window_sec) if ready_window_sec else None
 
         self._buffer: deque = deque(maxlen=self.max_length)
         self._total_appended = 0
@@ -102,8 +107,42 @@ class TemporalBuffer:
         return self.length()
 
     def is_ready(self) -> bool:
-        """Returns True when buffer has accumulated exactly max_length frames."""
-        return len(self._buffer) >= self.max_length
+        """Returns True when buffer has accumulated max_length frames, or (time-aligned
+        mode) when it covers ready_window_sec seconds with at least min_valid_frames frames."""
+        n = len(self._buffer)
+        if n >= self.max_length:
+            return True
+        if self.ready_window_sec is None or n < max(2, self.min_valid_frames):
+            return False
+        span = self._buffer[-1].timestamp - self._buffer[0].timestamp
+        return span >= self.ready_window_sec
+
+    def get_time_aligned_window(
+        self,
+        duration_sec: float = 1.8,
+        num_frames: Optional[int] = None,
+    ) -> List[LandmarkFrame]:
+        """
+        Returns exactly `num_frames` frames covering the LAST `duration_sec` seconds,
+        picked by timestamp (nearest frame). This makes the model input independent of
+        the real camera/processing FPS: the model was trained on ~1.8 s signs sampled at
+        25 FPS, so at e.g. 10 FPS the last 1.8 s (18 frames) is stretched to 45 frames
+        instead of the window silently covering 4.5 s.
+
+        If less than `duration_sec` of history exists, the whole available span is used.
+        """
+        n = int(num_frames or self.max_length)
+        frames = list(self._buffer)
+        if len(frames) < 2:
+            return frames
+        ts = np.asarray([f.timestamp for f in frames], dtype=np.float64)
+        t_end = ts[-1]
+        t_start = max(ts[0], t_end - float(duration_sec))
+        targets = np.linspace(t_start, t_end, n)
+        hi = np.clip(np.searchsorted(ts, targets), 1, len(ts) - 1)
+        lo = hi - 1
+        pick = np.where(np.abs(targets - ts[lo]) <= np.abs(ts[hi] - targets), lo, hi)
+        return [frames[int(i)] for i in pick]
 
     def get_window(self) -> List[LandmarkFrame]:
         """
@@ -112,7 +151,7 @@ class TemporalBuffer:
         Raises:
             ValueError: If buffer does not have sufficient frames.
         """
-        if not self.is_ready():
+        if len(self._buffer) < self.max_length:
             raise ValueError(
                 f"Insufficient frames in buffer: have {len(self._buffer)}, need {self.max_length}"
             )
@@ -159,16 +198,28 @@ class TemporalBuffer:
         if not self.is_ready():
             return False
 
-        meta = self.get_window_metadata()
-        if meta["valid_frames"] < self.min_valid_frames:
+        frames = self._gate_frames()
+        valid_count = sum(1 for f in frames if f.quality.is_valid)
+        # At low FPS a 1.8 s window holds fewer than min_valid_frames frames; require half of them
+        if valid_count < min(self.min_valid_frames, int(np.ceil(0.5 * len(frames)))):
             return False
 
         # Active hand requirement (at least 20% of frames have an active hand detected)
-        hand_count = sum(1 for f in self._buffer if f.modality_stats.either_hand_detected)
-        if (hand_count / self.max_length) < min_hand_ratio:
+        hand_count = sum(1 for f in frames if f.modality_stats.either_hand_detected)
+        if (hand_count / len(frames)) < min_hand_ratio:
             return False
 
         return True
+
+    def _gate_frames(self) -> List[LandmarkFrame]:
+        """Frames the activity gates judge: the same last ready_window_sec seconds the model
+        sees in time-aligned mode (otherwise the whole buffer). Judging only the newest frames
+        rejected signs exactly when they completed, because the hands were already dropping."""
+        frames = list(self._buffer)
+        if self.ready_window_sec is None or not frames:
+            return frames
+        t_start = frames[-1].timestamp - self.ready_window_sec
+        return [f for f in frames if f.timestamp >= t_start]
 
     def has_hand_movement(self, min_velocity: float = 0.018) -> bool:
         """
@@ -178,7 +229,7 @@ class TemporalBuffer:
         if len(self._buffer) < 5:
             return False
 
-        frames = list(self._buffer)
+        frames = self._gate_frames()
         displacements = []
         for i in range(0, len(frames) - 2, 2):
             f1 = frames[i]
@@ -205,7 +256,7 @@ class TemporalBuffer:
         if len(self._buffer) < 5:
             return False
 
-        recent_frames = list(self._buffer)[-10:]
+        recent_frames = self._gate_frames() if self.ready_window_sec is not None else list(self._buffer)[-10:]
         y_positions = []
         for f in recent_frames:
             valid_hand_indices = np.where(f.mask[:42])[0]

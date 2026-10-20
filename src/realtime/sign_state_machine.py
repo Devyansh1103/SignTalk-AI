@@ -52,6 +52,7 @@ class SignStateMachine:
         min_consecutive_predictions: int = 2,
         min_confidence: float = 0.65,
         min_input_quality: float = 0.40,
+        emit_on_confirm: bool = False,
     ) -> None:
         """Initialize SignStateMachine.
 
@@ -59,10 +60,15 @@ class SignStateMachine:
             min_consecutive_predictions: Count of consecutive matching predictions to enter ACTIVE.
             min_confidence: Minimum model confidence to treat prediction as valid candidate.
             min_input_quality: Minimum landmark tracking quality score.
+            emit_on_confirm: Emit the SignEvent as soon as the sign becomes ACTIVE instead of
+                when it ends. The model keeps predicting a sign until the 1.8 s window slides
+                past it, so waiting for the end added ~1-2 s of visible lag.
         """
         self.min_consecutive_predictions = max(1, min_consecutive_predictions)
         self.min_confidence = min_confidence
         self.min_input_quality = min_input_quality
+        self.emit_on_confirm = bool(emit_on_confirm)
+        self._emitted_current = False
 
         self._state: SignState = SignState.IDLE
 
@@ -135,6 +141,9 @@ class SignStateMachine:
                 self._accumulate_metrics(pred)
                 if self._consecutive_count >= self.min_consecutive_predictions:
                     self._transition_to_active(pred)
+                    if self.emit_on_confirm:
+                        event_to_emit = self._finalize_active_event()
+                        self._emitted_current = True
             elif valid and pred.class_id != self._current_class_id:
                 # Class changed before achieving stability - switch candidate
                 self._transition_to_candidate(pred)
@@ -150,7 +159,8 @@ class SignStateMachine:
                 # Keep ACTIVE
             else:
                 # Sign concluded: prediction changed or confidence dropped
-                event_to_emit = self._finalize_active_event()
+                if not self._emitted_current:
+                    event_to_emit = self._finalize_active_event()
                 self._state = SignState.ENDING
 
                 # Decide next state from ENDING:
@@ -176,7 +186,7 @@ class SignStateMachine:
             Completed SignEvent if in ACTIVE state, else None.
         """
         if self._state == SignState.ACTIVE:
-            event = self._finalize_active_event()
+            event = None if self._emitted_current else self._finalize_active_event()
             self._reset_to_idle()
             return event
         self._reset_to_idle()
@@ -190,6 +200,7 @@ class SignStateMachine:
 
     def _transition_to_candidate(self, pred: SmoothedPrediction) -> None:
         self._state = SignState.CANDIDATE
+        self._emitted_current = False
         self._current_class_id = pred.class_id
         self._current_label = pred.label
         self._consecutive_count = 1
@@ -245,6 +256,7 @@ class SignStateMachine:
 
     def _reset_to_idle(self) -> None:
         self._state = SignState.IDLE
+        self._emitted_current = False
         self._current_class_id = None
         self._current_label = None
         self._consecutive_count = 0

@@ -1,3 +1,61 @@
 true_label,pred_label,confidence,primary_category,explanation,quality_status,valid_frames,quality_score,sample_index
-happy,teacher,0.453,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'happy' and 'teacher' share similar articulatory trajectory.,ACCEPTABLE,45,0.6167,3
-time,teacher,0.3677,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'time' and 'teacher' share similar articulatory trajectory.,ACCEPTABLE,45,0.5133,9
+loud,happy,0.5445,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'loud' and 'happy' share similar articulatory trajectory.,GOOD,45,0.9433,1
+quiet,white,0.5679,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'quiet' and 'white' share similar articulatory trajectory.,GOOD,45,0.95,5
+ugly,beautiful,0.5399,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'ugly' and 'beautiful' share similar articulatory trajectory.,GOOD,45,0.95,13
+ugly,second,0.5947,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'ugly' and 'second' share similar articulatory trajectory.,GOOD,45,0.9133,14
+cheap,black,0.395,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'cheap' and 'black' share similar articulatory trajectory.,GOOD,45,0.9067,30
+dog,rich,0.2643,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'dog' and 'rich' share similar articulatory trajectory.,GOOD,45,0.8022,43
+fish,time,0.6911,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'fish' and 'time' share similar articulatory trajectory.,GOOD,45,0.88,51
+bird,animal,0.7714,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'bird' and 'animal' share similar articulatory trajectory.,GOOD,45,0.95,53
+animal,bird,0.5461,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'animal' and 'bird' share similar articulatory trajectory.,GOOD,45,0.9333,66
+hat,fan,0.4118,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'hat' and 'fan' share similar articulatory trajectory.,ACCEPTABLE,45,0.63,68
+dress,pen,0.422,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'dress' and 'pen' share similar articulatory trajectory.,GOOD,45,0.95,70
+dress,clothing,0.5225,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'dress' and 'clothing' share similar articulatory trajectory.,GOOD,45,0.89,71
+dress,clothing,0.8939,SEMANTIC_OVERCONFIDENT_CONFUSION,High-confidence false prediction (conf=0.89): spatial ambiguity between 'dress' and 'clothing'.,ACCEPTABLE,45,0.6078,72
+shoes,tshirt,0.3416,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'shoes' and 'tshirt' share similar articulatory trajectory.,GOOD,45,0.9467,88
+pocket,quiet,0.6931,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'pocket' and 'quiet' share similar articulatory trajectory.,ACCEPTABLE,45,0.5367,93
+red,colour,0.7053,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'red' and 'colour' share similar articulatory trajectory.,GOOD,45,0.95,97
+red,pink,0.6305,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'red' and 'pink' share similar articulatory trajectory.,GOOD,45,0.9367,98
+red,pink,0.4608,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'red' and 'pink' share similar articulatory trajectory.,GOOD,45,0.95,99
+green,yellow,0.2059,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'green' and 'yellow' share similar articulatory trajectory.,GOOD,45,0.9467,101
+green,friday,0.3694,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'green' and 'friday' share similar articulatory trajectory.,ACCEPTABLE,45,0.5878,102
+blue,goodafternoon,0.9826,SEMANTIC_OVERCONFIDENT_CONFUSION,High-confidence false prediction (conf=0.98): spatial ambiguity between 'blue' and 'goodafternoon'.,GOOD,45,0.95,103
+blue,white,0.4509,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'blue' and 'white' share similar articulatory trajectory.,GOOD,45,0.9267,104
+blue,white,0.3254,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'blue' and 'white' share similar articulatory trajectory.,GOOD,45,0.95,105
+yellow,blue,0.2707,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'yellow' and 'blue' share similar articulatory trajectory.,GOOD,45,0.95,106
+yellow,pen,0.2233,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'yellow' and 'pen' share similar articulatory trajectory.,GOOD,45,0.95,107
+yellow,train,0.2856,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'yellow' and 'train' share similar articulatory trajectory.,GOOD,45,0.7522,108
+brown,doctor,0.6965,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'brown' and 'doctor' share similar articulatory trajectory.,GOOD,45,0.95,109
+brown,doctor,0.8283,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'brown' and 'doctor' share similar articulatory trajectory.,GOOD,45,0.9233,111
+pink,red,0.5689,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'pink' and 'red' share similar articulatory trajectory.,ACCEPTABLE,45,0.6711,114
+grey,black,0.5965,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'grey' and 'black' share similar articulatory trajectory.,GOOD,45,0.9133,124
+colour,red,0.4022,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'colour' and 'red' share similar articulatory trajectory.,GOOD,45,0.9467,127
+colour,red,0.4449,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'colour' and 'red' share similar articulatory trajectory.,GOOD,45,0.95,128
+colour,female,0.8025,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'colour' and 'female' share similar articulatory trajectory.,GOOD,45,0.95,129
+wednesday,month,0.3536,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'wednesday' and 'month' share similar articulatory trajectory.,GOOD,45,0.9133,137
+friday,saturday,0.5353,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'friday' and 'saturday' share similar articulatory trajectory.,ACCEPTABLE,45,0.5278,140
+saturday,friday,0.6798,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'saturday' and 'friday' share similar articulatory trajectory.,ACCEPTABLE,45,0.7489,142
+week,month,0.5992,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'week' and 'month' share similar articulatory trajectory.,GOOD,45,0.7967,151
+minute,goodmorning,0.4775,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'minute' and 'goodmorning' share similar articulatory trajectory.,ACCEPTABLE,45,0.56,159
+second,hello,0.3747,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'second' and 'hello' share similar articulatory trajectory.,GOOD,45,0.9133,161
+lamp,afternoon,0.838,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'lamp' and 'afternoon' share similar articulatory trajectory.,GOOD,45,0.7711,174
+fan,afternoon,0.547,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'fan' and 'afternoon' share similar articulatory trajectory.,GOOD,45,0.7556,176
+cellphone,friday,0.2398,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'cellphone' and 'friday' share similar articulatory trajectory.,GOOD,45,0.95,179
+screen,dream,0.3693,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'screen' and 'dream' share similar articulatory trajectory.,GOOD,45,0.95,185
+hello,goodnight,0.8484,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'hello' and 'goodnight' share similar articulatory trajectory.,GOOD,45,0.95,194
+alright,bicycle,0.6881,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'alright' and 'bicycle' share similar articulatory trajectory.,GOOD,45,0.94,199
+window,computer,0.973,SEMANTIC_OVERCONFIDENT_CONFUSION,High-confidence false prediction (conf=0.97): spatial ambiguity between 'window' and 'computer'.,ACCEPTABLE,45,0.7022,227
+door,patient,0.8354,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'door' and 'patient' share similar articulatory trajectory.,GOOD,45,0.95,230
+bedroom,computer,0.1857,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'bedroom' and 'computer' share similar articulatory trajectory.,GOOD,45,0.8611,231
+kitchen,bathroom,0.9986,SEMANTIC_OVERCONFIDENT_CONFUSION,High-confidence false prediction (conf=1.00): spatial ambiguity between 'kitchen' and 'bathroom'.,GOOD,45,0.8367,234
+soap,time,0.284,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'soap' and 'time' share similar articulatory trajectory.,ACCEPTABLE,45,0.5867,243
+book,page,0.9995,SEMANTIC_OVERCONFIDENT_CONFUSION,High-confidence false prediction (conf=1.00): spatial ambiguity between 'book' and 'page'.,GOOD,45,0.7867,245
+lock,telephone,0.5221,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'lock' and 'telephone' share similar articulatory trajectory.,ACCEPTABLE,45,0.6878,258
+ring,wednesday,0.3261,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'ring' and 'wednesday' share similar articulatory trajectory.,GOOD,45,0.8389,270
+tool,box,0.3334,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'tool' and 'box' share similar articulatory trajectory.,ACCEPTABLE,45,0.6589,271
+lawyer,thankyou,0.4627,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'lawyer' and 'thankyou' share similar articulatory trajectory.,GOOD,45,0.8,277
+waiter,morning,0.3863,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'waiter' and 'morning' share similar articulatory trajectory.,ACCEPTABLE,45,0.56,283
+manager,week,0.5001,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'manager' and 'week' share similar articulatory trajectory.,GOOD,45,0.8356,297
+manager,week,0.7008,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'manager' and 'week' share similar articulatory trajectory.,GOOD,45,0.8433,298
+train,white,0.5823,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'train' and 'white' share similar articulatory trajectory.,GOOD,45,0.9133,307
+bus,bicycle,0.3448,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'bus' and 'bicycle' share similar articulatory trajectory.,GOOD,45,0.95,321

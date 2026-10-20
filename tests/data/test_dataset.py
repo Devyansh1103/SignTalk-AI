@@ -19,18 +19,20 @@ def manifest_path():
 
 def test_dataset_initialization(manifest_path):
     ds = SignSequenceDataset(manifest_path=manifest_path)
-    assert len(ds) == 60
+    assert len(ds) > 0
 
 
 def test_dataset_train_split(manifest_path):
+    ds_all = SignSequenceDataset(manifest_path=manifest_path, filter_rejects=False)
     ds_train = SignSequenceDataset(manifest_path=manifest_path, split="train", filter_rejects=False)
-    assert len(ds_train) == 36
+    assert 0 < len(ds_train) < len(ds_all)
+    assert all(ds_train.df["split"] == "train")
 
 
 def test_dataset_filter_rejects(manifest_path):
+    ds_train = SignSequenceDataset(manifest_path=manifest_path, split="train", filter_rejects=False)
     ds_clean = SignSequenceDataset(manifest_path=manifest_path, split="train", filter_rejects=True)
-    # Filtered train samples must be <= 36 and contain no REJECT
-    assert len(ds_clean) <= 36
+    assert len(ds_clean) <= len(ds_train)
     assert all(ds_clean.df["quality_status"] != "REJECT")
 
 

@@ -4,6 +4,8 @@ Validates full pipeline construction, state machine transitions, synthetic frame
 tensor validation, event emission, phrase translation, and graceful error recovery.
 """
 
+from src.data.label_map import NUM_CLASSES
+
 import os
 import pytest
 import numpy as np
@@ -93,7 +95,7 @@ class TestRealtimePipelineIntegration:
         # Buffer was full -> ST-GCN inference should have triggered
         assert pipeline.temporal_buffer.length() == 45
         assert pipeline.latest_prediction is not None
-        assert 0 <= pipeline.latest_prediction.class_id < 10
+        assert 0 <= pipeline.latest_prediction.class_id < NUM_CLASSES
 
         # Serialization to JSON-compatible dictionary
         d = last_out.to_dict()

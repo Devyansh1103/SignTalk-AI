@@ -55,3 +55,23 @@ models/*.pth
 *.swo
 .DS_Store
 Thumbs.db
+signtalk_colab.zip
+
+# Local notes (not for the repo)
+CONTEXT.md
+CHANGES.md
+
+# Local model copies, backups and fine-tune runs (deployed model is experiments/stgcn/checkpoints/best_checkpoint.pt)
+/best_checkpoint.pt
+backups/
+experiments/stgcn/checkpoints/*_f1bug.pt
+experiments/stgcn_user/
+
+# Personal webcam data (privacy: landmarks of the user's own signing)
+experiments/realtime_debug/
+data/user_recordings/
+data/manifests/user_recordings.csv
+
+# Generated landmark data (231 MB) and logs
+data/processed/
+logs/

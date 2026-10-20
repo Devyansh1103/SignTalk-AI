@@ -75,7 +75,8 @@ def main():
         batch_size=args.batch_size,
         shuffle=False,
         filter_rejects=False,
-        augment=False
+        augment=False,
+        restrict_to_vocab=True
     )
 
     evaluator = ModelEvaluator(

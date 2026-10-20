@@ -71,10 +71,8 @@ class ModelEvaluator:
         self.checkpoint_path = checkpoint_path
         self.model_type = model_type.lower()
         self.device, self.device_info = get_device(device)
-        self.class_names = class_names or [
-            "hello", "thankyou", "good", "happy", "monday",
-            "car", "bird", "house", "time", "teacher"
-        ]
+        from src.data.label_map import ID_TO_LABEL
+        self.class_names = class_names or [ID_TO_LABEL[i] for i in sorted(ID_TO_LABEL)]
         self.config = config or {}
 
         # Load checkpoint and instantiate model

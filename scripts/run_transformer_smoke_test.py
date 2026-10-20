@@ -37,7 +37,7 @@ def run_smoke_test():
 
     # 1. Tokenizer test
     print("\n[Step 1] Initializing Tokenizer...")
-    tokenizer = SignLanguageTokenizer(vocab_path="assets/vocabularies/mvp_10.json")
+    tokenizer = SignLanguageTokenizer(vocab_path="assets/vocabularies/signtalk_vocab.json")
     assert tokenizer.vocab_size == 14
     tokens = tokenizer.encode("HELLO", add_special_tokens=True)
     decoded = tokenizer.decode(tokens, skip_special_tokens=True)

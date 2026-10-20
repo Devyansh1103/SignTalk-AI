@@ -84,7 +84,7 @@ def main():
 
     # Class names
     class_names = [f"Class_{i}" for i in range(dataset_cfg.get("num_classes", 10))]
-    vocab_path = config.get("paths", {}).get("vocabulary_file", "assets/vocabularies/mvp_10.json")
+    vocab_path = config.get("paths", {}).get("vocabulary_file", "assets/vocabularies/signtalk_vocab.json")
     if os.path.exists(vocab_path):
         with open(vocab_path, "r", encoding="utf-8") as vf:
             vocab = json.load(vf)

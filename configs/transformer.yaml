@@ -30,7 +30,7 @@ stgcn:
   use_learnable_edge_weights: true
 
 transformer:
-  vocabulary_file: "assets/vocabularies/mvp_10.json"
+  vocabulary_file: "assets/vocabularies/signtalk_vocab.json"
   vocabulary_size: 14
   embedding_dim: 128
   num_heads: 4

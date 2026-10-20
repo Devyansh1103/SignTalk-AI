@@ -70,7 +70,9 @@ class RealTimeLandmarkStream:
             pose_confidence=mp_cfg.pose_detection_confidence,
             hand_confidence=mp_cfg.hand_detection_confidence,
             face_confidence=mp_cfg.face_detection_confidence,
-            enable_face_mesh=mp_cfg.enable_face
+            enable_face_mesh=mp_cfg.enable_face,
+            running_mode=mp_cfg.running_mode,
+            tracking_confidence=mp_cfg.hand_tracking_confidence
         )
 
         # 3. Normalizer & Temporal Anchor State
@@ -210,7 +212,8 @@ class RealTimeLandmarkStream:
             extraction_latency_ms=round(extract_latency_ms, 3),
             normalization_latency_ms=round(norm_latency_ms, 3),
             quality_check_latency_ms=round(quality_latency_ms, 3),
-            total_latency_ms=round(total_latency_ms, 3)
+            total_latency_ms=round(total_latency_ms, 3),
+            aspect_y_scale=self._aspect_y_scale(processed_packet.image)
         )
 
         # Step 5: Update Stream Accounting & History
@@ -227,6 +230,13 @@ class RealTimeLandmarkStream:
         self._previous_rh_detected = modality_detection.right_hand_detected
 
         return landmark_frame
+
+    def _aspect_y_scale(self, image: np.ndarray) -> float:
+        ref = float(self.config.normalization.reference_aspect or 0.0)
+        h, w = image.shape[:2]
+        if ref <= 0 or h <= 0 or w <= 0:
+            return 1.0
+        return ref / (w / h)
 
     def _normalize_realtime_frame(
         self,

@@ -4,6 +4,7 @@ Validates /health, /api/status, /api/vocabulary, and WebSocket session handshake
 """
 
 import pytest
+from src.data.label_map import NUM_CLASSES
 from fastapi.testclient import TestClient
 
 from backend.app.main import app
@@ -26,7 +27,7 @@ def test_health_endpoint(client):
     assert res.status_code == 200
     data = res.json()
     assert data["status"] == "ok"
-    assert data["vocabulary_size"] == 10
+    assert data["vocabulary_size"] == NUM_CLASSES
 
 
 def test_api_status_endpoint(client):
@@ -41,8 +42,8 @@ def test_vocabulary_endpoint(client):
     res = client.get("/api/vocabulary")
     assert res.status_code == 200
     data = res.json()
-    assert data["num_classes"] == 10
-    assert len(data["classes"]) == 10
+    assert data["num_classes"] == NUM_CLASSES
+    assert len(data["classes"]) == NUM_CLASSES
     labels = [c["label"] for c in data["classes"]]
     assert "hello" in labels
     assert "teacher" in labels

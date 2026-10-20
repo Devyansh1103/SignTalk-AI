@@ -13,6 +13,7 @@ import pytest
 from src.realtime.prediction_history import PredictionHistory, PredictionRecord
 from src.realtime.smoothing.majority_vote import MajorityVoteSmoother
 from src.realtime.smoothing.base import UNSTABLE_LABEL, UNSTABLE_CLASS_ID
+from src.data.label_map import get_label
 
 
 def make_record(class_id: int, label: str, confidence: float, timestamp: float) -> PredictionRecord:
@@ -43,7 +44,7 @@ class TestMajorityVoteSmoother:
         smoothed = smoother.smooth(history)
         assert smoothed.is_stable is True
         assert smoothed.class_id == 3
-        assert smoothed.label == "happy"
+        assert smoothed.label == get_label(3)
         assert smoothed.stability_score == 4 / 5  # 0.80
 
 

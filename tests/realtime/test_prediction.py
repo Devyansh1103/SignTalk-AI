@@ -47,19 +47,19 @@ class TestPrediction:
         )
 
         assert res.class_id == 3
-        assert res.label == "happy"
+        assert res.label == get_label(3)
         assert np.isclose(res.confidence, 0.70, atol=1e-4)
         assert len(res.top_k) == 3
         assert res.top_k[0][0] == 3
-        assert res.top_k[0][1] == "happy"
+        assert res.top_k[0][1] == get_label(3)
 
         # Check serialization
         d = res.to_dict()
         assert d["class_id"] == 3
-        assert d["label"] == "happy"
+        assert d["label"] == get_label(3)
         assert np.isclose(d["confidence"], 0.70, atol=1e-4)
         assert len(d["top_k"]) == 3
 
         console_str = res.format_console()
-        assert "HAPPY" in console_str
+        assert get_gloss(3).upper() in console_str.upper()
         assert "70.0%" in console_str

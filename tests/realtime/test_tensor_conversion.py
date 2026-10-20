@@ -99,3 +99,50 @@ class TestTensorConversion:
 
         with pytest.raises(ModelRunnerError, match="NaN or Infinite"):
             runner.window_to_tensor(window)
+
+
+def make_raw_frame(frame_id: int, hand_visible: bool = True, aspect_y_scale: float = 1.0) -> LandmarkFrame:
+    raw = np.zeros((TOTAL_NODES, CHANNELS), dtype=np.float32)
+    raw[47] = [0.6, 0.5, 0.0]   # left shoulder
+    raw[48] = [0.4, 0.5, 0.0]   # right shoulder -> center (0.5, 0.5), width 0.2
+    raw[0:21] = [0.5 + 0.001 * frame_id, 0.3, 0.0]  # left hand drifting right
+    mask = np.zeros((TOTAL_NODES,), dtype=bool)
+    mask[47:49] = True
+    mask[0:21] = hand_visible
+    return LandmarkFrame(
+        frame_id=frame_id,
+        timestamp=frame_id * 0.04,
+        raw_coords=raw,
+        normalized_coords=np.zeros((TOTAL_NODES, CHANNELS), dtype=np.float32),
+        mask=mask,
+        visibility=np.ones((TOTAL_NODES,), dtype=np.float32),
+        modality_stats=ModalityDetection(hand_visible, False, True, False),
+        quality=QualityReport(True, 0.95, "GOOD", 0.0, False, True, False),
+        aspect_y_scale=aspect_y_scale,
+    )
+
+
+class TestOfflinePostprocess:
+    @pytest.fixture
+    def runner(self):
+        return STGCNRunner(checkpoint_path="experiments/stgcn/checkpoints/best_checkpoint.pt", device="cpu", warmup_iterations=0)
+
+    def test_matches_training_normalization(self, runner):
+        window = [make_raw_frame(i) for i in range(TARGET_SEQUENCE_LENGTH)]
+        x, mask = runner.window_to_tensor(window, offline_postprocess=True)
+        # Hand x at frame 0: (0.5 - 0.5) / 0.2 = 0; y: (0.3 - 0.5) / 0.2 = -1
+        assert np.isclose(x[0, 0, 0, 0].item(), 0.0, atol=1e-5)
+        assert np.isclose(x[0, 1, 0, 0].item(), -1.0, atol=1e-5)
+
+    def test_bridges_short_hand_gaps(self, runner):
+        window = [make_raw_frame(i, hand_visible=not (10 <= i < 14)) for i in range(TARGET_SEQUENCE_LENGTH)]
+        x, mask = runner.window_to_tensor(window, offline_postprocess=True)
+        assert mask[0, 0, 12, 0].item() == 1.0
+        # Linearly interpolated x at frame 12 lies between frames 9 and 14
+        assert np.isclose(x[0, 0, 12, 0].item(), (0.001 * 12) / 0.2, atol=1e-4)
+
+    def test_aspect_correction_scales_vertical_offsets(self, runner):
+        window = [make_raw_frame(i, aspect_y_scale=4.0 / 3.0) for i in range(TARGET_SEQUENCE_LENGTH)]
+        x, _ = runner.window_to_tensor(window, offline_postprocess=True)
+        # Both hand and shoulders scale by 4/3, so hand-to-shoulder y offset grows by 4/3
+        assert np.isclose(x[0, 1, 0, 0].item(), -4.0 / 3.0, atol=1e-4)

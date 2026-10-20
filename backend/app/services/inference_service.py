@@ -40,7 +40,7 @@ class SessionInferenceService:
         shared_model_runner: Optional[STGCNRunner] = None,
     ):
         self.session_id = session_id
-        self.config = config or RealTimeConfig()
+        self.config = config or RealTimeConfig.from_yaml("configs/realtime.yaml")
 
         # Shared model weights can be reused across sessions to save memory,
         # but buffers, state machines, and sequence transcripts remain strictly isolated!
@@ -52,6 +52,7 @@ class SessionInferenceService:
         self.pipeline.initialize()
         self._frame_count = 0
         self._is_active = True
+        self._last_debug_log = 0.0
 
     def process_frame_bytes(self, image_bytes: bytes) -> ServerRealtimeMessage:
         """Decodes raw JPEG/PNG image bytes and executes a pipeline step."""
@@ -72,6 +73,7 @@ class SessionInferenceService:
         """Processes a single BGR frame through the session pipeline."""
         self._frame_count += 1
         output = self.pipeline.step(bgr_frame)
+        self._debug_log(output)
 
         # Build response payload only when actively detecting or confirming a valid gesture
         pred_payload = None
@@ -80,7 +82,7 @@ class SessionInferenceService:
             and output.smoothed is not None
             and output.smoothed.is_valid
             and output.smoothed.label not in ("UNCERTAIN", "UNSTABLE", "IDLE", "NO_SIGN", "UNKNOWN")
-            and output.smoothed.confidence >= 0.65
+            and output.smoothed.confidence >= self.config.stability.min_confidence
         ):
             top_k_list = []
             if output.prediction and output.prediction.top_k:
@@ -129,6 +131,30 @@ class SessionInferenceService:
             stage_latencies_ms={k: round(v, 2) for k, v in output.stage_latencies_ms.items()},
             fps=round(output.fps, 1),
             is_valid_input=output.is_valid_input
+        )
+
+    def _debug_log(self, output) -> None:
+        """Once per second: what the model actually sees (helps tune thresholds)."""
+        now = time.time()
+        if now - self._last_debug_log < 1.0:
+            return
+        self._last_debug_log = now
+        pred = output.prediction
+        if pred is None:
+            logger.info(
+                f"[LIVE] no prediction yet | pipeline={output.pipeline_state} state={output.state} "
+                f"valid_input={output.is_valid_input} fps={output.fps:.1f}"
+            )
+            return
+        top = ", ".join(f"{lbl}:{conf:.2f}" for _, lbl, conf in (pred.top_k or [])[:3])
+        sm = output.smoothed.label if output.smoothed is not None else None
+        lat = output.stage_latencies_ms or {}
+        span = max(0.0, pred.window_end_time - pred.window_start_time)
+        logger.info(
+            f"[LIVE] raw top3=[{top}] quality={pred.input_quality:.2f} state={output.state} "
+            f"smoothed={sm} fps={output.fps:.1f} window={span:.1f}s "
+            f"mediapipe={lat.get('mediapipe', 0):.0f}ms (need conf>={self.config.confidence.threshold}, "
+            f"quality>={self.config.stability.min_input_quality})"
         )
 
     def pause(self) -> None:

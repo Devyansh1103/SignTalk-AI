@@ -17,7 +17,7 @@ dataset:
     train: "data/manifests/train.csv"
     val: "data/manifests/val.csv"
     test: "data/manifests/test.csv"
-  vocabulary_file: "assets/vocabularies/mvp_10.json"
+  vocabulary_file: "assets/vocabularies/signtalk_vocab.json"
   label_mapping: "data/processed/label_mapping.csv"
 
 models:

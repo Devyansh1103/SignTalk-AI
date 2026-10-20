@@ -36,9 +36,11 @@ def test_no_exact_video_leakage():
     val_df = pd.read_csv("data/manifests/val.csv")
     test_df = pd.read_csv("data/manifests/test.csv")
 
-    train_vids = set(train_df["source_video_id"])
-    val_vids = set(val_df["source_video_id"])
-    test_vids = set(test_df["source_video_id"])
+    # INCLUDE reuses camera filenames (MVI_xxxx.MOV) across class folders, so the
+    # filename alone is not unique. source_recording_id is a hash of the full path.
+    train_vids = set(train_df["source_recording_id"])
+    val_vids = set(val_df["source_recording_id"])
+    test_vids = set(test_df["source_recording_id"])
 
     assert len(train_vids.intersection(val_vids)) == 0, "Train and Val share source videos!"
     assert len(train_vids.intersection(test_vids)) == 0, "Train and Test share source videos!"

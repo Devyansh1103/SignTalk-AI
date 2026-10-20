@@ -129,3 +129,31 @@ class TestSignStateMachine:
 
         labels = [e.label for e in events]
         assert labels == ["help", "water"]
+
+
+class TestEmitOnConfirm:
+    def _run(self, fsm, labels):
+        events = []
+        for i, (cid, lab) in enumerate(labels):
+            p = make_pred(cid, lab, timestamp=1.0 + 0.2 * i) if cid >= 0 else make_pred(-1, "UNCERTAIN", is_stable=False, timestamp=1.0 + 0.2 * i)
+            _, ev = fsm.process(p)
+            events.append(ev.label if ev is not None else None)
+        return events
+
+    def test_emits_when_confirmed_not_at_end(self):
+        fsm = SignStateMachine(min_consecutive_predictions=3, min_confidence=0.30, emit_on_confirm=True)
+        seq = [(5, "hello")] * 5 + [(-1, "")] * 2
+        events = self._run(fsm, seq)
+        assert events[2] == "hello"           # third consecutive prediction confirms it
+        assert [e for e in events if e] == ["hello"]  # no second emission when the sign ends
+        assert fsm.force_end() is None
+
+    def test_two_signs_each_emitted_once(self):
+        fsm = SignStateMachine(min_consecutive_predictions=2, min_confidence=0.30, emit_on_confirm=True)
+        seq = [(5, "hello")] * 3 + [(7, "thankyou")] * 3
+        assert [e for e in self._run(fsm, seq) if e] == ["hello", "thankyou"]
+
+    def test_default_still_emits_at_end(self):
+        fsm = SignStateMachine(min_consecutive_predictions=2, min_confidence=0.30)
+        events = self._run(fsm, [(5, "hello")] * 3 + [(-1, "")])
+        assert events[:3] == [None, None, None] and events[3] == "hello"

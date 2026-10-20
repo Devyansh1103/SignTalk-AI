@@ -49,6 +49,7 @@ normalization:
   z_scale_factor: 1.0
   use_temporal_anchor_smoothing: true
   anchor_smoothing_alpha: 0.25  # Exponential moving average factor for torso center & scale
+  reference_aspect: 1.7778      # Training videos are 16:9; model-input y is rescaled for 4:3 webcams (0 = off)
 
 quality:
   min_valid_pose_ratio: 0.70
@@ -81,21 +82,26 @@ debug:
   record_landmarks: false  # Privacy-first default: Never record without explicit opt-in
   record_video: false      # Privacy-first default: Never store raw video frames
   record_dir: "experiments/realtime_debug"
+  save_segments: true      # Landmark points only (no video): one .npz per recognised sign in record_dir/segments
 
 buffer:
   max_length: 45           # Fixed temporal window size matching ST-GCN training (45 frames @ 25 FPS = 1.8s)
   min_valid_frames: 15     # Minimum valid frames for window quality gate
   interpolate_missing_frames: true
   max_consecutive_interpolated: 10
+  time_align: true         # Window = last window_seconds of REAL time (FPS-independent), resampled to max_length frames
+  window_seconds: 1.8      # 45 frames @ 25 FPS
 
 scheduler:
-  stride: 5                # Slide stride: trigger inference every 5 new frames (200ms update cadence @ 25 FPS)
+  stride: 3                # Trigger inference every 3 new frames (faster response; was 5)
   drop_stale_windows: true # Discard queued windows if ST-GCN is currently processing
 
 inference:
   enabled: true
   checkpoint_path: "experiments/stgcn/checkpoints/best_checkpoint.pt"
   device: "auto"           # "auto", "cpu", or "cuda"
+  num_threads: 4           # torch CPU threads; 4 = 42 ms/forward vs 67 ms with the default 8 on this laptop
+  offline_postprocess: true  # Same gap interpolation + sequence normalization as training (53% -> 85% on test clips)
   top_k: 3                 # Top-K prediction ranks
   warmup_iterations: 5     # Warm-up cycles before measurement
   record_predictions: false # Whether to record predictions to CSV
@@ -107,28 +113,42 @@ inference:
 # ==============================================================================
 
 confidence:
-  threshold: 0.65          # Empirically selected from validation set threshold evaluation
+  threshold: 0.60          # Tuned on 60 test clips at 12.5 FPS: 0.30 committed a wrong word in 55% of clips, 0.60 in 30%
   source: "validation"
   uncertain_label: "UNCERTAIN"
-  min_margin: 0.15         # Minimum margin between top-1 and top-2 softmax probabilities
+  min_margin: 0.05         # Minimum margin between top-1 and top-2 softmax probabilities (was 0.15)
 
 smoothing:
   method: "majority_vote"  # Options: "majority_vote", "confidence_weighted", "temporal_stability"
   history_size: 5          # History depth (5 predictions = 1.0s window buffer)
-  min_votes: 3             # Quorum for majority consensus
+  min_votes: 2             # Quorum for majority consensus (was 3)
   decay_factor: 0.85       # For confidence_weighted smoothing
   min_consecutive: 2       # For temporal_stability smoothing
 
 stability:
-  min_consecutive_predictions: 2  # Transitions CANDIDATE -> ACTIVE
-  min_confidence: 0.65
-  min_input_quality: 0.50
+  min_consecutive_predictions: 3  # Transitions CANDIDATE -> ACTIVE (3 skips half-finished-sign guesses)
+  min_confidence: 0.30
+  min_input_quality: 0.35
+  emit_on_confirm: true    # Emit the word as soon as the sign is confirmed, not after the window slides past it (~1-2 s less lag)
 
 events:
   minimum_gap_ms: 800.0    # Minimum temporal separation between distinct repetitions
   unknown_timeout_ms: 1000.0 # Duration of uncertainty before resetting to IDLE
   log_events: false        # Default disabled; enable for logging events to CSV
   events_csv: "results/realtime/events.csv"
+
+segmentation:
+  # Classify each whole sign once (hands rise -> hands drop) instead of sliding 1.8 s windows.
+  # 150 INCLUDE test clips, live extractor: 80% correct / 15% wrong / 5% none vs 69% for one sliding window.
+  # Also lets the same word repeat immediately. When enabled, confidence/smoothing/stability/events are unused.
+  enabled: true
+  active_max_y: 1.35       # Hand counts as signing when above this (normalized, shoulder widths below mid-shoulder)
+  min_active_sec: 0.3      # Ignore shorter hand twitches
+  end_hold_sec: 0.5        # Hands must stay down this long to end a sign (= word delay after the sign)
+  pad_before_sec: 0.5      # Rest frames kept before/after, like the training clips
+  pad_after_sec: 0.5
+  max_segment_sec: 4.0     # Hands never dropped: classify anyway after this long
+  min_confidence: 0.50
 
 sequence:
   max_events: 50           # Maximum discrete sign events retained in continuous buffer
@@ -140,8 +160,8 @@ sequence:
 translation:
   enabled: true
   mode: "gloss_to_text"    # "gloss_to_text" (linguistic templates/lexicon) or "visual_transformer"
-  pause_threshold_sec: 1.5 # Temporal silence required to commit phrase to transcript
-  min_confidence: 0.50     # Gating threshold for sign tokens in translation
+  pause_threshold_sec: 0.9 # Temporal silence required to commit phrase to transcript (was 1.5)
+  min_confidence: 0.30     # Gating threshold for sign tokens in translation
   max_phrase_signs: 10     # Max signs per utterance before auto-committing
   transformer_checkpoint: "experiments/transformer/checkpoints/best_checkpoint.pt"
 

@@ -45,6 +45,7 @@ class MediaPipeConfig:
     enable_hands: bool = True
     enable_pose: bool = True
     enable_face: bool = False
+    running_mode: str = "image"  # "video" = track between frames (faster), "image" = detect every frame
 
 
 @dataclass
@@ -56,6 +57,10 @@ class NormalizationConfig:
     z_scale_factor: float = 1.0
     use_temporal_anchor_smoothing: bool = True
     anchor_smoothing_alpha: float = 0.25
+    # Training videos (INCLUDE) are 16:9. MediaPipe y is relative to frame height, so on a
+    # 4:3 webcam vertical motion looks ~25% smaller than in training. Model-input y is
+    # rescaled by reference_aspect / frame_aspect. 0 disables.
+    reference_aspect: float = 16.0 / 9.0
 
 
 @dataclass
@@ -98,6 +103,7 @@ class DebugConfig:
     record_landmarks: bool = False
     record_video: bool = False
     record_dir: str = "experiments/realtime_debug"
+    save_segments: bool = False  # Segmentation mode: save each sign's landmarks + top-3 to record_dir/segments
 
 
 @dataclass
@@ -106,6 +112,8 @@ class TemporalBufferConfig:
     min_valid_frames: int = 15
     interpolate_missing_frames: bool = True
     max_consecutive_interpolated: int = 10
+    time_align: bool = True        # pick window frames by timestamp (FPS-independent)
+    window_seconds: float = 1.8    # real-time length of one model window (45 frames @ 25 FPS)
 
 
 @dataclass
@@ -124,6 +132,11 @@ class InferenceConfig:
     record_predictions: bool = False
     predictions_csv: str = "results/realtime/predictions.csv"
     verbose_console: bool = False
+    # Rebuild each window with the offline training post-processing (gap interpolation +
+    # sequence-level torso normalization) from raw landmarks instead of the per-frame
+    # live normalization. Measured on 60 test clips: 53% -> 85% top-1.
+    offline_postprocess: bool = True
+    num_threads: int = 4
 
 
 @dataclass
@@ -131,6 +144,7 @@ class ConfidenceFilterConfig:
     threshold: float = 0.65
     source: str = "validation"
     uncertain_label: str = "UNCERTAIN"
+    min_margin: float = 0.15
 
 
 @dataclass
@@ -147,6 +161,7 @@ class StabilityConfig:
     min_consecutive_predictions: int = 2
     min_confidence: float = 0.65
     min_input_quality: float = 0.40
+    emit_on_confirm: bool = False
 
 
 @dataclass
@@ -155,6 +170,18 @@ class EventsConfig:
     unknown_timeout_ms: float = 1000.0
     log_events: bool = False
     events_csv: str = "results/realtime/events.csv"
+
+
+@dataclass
+class SegmentationConfig:
+    enabled: bool = False          # True: classify whole signs found by hand height instead of sliding windows
+    active_max_y: float = 1.35
+    min_active_sec: float = 0.3
+    end_hold_sec: float = 0.5
+    pad_before_sec: float = 0.5
+    pad_after_sec: float = 0.5
+    max_segment_sec: float = 4.0
+    min_confidence: float = 0.50
 
 
 @dataclass
@@ -203,6 +230,7 @@ class RealTimeConfig:
     smoothing: SmoothingConfig = field(default_factory=SmoothingConfig)
     stability: StabilityConfig = field(default_factory=StabilityConfig)
     events: EventsConfig = field(default_factory=EventsConfig)
+    segmentation: SegmentationConfig = field(default_factory=SegmentationConfig)
     sequence: SequenceConfig = field(default_factory=SequenceConfig)
     translation: TranslationConfig = field(default_factory=TranslationConfig)
     performance: PerformanceConfig = field(default_factory=PerformanceConfig)
@@ -258,6 +286,7 @@ class RealTimeConfig:
                 face_presence_confidence=float(m.get("face_presence_confidence", cfg.mediapipe.face_presence_confidence)),
                 enable_hands=bool(m.get("enable_hands", cfg.mediapipe.enable_hands)),
                 enable_pose=bool(m.get("enable_pose", cfg.mediapipe.enable_pose)),
+                running_mode=str(m.get("running_mode", cfg.mediapipe.running_mode)),
                 enable_face=bool(m.get("enable_face", cfg.mediapipe.enable_face))
             )
 
@@ -270,7 +299,8 @@ class RealTimeConfig:
                 min_scale_epsilon=float(n.get("min_scale_epsilon", cfg.normalization.min_scale_epsilon)),
                 z_scale_factor=float(n.get("z_scale_factor", cfg.normalization.z_scale_factor)),
                 use_temporal_anchor_smoothing=bool(n.get("use_temporal_anchor_smoothing", cfg.normalization.use_temporal_anchor_smoothing)),
-                anchor_smoothing_alpha=float(n.get("anchor_smoothing_alpha", cfg.normalization.anchor_smoothing_alpha))
+                anchor_smoothing_alpha=float(n.get("anchor_smoothing_alpha", cfg.normalization.anchor_smoothing_alpha)),
+                reference_aspect=float(n.get("reference_aspect", cfg.normalization.reference_aspect))
             )
 
         if "quality" in raw:
@@ -307,7 +337,8 @@ class RealTimeConfig:
             cfg.debug = DebugConfig(
                 record_landmarks=bool(d.get("record_landmarks", cfg.debug.record_landmarks)),
                 record_video=bool(d.get("record_video", cfg.debug.record_video)),
-                record_dir=str(d.get("record_dir", cfg.debug.record_dir))
+                record_dir=str(d.get("record_dir", cfg.debug.record_dir)),
+                save_segments=bool(d.get("save_segments", cfg.debug.save_segments)),
             )
 
         if "buffer" in raw:
@@ -316,7 +347,9 @@ class RealTimeConfig:
                 max_length=int(b.get("max_length", cfg.buffer.max_length)),
                 min_valid_frames=int(b.get("min_valid_frames", cfg.buffer.min_valid_frames)),
                 interpolate_missing_frames=bool(b.get("interpolate_missing_frames", cfg.buffer.interpolate_missing_frames)),
-                max_consecutive_interpolated=int(b.get("max_consecutive_interpolated", cfg.buffer.max_consecutive_interpolated))
+                max_consecutive_interpolated=int(b.get("max_consecutive_interpolated", cfg.buffer.max_consecutive_interpolated)),
+                time_align=bool(b.get("time_align", cfg.buffer.time_align)),
+                window_seconds=float(b.get("window_seconds", cfg.buffer.window_seconds))
             )
 
         if "scheduler" in raw:
@@ -336,7 +369,9 @@ class RealTimeConfig:
                 warmup_iterations=int(inf.get("warmup_iterations", cfg.inference.warmup_iterations)),
                 record_predictions=bool(inf.get("record_predictions", cfg.inference.record_predictions)),
                 predictions_csv=str(inf.get("predictions_csv", cfg.inference.predictions_csv)),
-                verbose_console=bool(inf.get("verbose_console", cfg.inference.verbose_console))
+                verbose_console=bool(inf.get("verbose_console", cfg.inference.verbose_console)),
+                offline_postprocess=bool(inf.get("offline_postprocess", cfg.inference.offline_postprocess)),
+                num_threads=int(inf.get("num_threads", cfg.inference.num_threads))
             )
 
         if "confidence" in raw:
@@ -345,6 +380,7 @@ class RealTimeConfig:
                 threshold=float(conf.get("threshold", cfg.confidence.threshold)),
                 source=str(conf.get("source", cfg.confidence.source)),
                 uncertain_label=str(conf.get("uncertain_label", cfg.confidence.uncertain_label)),
+                min_margin=float(conf.get("min_margin", cfg.confidence.min_margin)),
             )
 
         if "smoothing" in raw:
@@ -363,6 +399,7 @@ class RealTimeConfig:
                 min_consecutive_predictions=int(st.get("min_consecutive_predictions", cfg.stability.min_consecutive_predictions)),
                 min_confidence=float(st.get("min_confidence", cfg.stability.min_confidence)),
                 min_input_quality=float(st.get("min_input_quality", cfg.stability.min_input_quality)),
+                emit_on_confirm=bool(st.get("emit_on_confirm", cfg.stability.emit_on_confirm)),
             )
 
         if "events" in raw:
@@ -372,6 +409,20 @@ class RealTimeConfig:
                 unknown_timeout_ms=float(ev.get("unknown_timeout_ms", cfg.events.unknown_timeout_ms)),
                 log_events=bool(ev.get("log_events", cfg.events.log_events)),
                 events_csv=str(ev.get("events_csv", cfg.events.events_csv)),
+            )
+
+        if "segmentation" in raw:
+            sg = raw["segmentation"]
+            d = cfg.segmentation
+            cfg.segmentation = SegmentationConfig(
+                enabled=bool(sg.get("enabled", d.enabled)),
+                active_max_y=float(sg.get("active_max_y", d.active_max_y)),
+                min_active_sec=float(sg.get("min_active_sec", d.min_active_sec)),
+                end_hold_sec=float(sg.get("end_hold_sec", d.end_hold_sec)),
+                pad_before_sec=float(sg.get("pad_before_sec", d.pad_before_sec)),
+                pad_after_sec=float(sg.get("pad_after_sec", d.pad_after_sec)),
+                max_segment_sec=float(sg.get("max_segment_sec", d.max_segment_sec)),
+                min_confidence=float(sg.get("min_confidence", d.min_confidence)),
             )
 
         if "sequence" in raw:

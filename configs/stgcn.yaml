@@ -8,14 +8,16 @@ device: "auto"
 
 dataset:
   version: "signTalk-seq-v1.0.0"
-  num_classes: 10
+  num_classes: auto   # ignored: class count comes from assets/vocabularies/signtalk_vocab.json
+  restrict_to_vocab: true   # keep only labels in signtalk_vocab.json; class_id derived from label
   sequence_length: 45
   num_nodes: 93
   in_channels: 3
   include_velocity: false
   filter_rejects_train: false
   filter_rejects_val: false
-  augment_train: false
+  augment_train: true   # jitter/scale/rotation + temporal crop (live windows start/end mid-sign)
+  balance_classes: true   # oversample small classes (1/sqrt(count)); Adjectives have only 4 train clips
 
 graph:
   type: "anatomical_multimodal"
@@ -56,7 +58,7 @@ paths:
   train_manifest: "data/manifests/train.csv"
   val_manifest: "data/manifests/val.csv"
   test_manifest: "data/manifests/test.csv"
-  vocabulary_file: "assets/vocabularies/mvp_10.json"
+  vocabulary_file: "assets/vocabularies/signtalk_vocab.json"
   checkpoint_dir: "experiments/stgcn/checkpoints"
   log_dir: "experiments/stgcn/logs"
   metrics_dir: "experiments/stgcn/metrics"

@@ -35,7 +35,7 @@ class TestLabelMapping:
             assert get_class_id(lbl) == cid
 
     def test_consistency_with_mvp_10_json(self):
-        vocab_path = "assets/vocabularies/mvp_10.json"
+        vocab_path = "assets/vocabularies/signtalk_vocab.json"
         if not os.path.exists(vocab_path):
             pytest.skip("MVP 10 vocabulary file not found")
 

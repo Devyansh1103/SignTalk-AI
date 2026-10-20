@@ -24,31 +24,11 @@ from src.data.label_map import (
 logger = logging.getLogger("SignTalk.RealTime.Translator")
 
 
-# Bilingual lexical dictionaries for MVP-10 vocabulary
-ENGLISH_LEXICON: Dict[str, str] = {
-    "hello": "Hello",
-    "thankyou": "Thank you",
-    "good": "Good",
-    "happy": "Happy",
-    "monday": "Monday",
-    "car": "Car",
-    "bird": "Bird",
-    "house": "House",
-    "time": "Time",
-    "teacher": "Teacher",
-}
+# Bilingual lexical dictionaries, built from the active vocabulary (assets/vocabularies/signtalk_vocab.json)
+ENGLISH_LEXICON: Dict[str, str] = {info.label: info.translation for info in CANONICAL_CLASSES.values()}
 
 HINDI_LEXICON: Dict[str, str] = {
-    "hello": "नमस्ते",
-    "thankyou": "धन्यवाद",
-    "good": "अच्छा",
-    "happy": "खुश",
-    "monday": "सोमवार",
-    "car": "गाड़ी",
-    "bird": "पक्षी",
-    "house": "घर",
-    "time": "समय",
-    "teacher": "शिक्षक",
+    info.label: (info.hindi or info.translation) for info in CANONICAL_CLASSES.values()
 }
 
 # Linguistic phrase composition templates for natural multi-sign communication

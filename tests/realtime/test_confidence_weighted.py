@@ -11,6 +11,7 @@ import pytest
 from src.realtime.prediction_history import PredictionHistory, PredictionRecord
 from src.realtime.smoothing.confidence_weighted import ConfidenceWeightedSmoother
 from src.realtime.smoothing.base import UNSTABLE_LABEL, UNSTABLE_CLASS_ID
+from src.data.label_map import get_label
 
 
 def make_record(class_id: int, label: str, confidence: float, timestamp: float) -> PredictionRecord:
@@ -43,7 +44,7 @@ class TestConfidenceWeightedSmoother:
         smoothed = smoother.smooth(history)
         assert smoothed.is_stable is True
         assert smoothed.class_id == 3
-        assert smoothed.label == "happy"
+        assert smoothed.label == get_label(3)
 
     def test_recency_decay_favors_recent_evidence(self):
         # 1 old 'hello' (id=0) vs 2 newer 'happy' (id=3)
@@ -56,7 +57,7 @@ class TestConfidenceWeightedSmoother:
 
         smoothed = smoother.smooth(history)
         assert smoothed.class_id == 3
-        assert smoothed.label == "happy"
+        assert smoothed.label == get_label(3)
 
 
     def test_empty_or_subthreshold_records(self):

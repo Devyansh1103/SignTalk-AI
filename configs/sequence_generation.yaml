@@ -16,7 +16,7 @@ paths:
   output_sequences_dir: "data/processed/sequences"
   output_manifest_dir: "data/manifests"
   label_mapping_path: "data/processed/label_mapping.csv"
-  vocabulary_path: "assets/vocabularies/mvp_10.json"
+  vocabulary_path: "assets/vocabularies/signtalk_vocab.json"
   adjacency_path: "assets/graphs/kinematic_adjacency_93.npy"
 
 sequence_parameters:

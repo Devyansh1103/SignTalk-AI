@@ -7,7 +7,7 @@ seed: 42
 device: "auto"
 batch_size: 8
 test_manifest: "data/manifests/test.csv"
-vocabulary_file: "assets/vocabularies/mvp_10.json"
+vocabulary_file: "assets/vocabularies/signtalk_vocab.json"
 output_dir: "results/ablation"
 
 ablations:

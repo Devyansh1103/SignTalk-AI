@@ -9,6 +9,8 @@ Evaluates sliding-window behavior under:
   - Temporary occlusions / bridged dropped frames
 """
 
+from src.data.label_map import NUM_CLASSES
+
 import pytest
 import os
 import numpy as np
@@ -107,7 +109,7 @@ class TestKnownLimitations:
         assert buf.is_window_valid()
         pred = runner.predict_window(buf.get_window())
         assert pred.is_valid_quality
-        assert 0 <= pred.class_id < 10
+        assert 0 <= pred.class_id < NUM_CLASSES
 
     def test_dual_hand_behavior(self, runner):
         """Two hands visible (bimanual signing). Window satisfies quality gate."""

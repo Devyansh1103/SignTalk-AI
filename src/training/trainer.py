@@ -105,7 +105,8 @@ class ModelTrainer:
             all_probs.extend(probs.tolist())
 
         avg_loss = total_loss / len(self.train_loader.dataset)
-        num_classes = self.config.get("dataset_metadata", {}).get("num_classes", 10)
+        # Model output width, not a config default: the old fallback of 10 scored only classes 0-9.
+        num_classes = len(self.class_names) if self.class_names else self.config.get("dataset_metadata", {}).get("num_classes", 10)
         metrics = compute_classification_metrics(
             all_true, all_pred, np.array(all_probs), num_classes=num_classes, class_names=self.class_names
         )
@@ -141,7 +142,8 @@ class ModelTrainer:
                 all_meta.extend(batch["metadata"])
 
         avg_loss = total_loss / len(loader.dataset) if len(loader.dataset) > 0 else 0.0
-        num_classes = self.config.get("dataset_metadata", {}).get("num_classes", 10)
+        # Model output width, not a config default: the old fallback of 10 scored only classes 0-9.
+        num_classes = len(self.class_names) if self.class_names else self.config.get("dataset_metadata", {}).get("num_classes", 10)
         metrics = compute_classification_metrics(
             all_true, all_pred, np.array(all_probs), num_classes=num_classes, class_names=self.class_names
         )

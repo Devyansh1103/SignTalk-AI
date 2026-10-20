@@ -69,6 +69,7 @@ from src.realtime.sign_state_machine import SignStateMachine, SignState
 from src.realtime.event_deduplicator import EventDeduplicator
 from src.realtime.sign_event import SignEvent
 from src.realtime.sign_sequence import SignSequenceBuffer
+from src.realtime.sign_segmenter import SignSegmenter, resample_by_time
 from src.realtime.translator import RealTimeTranslator, TranslationResult
 from src.realtime.performance import PerformanceProfiler
 
@@ -183,7 +184,8 @@ class RealtimePipeline:
                 checkpoint_path=inf_cfg.checkpoint_path,
                 device=inf_cfg.device,
                 top_k=inf_cfg.top_k,
-                warmup_iterations=inf_cfg.warmup_iterations
+                warmup_iterations=inf_cfg.warmup_iterations,
+                num_threads=inf_cfg.num_threads
             )
 
         # 5. Temporal Buffer
@@ -192,7 +194,8 @@ class RealtimePipeline:
             max_length=buf_cfg.max_length,
             min_valid_frames=buf_cfg.min_valid_frames,
             interpolate_missing_frames=buf_cfg.interpolate_missing_frames,
-            max_consecutive_interpolated=buf_cfg.max_consecutive_interpolated
+            max_consecutive_interpolated=buf_cfg.max_consecutive_interpolated,
+            ready_window_sec=buf_cfg.window_seconds if buf_cfg.time_align else None
         )
 
         # 6. Inference Scheduler
@@ -206,6 +209,7 @@ class RealtimePipeline:
         self.confidence_filter = ConfidenceFilter(
             threshold=self.config.confidence.threshold,
             uncertain_label=self.config.confidence.uncertain_label,
+            min_margin=self.config.confidence.min_margin,
         )
         self.prediction_history = PredictionHistory(
             max_history=max(20, self.config.smoothing.history_size * 4)
@@ -233,6 +237,7 @@ class RealtimePipeline:
             min_consecutive_predictions=self.config.stability.min_consecutive_predictions,
             min_confidence=self.config.stability.min_confidence,
             min_input_quality=self.config.stability.min_input_quality,
+            emit_on_confirm=self.config.stability.emit_on_confirm,
         )
         self.event_deduplicator = EventDeduplicator(
             minimum_gap_ms=self.config.events.minimum_gap_ms
@@ -240,6 +245,18 @@ class RealtimePipeline:
         self.sign_sequence = SignSequenceBuffer(
             max_events=self.config.sequence.max_events
         )
+
+        # 9b. Optional activity segmentation (replaces sliding windows + smoothing + state machine)
+        seg_cfg = self.config.segmentation
+        self.segmenter: Optional[SignSegmenter] = SignSegmenter(
+            active_max_y=seg_cfg.active_max_y,
+            min_active_sec=seg_cfg.min_active_sec,
+            end_hold_sec=seg_cfg.end_hold_sec,
+            pad_before_sec=seg_cfg.pad_before_sec,
+            pad_after_sec=seg_cfg.pad_after_sec,
+            max_segment_sec=seg_cfg.max_segment_sec,
+        ) if seg_cfg.enabled else None
+        self._segment_display_until = 0.0
 
         # 10. Translation Layer
         trans_cfg = self.config.translation
@@ -374,13 +391,22 @@ class RealtimePipeline:
         # Stage 4: Sliding Window & ST-GCN Model Inference
         # -------------------------------------------------------------
         output_translation = None
-        if self.scheduler.should_infer(self.temporal_buffer):
+        if self.segmenter is not None:
+            output_translation = self._segment_step(landmark_frame, ts, latencies)
+        elif self.scheduler.should_infer(self.temporal_buffer):
             self.scheduler.record_inference_start()
-            window = self.temporal_buffer.get_window()
+            if self.config.buffer.time_align:
+                window = self.temporal_buffer.get_time_aligned_window(
+                    duration_sec=self.config.buffer.window_seconds
+                )
+            else:
+                window = self.temporal_buffer.get_window()
 
             # Tensor preparation
             t_tp = time.perf_counter()
-            x, mask = self.model_runner.window_to_tensor(window)
+            x, mask = self.model_runner.window_to_tensor(
+                window, offline_postprocess=self.config.inference.offline_postprocess
+            )
             latencies["tensor_prep"] = (time.perf_counter() - t_tp) * 1000.0
             self.profiler.record_stage("tensor_prep", latencies["tensor_prep"])
 
@@ -486,29 +512,7 @@ class RealtimePipeline:
             if completed_event is not None:
                 deduped = self.event_deduplicator.process(completed_event)
                 if deduped is not None:
-                    self.sign_sequence.append_event(deduped)
-                    self.latest_event = deduped
-
-                    # -------------------------------------------------
-                    # Stage 8: Translation Layer Ingestion
-                    # -------------------------------------------------
-                    t_trans = time.perf_counter()
-                    trans_res = self.translator.process_event(deduped)
-                    self.latest_translation = trans_res
-                    if trans_res.is_final and trans_res.text:
-                        output_translation = trans_res
-                        self.latest_translation = TranslationResult(
-                            text=trans_res.text,
-                            hindi_text=trans_res.hindi_text,
-                            confidence=trans_res.confidence,
-                            tokens=trans_res.tokens,
-                            source_signs=trans_res.source_signs,
-                            timestamp=trans_res.timestamp,
-                            status=trans_res.status,
-                            is_final=False
-                        )
-                    latencies["translation"] = (time.perf_counter() - t_trans) * 1000.0
-                    self.profiler.record_stage("translation", latencies["translation"])
+                    output_translation = self._ingest_event(deduped, latencies)
 
             latencies["deduplicator"] = (time.perf_counter() - t_dedup) * 1000.0
             self.profiler.record_stage("deduplicator", latencies["deduplicator"])
@@ -542,7 +546,7 @@ class RealtimePipeline:
             landmark_frame=landmark_frame,
             prediction=self.latest_prediction,
             smoothed=self.latest_smoothed,
-            state=self.sign_state_machine.state.value,
+            state=self._display_state(ts),
             latest_event=self.latest_event,
             sign_sequence=self.sign_sequence.get_labels(),
             translation=output_translation,
@@ -553,6 +557,126 @@ class RealtimePipeline:
         )
         self.last_step_output = output
         return output
+
+    def _ingest_event(self, event: SignEvent, latencies: Dict[str, float]) -> Optional[TranslationResult]:
+        """Stage 8: appends an accepted event to the transcript and feeds the translator."""
+        self.sign_sequence.append_event(event)
+        self.latest_event = event
+        output_translation = None
+        t_trans = time.perf_counter()
+        trans_res = self.translator.process_event(event)
+        self.latest_translation = trans_res
+        if trans_res.is_final and trans_res.text:
+            output_translation = trans_res
+            self.latest_translation = TranslationResult(
+                text=trans_res.text,
+                hindi_text=trans_res.hindi_text,
+                confidence=trans_res.confidence,
+                tokens=trans_res.tokens,
+                source_signs=trans_res.source_signs,
+                timestamp=trans_res.timestamp,
+                status=trans_res.status,
+                is_final=False
+            )
+        latencies["translation"] = (time.perf_counter() - t_trans) * 1000.0
+        self.profiler.record_stage("translation", latencies["translation"])
+        return output_translation
+
+    def _segment_step(self, landmark_frame, ts: float, latencies: Dict[str, float]) -> Optional[TranslationResult]:
+        """Segmentation mode: classify each finished sign once and emit it directly."""
+        was_signing = self.segmenter.in_segment
+        segment = self.segmenter.update(landmark_frame)
+        if self.segmenter.in_segment and not was_signing:
+            self.latest_smoothed = None  # a new sign started: stop showing the previous word as live
+        if segment is None:
+            return None
+        window = resample_by_time(segment, segment[0].timestamp, segment[-1].timestamp, self.config.buffer.max_length)
+
+        t_tp = time.perf_counter()
+        x, mask = self.model_runner.window_to_tensor(window, offline_postprocess=self.config.inference.offline_postprocess)
+        latencies["tensor_prep"] = (time.perf_counter() - t_tp) * 1000.0
+        t_inf = time.perf_counter()
+        with torch.inference_mode():
+            logits, probs = self.model_runner.predict(x, mask)
+        latencies["stgcn_inference"] = (time.perf_counter() - t_inf) * 1000.0
+        self.profiler.record_stage("stgcn_inference", latencies["stgcn_inference"])
+
+        from src.data.label_map import get_label, get_gloss, get_translation
+        probs_np = probs[0].cpu().numpy()
+        order = np.argsort(probs_np)[::-1]
+        cid, conf = int(order[0]), float(probs_np[order[0]])
+        margin = conf - float(probs_np[order[1]]) if len(order) > 1 else conf
+        quality = float(np.mean([f.quality.quality_score for f in segment]))
+        accepted = conf >= self.config.segmentation.min_confidence and margin >= self.config.confidence.min_margin
+        duration = segment[-1].timestamp - segment[0].timestamp
+
+        self.latest_prediction = PredictionResult(
+            class_id=cid,
+            label=get_label(cid),
+            gloss=get_gloss(cid),
+            translation=get_translation(cid),
+            confidence=conf,
+            probabilities=probs_np,
+            logits=logits[0].cpu().numpy(),
+            top_k=[(int(i), get_label(int(i)), float(probs_np[i])) for i in order[:self.config.inference.top_k]],
+            timestamp=ts,
+            window_start_time=segment[0].timestamp,
+            window_end_time=segment[-1].timestamp,
+            window_frame_count=len(window),
+            inference_start_time=t_inf,
+            inference_end_time=time.perf_counter(),
+            inference_latency_ms=round(latencies["stgcn_inference"], 2),
+            input_quality=round(quality, 4),
+            is_valid_quality=accepted,
+            buffer_length=len(segment),
+            device=str(self.model_runner.device)
+        )
+        top3 = ", ".join(f"{lbl}:{p:.2f}" for _, lbl, p in self.latest_prediction.top_k[:3])
+        if self.config.debug.save_segments:
+            self._save_segment(segment, self.latest_prediction.top_k, accepted)
+        if not accepted:
+            logger.info("[SEGMENT] rejected (%.1fs) top3=[%s] need conf>=%.2f", duration, top3,
+                        self.config.segmentation.min_confidence)
+            return None
+        logger.info("[SEGMENT] %s (%.1fs) top3=[%s]", get_label(cid), duration, top3)
+
+        self.latest_smoothed = SmoothedPrediction(
+            class_id=cid, label=get_label(cid), gloss=get_gloss(cid), translation=get_translation(cid),
+            confidence=conf, stability_score=1.0, is_stable=True, timestamp=ts, method="segment",
+            input_quality=quality, window_start=segment[0].timestamp, window_end=segment[-1].timestamp,
+        )
+        self._segment_display_until = ts + 1.5
+        # Each segment is a separate sign by construction, so the deduplicator is bypassed:
+        # the same word signed twice in a row must appear twice.
+        event = SignEvent.create(
+            class_id=cid, label=get_label(cid), start_time=segment[0].timestamp, end_time=segment[-1].timestamp,
+            confidence=conf, input_quality=quality, stability_score=1.0, metadata={"num_frames": len(segment)},
+        )
+        return self._ingest_event(event, latencies)
+
+    def _save_segment(self, segment, top_k, accepted: bool) -> None:
+        """Debug: dump one sign's raw landmarks so live input can be compared with training clips."""
+        out_dir = os.path.join(self.config.debug.record_dir, "segments")
+        os.makedirs(out_dir, exist_ok=True)
+        stamp = time.strftime("%H%M%S", time.localtime(segment[-1].timestamp))
+        path = os.path.join(out_dir, f"{stamp}_{top_k[0][1]}{'' if accepted else '_rejected'}.npz")
+        np.savez_compressed(
+            path,
+            raw_coords=np.stack([f.raw_coords for f in segment]).astype(np.float32),
+            normalized_coords=np.stack([f.normalized_coords for f in segment]).astype(np.float32),
+            mask=np.stack([f.mask for f in segment]),
+            timestamps=np.array([f.timestamp for f in segment]),
+            aspect_y_scale=np.array([f.aspect_y_scale for f in segment]),
+            top_k=np.array([f"{lbl}:{p:.3f}" for _, lbl, p in top_k]),
+        )
+
+    def _display_state(self, ts: float) -> str:
+        """State reported to the UI; segmentation mode maps signing / just-recognised onto the FSM names."""
+        if self.segmenter is None:
+            return self.sign_state_machine.state.value
+        if self.segmenter.in_segment:
+            return SignState.ACTIVE.value
+        return SignState.ENDING.value if ts < self._segment_display_until else SignState.IDLE.value
 
     def render_overlay(
         self,
@@ -691,6 +815,9 @@ class RealtimePipeline:
         self.translator.reset()
         self.profiler.reset()
         self.scheduler.reset()
+        if self.segmenter is not None:
+            self.segmenter.reset()
+        self._segment_display_until = 0.0
 
         self.latest_prediction = None
         self.latest_filtered = None

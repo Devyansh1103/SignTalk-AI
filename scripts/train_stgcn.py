@@ -18,6 +18,7 @@ import torch.nn as nn
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from src.utils.device import get_device
+from src.data.label_map import NUM_CLASSES, ID_TO_LABEL
 from src.utils.reproducibility import set_seed
 from src.models.stgcn import SignSTGCN
 from src.data.dataloader import create_sequence_dataloader
@@ -62,6 +63,7 @@ def main():
     paths_cfg = config["paths"]
     batch_size = train_cfg.get("batch_size", 8)
     dataset_cfg = config["dataset"]
+    dataset_cfg["num_classes"] = NUM_CLASSES   # always follow the vocabulary file
 
     train_loader = create_sequence_dataloader(
         manifest_path=paths_cfg["train_manifest"],
@@ -71,7 +73,9 @@ def main():
         filter_rejects=dataset_cfg.get("filter_rejects_train", False),
         augment=dataset_cfg.get("augment_train", False),
         include_velocity=dataset_cfg.get("include_velocity", False),
-        seed=seed
+        seed=seed,
+        restrict_to_vocab=dataset_cfg.get("restrict_to_vocab", True),
+        balance_classes=dataset_cfg.get("balance_classes", False)
     )
 
     val_loader = create_sequence_dataloader(
@@ -81,7 +85,8 @@ def main():
         shuffle=False,
         filter_rejects=dataset_cfg.get("filter_rejects_val", False),
         augment=False,
-        include_velocity=dataset_cfg.get("include_velocity", False)
+        include_velocity=dataset_cfg.get("include_velocity", False),
+        restrict_to_vocab=dataset_cfg.get("restrict_to_vocab", True)
     )
 
     print(f"[DATA] Train Batches: {len(train_loader)} ({len(train_loader.dataset)} samples)")
@@ -92,7 +97,7 @@ def main():
     graph_cfg = config["graph"]
     model = SignSTGCN(
         in_channels=dataset_cfg.get("in_channels", 3),
-        num_classes=dataset_cfg.get("num_classes", 10),
+        num_classes=NUM_CLASSES,
         num_nodes=dataset_cfg.get("num_nodes", 93),
         sequence_length=dataset_cfg.get("sequence_length", 45),
         graph_strategy=graph_cfg.get("strategy", "spatial"),
@@ -135,13 +140,7 @@ def main():
     loss_fn = nn.CrossEntropyLoss()
 
     # 6. Class Names
-    class_names = [f"Class_{i}" for i in range(dataset_cfg.get("num_classes", 10))]
-    vocab_path = paths_cfg.get("vocabulary_file")
-    if vocab_path and os.path.exists(vocab_path):
-        with open(vocab_path, "r", encoding="utf-8") as vf:
-            vocab = json.load(vf)
-            c2g = vocab.get("class_id_to_gloss", {})
-            class_names = [c2g.get(str(i), f"Class_{i}") for i in range(dataset_cfg.get("num_classes", 10))]
+    class_names = [ID_TO_LABEL[i] for i in range(NUM_CLASSES)]
 
     # 7. Trainer Coordination
     trainer = ModelTrainer(

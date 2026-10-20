@@ -74,7 +74,7 @@ def main():
 
     # Class names
     class_names = [f"Class_{i}" for i in range(10)]
-    vocab_path = "assets/vocabularies/mvp_10.json"
+    vocab_path = "assets/vocabularies/signtalk_vocab.json"
     if os.path.exists(vocab_path):
         with open(vocab_path, "r", encoding="utf-8") as vf:
             vocab = json.load(vf)

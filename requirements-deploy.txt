@@ -1,0 +1,15 @@
+# Backend-only dependencies for the hosted server (deploy/hf-space/Dockerfile).
+# Training, evaluation and test tools from requirements.txt are left out to keep the image small.
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch==2.3.1+cpu
+numpy==1.26.4
+pandas==2.2.2
+opencv-python-headless==4.9.0.80
+mediapipe==0.10.14
+fastapi==0.111.0
+uvicorn[standard]==0.30.1
+pydantic==2.7.4
+websockets==12.0
+python-multipart==0.0.9
+pyyaml==6.0.1
+psutil==5.9.8

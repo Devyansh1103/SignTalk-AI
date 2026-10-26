@@ -4,6 +4,8 @@ SignTalk AI: pack everything ST-GCN training needs into one zip for Google Colab
 
 Includes code (src, scripts, configs), the vocabulary, the train/val/test manifests and
 only the sequence .npz files those manifests reference. Raw videos are not needed.
+Own recordings (data/manifests/user_recordings.csv from scripts/record_signs.py) are included
+when present, so train_stgcn.py trains on them too.
 
 Usage:
   python scripts/pack_for_colab.py            -> signtalk_colab.zip in the project root
@@ -17,6 +19,7 @@ ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 OUT = os.path.join(ROOT, "signtalk_colab.zip")
 CODE_DIRS = ["src", "scripts", "configs", "assets"]
 SPLITS = ["train", "val", "test"]
+USER_MANIFEST = "data/manifests/user_recordings.csv"
 
 
 def main():
@@ -27,8 +30,14 @@ def main():
             dirs[:] = [x for x in dirs if x != "__pycache__"]
             files += [os.path.join(base, n) for n in names if not n.endswith(".pyc")]
     missing = []
-    for split in SPLITS:
-        m = f"data/manifests/{split}.csv"
+    manifests = [f"data/manifests/{split}.csv" for split in SPLITS]
+    if os.path.exists(USER_MANIFEST):
+        manifests.append(USER_MANIFEST)
+        user = pd.read_csv(USER_MANIFEST)
+        print(f"[INFO] Own recordings included: {len(user)} takes, {user['label'].nunique()} words")
+    else:
+        print("[INFO] No own recordings (scripts/record_signs.py); INCLUDE only")
+    for m in manifests:
         files.append(m)
         for p in pd.read_csv(m)["file_path"]:
             (files if os.path.exists(p) else missing).append(p)

@@ -18,6 +18,9 @@ dataset:
   filter_rejects_val: false
   augment_train: true   # jitter/scale/rotation + temporal crop (live windows start/end mid-sign)
   balance_classes: true   # oversample small classes (1/sqrt(count)); Adjectives have only 4 train clips
+  mirror_prob: 0.3        # mirror clips left <-> right (left-handed signers); mirrored test clips: 24% with the old model
+  user_weight: 3.0        # own recordings (paths.user_manifest) are drawn 3x as often as an INCLUDE clip
+  user_val_every: 5       # every 5th own take of a word is held out for validation
 
 graph:
   type: "anatomical_multimodal"
@@ -58,6 +61,7 @@ paths:
   train_manifest: "data/manifests/train.csv"
   val_manifest: "data/manifests/val.csv"
   test_manifest: "data/manifests/test.csv"
+  user_manifest: "data/manifests/user_recordings.csv"   # optional, from scripts/record_signs.py
   vocabulary_file: "assets/vocabularies/signtalk_vocab.json"
   checkpoint_dir: "experiments/stgcn/checkpoints"
   log_dir: "experiments/stgcn/logs"

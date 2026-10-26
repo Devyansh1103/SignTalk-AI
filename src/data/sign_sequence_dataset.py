@@ -25,6 +25,13 @@ from src.data.stgcn_tensor import (
 )
 
 
+# Node order after a left <-> right mirror: hands 0-20 <-> 21-41, pose eyes / ears / shoulders /
+# elbows / wrists (43-52) pairwise. Nose (42) and the face nodes (unused, face mesh is off) stay.
+MIRROR_PERM = np.arange(NUM_NODES)
+for _a, _b in [(i, i + 21) for i in range(21)] + [(43, 44), (45, 46), (47, 48), (49, 50), (51, 52)]:
+    MIRROR_PERM[_a], MIRROR_PERM[_b] = _b, _a
+
+
 class SignSequenceDataset(Dataset):
     """
     Production-ready PyTorch Dataset for SignTalk AI spatial-temporal sequences.
@@ -39,7 +46,8 @@ class SignSequenceDataset(Dataset):
         include_velocity: bool = False,
         augment: bool = False,
         transform_seed: Optional[int] = None,
-        restrict_to_vocab: bool = False
+        restrict_to_vocab: bool = False,
+        mirror_prob: float = 0.0
     ):
         """
         Args:
@@ -53,6 +61,7 @@ class SignSequenceDataset(Dataset):
             restrict_to_vocab: If True, keeps only rows whose 'label' is in the canonical
                 10-class vocabulary and takes class_id from the label (not from the .npz),
                 so stale/colliding class ids from the full INCLUDE manifests cannot leak in.
+            mirror_prob: With augment, probability of mirroring a clip left <-> right (see _mirror).
         """
         if not os.path.exists(manifest_path):
             raise FileNotFoundError(f"Manifest not found: {manifest_path}")
@@ -80,6 +89,7 @@ class SignSequenceDataset(Dataset):
         self.df = df.reset_index(drop=True)
         self.include_velocity = include_velocity
         self.augment = augment
+        self.mirror_prob = float(mirror_prob)
         self.rng = np.random.default_rng(transform_seed) if transform_seed is not None else np.random.default_rng()
 
     def __len__(self) -> int:
@@ -156,6 +166,16 @@ class SignSequenceDataset(Dataset):
         idx = np.minimum((np.arange(T) + int(self.rng.integers(0, k))) // k * k, T - 1)
         return data[:, idx, :].copy(), mask[:, idx, :].copy()
 
+    def _mirror(self, data: np.ndarray, mask: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
+        """With probability mirror_prob, mirror the clip as a left-handed signer would sign it:
+        negate x (data is centred on mid-shoulder) and swap left/right hands and pose points.
+        The current model scores 85.5% on the test clips but 24.4% on the same clips mirrored."""
+        if self.mirror_prob <= 0 or self.rng.random() >= self.mirror_prob:
+            return data, mask
+        data, mask = data[:, :, MIRROR_PERM].copy(), mask[:, :, MIRROR_PERM].copy()
+        data[0] *= -1.0
+        return data, mask
+
     def __getitem__(self, idx: int) -> Dict[str, Any]:
         row = self.df.iloc[idx]
         file_path = str(row["file_path"])
@@ -182,6 +202,7 @@ class SignSequenceDataset(Dataset):
             data, mask = self._temporal_crop(data, mask)
             data, mask = self._low_fps(data, mask)
             data, mask = self._drop_rest_hands(data, mask)
+            data, mask = self._mirror(data, mask)
             data = self._apply_augmentation(data) * (mask > 0)  # keep missing nodes at exactly 0, like live input
 
         # Convert to PyTorch tensors

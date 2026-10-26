@@ -66,6 +66,7 @@ CHANGES.md
 backups/
 experiments/stgcn/checkpoints/*_f1bug.pt
 experiments/stgcn_user/
+experiments/stgcn/train_data/
 
 # Personal webcam data (privacy: landmarks of the user's own signing)
 experiments/realtime_debug/

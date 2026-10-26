@@ -16,7 +16,7 @@ def client():
 
 
 def test_root_endpoint(client):
-    res = client.get("/")
+    res = client.get("/api")  # "/" serves the built frontend when frontend/dist exists
     assert res.status_code == 200
     data = res.json()
     assert "SignTalk AI" in data["service"]

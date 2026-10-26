@@ -4,6 +4,10 @@ SignTalk AI: ST-GCN Training CLI.
 
 Trains the Spatial-Temporal Graph Convolutional Network using parameters
 from configs/stgcn.yaml. Saves checkpoints and metrics to experiments/stgcn/.
+
+If paths.user_manifest exists (own webcam recordings from scripts/record_signs.py), they are
+mixed into training: every user_val_every-th take of each word goes to validation, the rest to
+training with sample weight user_weight.
 """
 
 import sys
@@ -13,6 +17,8 @@ import json
 import yaml
 import torch
 import torch.nn as nn
+import numpy as np
+import pandas as pd
 
 # Add repository root to path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
@@ -23,6 +29,32 @@ from src.utils.reproducibility import set_seed
 from src.models.stgcn import SignSTGCN
 from src.data.dataloader import create_sequence_dataloader
 from src.training.trainer import ModelTrainer
+
+
+def add_user_recordings(paths_cfg, dataset_cfg):
+    """Returns (train, val) manifest paths, with the user's recordings appended when present."""
+    user_path = paths_cfg.get("user_manifest")
+    if not user_path or not os.path.exists(user_path):
+        print("[DATA] No user recordings; training on INCLUDE only")
+        return paths_cfg["train_manifest"], paths_cfg["val_manifest"]
+    user = pd.read_csv(user_path)
+    every = int(dataset_cfg.get("user_val_every", 5))
+    take = user.groupby("label").cumcount()
+    user["split"] = np.where(take % every == every - 1, "val", "train")
+    user["sample_weight"] = np.where(user["split"] == "train", float(dataset_cfg.get("user_weight", 3.0)), 1.0)
+    out_dir = os.path.join(os.path.dirname(paths_cfg["checkpoint_dir"]), "train_data")
+    os.makedirs(out_dir, exist_ok=True)
+    merged = []
+    for split, key in (("train", "train_manifest"), ("val", "val_manifest")):
+        base = pd.read_csv(paths_cfg[key])
+        df = pd.concat([base, user[user["split"] == split]], ignore_index=True)
+        path = os.path.join(out_dir, f"{split}.csv")
+        df.to_csv(path, index=False)
+        merged.append(path)
+    counts = user.groupby(["label", "split"]).size().unstack(fill_value=0)
+    print(f"[DATA] User recordings from {user_path} ({len(user)} takes, {user['label'].nunique()} words):")
+    print(counts.to_string())
+    return merged[0], merged[1]
 
 
 def main():
@@ -64,9 +96,10 @@ def main():
     batch_size = train_cfg.get("batch_size", 8)
     dataset_cfg = config["dataset"]
     dataset_cfg["num_classes"] = NUM_CLASSES   # always follow the vocabulary file
+    train_manifest, val_manifest = add_user_recordings(paths_cfg, dataset_cfg)
 
     train_loader = create_sequence_dataloader(
-        manifest_path=paths_cfg["train_manifest"],
+        manifest_path=train_manifest,
         split="train",
         batch_size=batch_size,
         shuffle=True,
@@ -75,11 +108,12 @@ def main():
         include_velocity=dataset_cfg.get("include_velocity", False),
         seed=seed,
         restrict_to_vocab=dataset_cfg.get("restrict_to_vocab", True),
-        balance_classes=dataset_cfg.get("balance_classes", False)
+        balance_classes=dataset_cfg.get("balance_classes", False),
+        mirror_prob=float(dataset_cfg.get("mirror_prob", 0.0))
     )
 
     val_loader = create_sequence_dataloader(
-        manifest_path=paths_cfg["val_manifest"],
+        manifest_path=val_manifest,
         split="val",
         batch_size=batch_size,
         shuffle=False,

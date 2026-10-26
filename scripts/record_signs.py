@@ -10,7 +10,7 @@ sign the word and lower your hands. Each finished sign is saved.
 Resumes by itself: takes already in the manifest count towards --reps, so after quitting just
 run the same command again and it continues with the remaining words.
 
-Keys: SPACE = start the word, u = undo last sample, s = skip word, q = quit.
+Keys: SPACE = start the word, u = undo last sample, s = skip word, c = next camera, q = quit.
 Stop the backend first (both need the webcam and the CPU).
 
 Usage:
@@ -104,6 +104,14 @@ class ReferencePlayer:
         cv2.putText(view, "reference", (x0, y0 - 6), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 200, 255), 1)
 
 
+def open_camera(index):
+    cap = cv2.VideoCapture(index, cv2.CAP_DSHOW)
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+    cap.set(cv2.CAP_PROP_BUFFERSIZE, 1)
+    return cap
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--words", nargs="+", default=["hello", "alright", "fan", "cow", "thankyou"])
@@ -147,10 +155,8 @@ def main():
         return seg
     pipe.segmenter.update = update
 
-    cap = cv2.VideoCapture(a.camera, cv2.CAP_DSHOW)
-    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
-    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
-    cap.set(cv2.CAP_PROP_BUFFERSIZE, 1)
+    cam = a.camera
+    cap = open_camera(cam)
     if not cap.isOpened():
         sys.exit("[ERROR] Webcam not available. Close the browser tab / backend that is using it.")
 
@@ -201,7 +207,7 @@ def main():
                       else "SIGNING..." if signing else "ready: sign karo, phir haath neeche")
             cv2.putText(view, status, (10, 62), cv2.FONT_HERSHEY_SIMPLEX, 0.6,
                         (0, 200, 255) if not started else (0, 0, 255) if signing else (0, 255, 0), 2)
-            cv2.putText(view, f"{last_msg}   fps {fps:.0f}   [u]ndo [s]kip [q]uit", (10, 84),
+            cv2.putText(view, f"{last_msg}   fps {fps:.0f}   cam {cam}   [u]ndo [s]kip [c]amera [q]uit", (10, 84),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.45, (200, 200, 200), 1)
             cv2.imshow("SignTalk recorder", view)
 
@@ -209,6 +215,19 @@ def main():
             if key == ord("q"):
                 quit_requested = True
                 break
+            elif key == ord("c"):
+                # Laptops can list virtual cameras (e.g. Lenovo Smart Connect) before the webcam
+                cap.release()
+                for nxt in (cam + 1, cam + 2, 0):
+                    cap = open_camera(nxt)
+                    if cap.isOpened() and cap.read()[0]:
+                        cam = nxt
+                        break
+                    cap.release()
+                else:
+                    cap = open_camera(cam)
+                pipe.segmenter.reset()
+                print(f"[INFO] camera {cam}")
             elif key == ord("s"):
                 break
             elif key == ord(" ") and not started:

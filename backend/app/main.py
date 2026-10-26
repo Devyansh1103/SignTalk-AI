@@ -12,6 +12,7 @@ import logging
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 # Ensure project root is in sys.path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
@@ -63,7 +64,7 @@ app.include_router(health_router, tags=["Health & Status"])
 app.include_router(realtime_router, tags=["Real-Time Streaming"])
 
 
-@app.get("/")
+@app.get("/api")
 def root():
     return {
         "service": "SignTalk AI Real-Time Translation API",
@@ -71,3 +72,9 @@ def root():
         "docs_url": "/docs",
         "websocket_endpoint": "/ws/realtime"
     }
+
+
+# Serve the built frontend (npm run build) so one URL hosts the whole app, e.g. behind a tunnel
+FRONTEND_DIST = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../frontend/dist"))
+if os.path.isdir(FRONTEND_DIST):
+    app.mount("/", StaticFiles(directory=FRONTEND_DIST, html=True), name="frontend")

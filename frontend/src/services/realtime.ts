@@ -20,7 +20,8 @@ export class RealtimeClient {
   private isExplicitlyClosed = false;
 
   constructor(url?: string) {
-    this.url = url || (import.meta.env.VITE_WS_URL || 'ws://localhost:8000/ws/realtime');
+    const sameOrigin = `${window.location.protocol === 'https:' ? 'wss' : 'ws'}://${window.location.host}/ws/realtime`;
+    this.url = url || import.meta.env.VITE_WS_URL || (import.meta.env.DEV ? 'ws://localhost:8000/ws/realtime' : sameOrigin);
   }
 
   public getStatus(): ConnectionStatus {

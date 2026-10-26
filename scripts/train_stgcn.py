@@ -7,7 +7,8 @@ from configs/stgcn.yaml. Saves checkpoints and metrics to experiments/stgcn/.
 
 If paths.user_manifest exists (own webcam recordings from scripts/record_signs.py), they are
 mixed into training: every user_val_every-th take of each word goes to validation, the rest to
-training with sample weight user_weight.
+training with sample weight user_weight ("auto": own takes together get about half the weight of
+the INCLUDE clips, each take between 1x and 3x an INCLUDE clip).
 """
 
 import sys
@@ -41,7 +42,11 @@ def add_user_recordings(paths_cfg, dataset_cfg):
     every = int(dataset_cfg.get("user_val_every", 5))
     take = user.groupby("label").cumcount()
     user["split"] = np.where(take % every == every - 1, "val", "train")
-    user["sample_weight"] = np.where(user["split"] == "train", float(dataset_cfg.get("user_weight", 3.0)), 1.0)
+    weight = dataset_cfg.get("user_weight", "auto")
+    if weight == "auto":
+        n_include = len(pd.read_csv(paths_cfg["train_manifest"]))
+        weight = float(np.clip(0.5 * n_include / max(int((user["split"] == "train").sum()), 1), 1.0, 3.0))
+    user["sample_weight"] = np.where(user["split"] == "train", float(weight), 1.0)
     out_dir = os.path.join(os.path.dirname(paths_cfg["checkpoint_dir"]), "train_data")
     os.makedirs(out_dir, exist_ok=True)
     merged = []
@@ -52,7 +57,7 @@ def add_user_recordings(paths_cfg, dataset_cfg):
         df.to_csv(path, index=False)
         merged.append(path)
     counts = user.groupby(["label", "split"]).size().unstack(fill_value=0)
-    print(f"[DATA] User recordings from {user_path} ({len(user)} takes, {user['label'].nunique()} words):")
+    print(f"[DATA] User recordings from {user_path} ({len(user)} takes, {user['label'].nunique()} words, weight {float(weight):.2f}):")
     print(counts.to_string())
     return merged[0], merged[1]
 

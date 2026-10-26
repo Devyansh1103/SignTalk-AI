@@ -19,7 +19,7 @@ dataset:
   augment_train: true   # jitter/scale/rotation + temporal crop (live windows start/end mid-sign)
   balance_classes: true   # oversample small classes (1/sqrt(count)); Adjectives have only 4 train clips
   mirror_prob: 0.3        # mirror clips left <-> right (left-handed signers); mirrored test clips: 24% with the old model
-  user_weight: 3.0        # own recordings (paths.user_manifest) are drawn 3x as often as an INCLUDE clip
+  user_weight: auto       # own recordings (paths.user_manifest): 1-3x an INCLUDE clip, about half the total weight
   user_val_every: 5       # every 5th own take of a word is held out for validation
 
 graph:

@@ -4,17 +4,22 @@ SignTalk AI: record your own signs from the webcam for fine-tuning.
 
 Runs the exact live pipeline (same MediaPipe settings, same segmentation, same 45-frame
 model input as the backend), so the saved samples look like what the model sees live.
-Sign the word shown on screen, then lower your hands; each finished sign is saved.
+Before each word its INCLUDE reference video plays in the corner; press SPACE to start, then
+sign the word and lower your hands. Each finished sign is saved.
 
-Keys: u = undo last sample, s = skip to next word, q = quit.
+Resumes by itself: takes already in the manifest count towards --reps, so after quitting just
+run the same command again and it continues with the remaining words.
+
+Keys: SPACE = start the word, u = undo last sample, s = skip word, q = quit.
 Stop the backend first (both need the webcam and the CPU).
 
 Usage:
   python scripts/record_signs.py --words hello alright fan cow thankyou --reps 15
+  python scripts/record_signs.py --all --reps 10        # all vocabulary words
 Output:
   data/user_recordings/<signer>/<word>/*.npz  +  data/manifests/user_recordings.csv
 """
-import argparse, logging, os, sys, time
+import argparse, glob, logging, os, re, sys, time
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import cv2
 import numpy as np
@@ -26,6 +31,7 @@ from src.realtime.sign_segmenter import resample_by_time
 from src.data.label_map import LABEL_TO_ID, get_gloss, get_translation
 
 MANIFEST = "data/manifests/user_recordings.csv"
+DEFAULT_REFERENCE_ROOT = "D:/data convertion for mini project/dataset"
 
 
 def save_sample(pipe, segment, word, signer, out_dir):
@@ -56,17 +62,74 @@ def save_sample(pipe, segment, word, signer, out_dir):
     }
 
 
+def find_references(root):
+    """word -> INCLUDE videos, from <root>/<Category>/<N. Word>/*.MOV (labels are letters only)."""
+    refs = {}
+    for d in glob.glob(os.path.join(root, "*", "*")):
+        word = re.sub(r"[^a-z]", "", re.sub(r"^\d+\.\s*", "", os.path.basename(d)).lower())
+        videos = sorted(glob.glob(os.path.join(d, "*.MOV")) + glob.glob(os.path.join(d, "*.mp4")) + glob.glob(os.path.join(d, "*.MP4")))
+        if videos:
+            refs.setdefault(word, videos)
+    return refs
+
+
+class ReferencePlayer:
+    """Loops one INCLUDE clip of the current word, scaled down for a corner of the window.
+    Mirrored like the camera preview, so copying what you see uses the signer's hand, not the
+    opposite one."""
+
+    def __init__(self, videos, width=256):
+        self.frames = []
+        if videos:
+            cap = cv2.VideoCapture(videos[0])
+            while True:
+                ok, f = cap.read()
+                if not ok:
+                    break
+                h, w = f.shape[:2]
+                self.frames.append(cv2.flip(cv2.resize(f, (width, int(h * width / w))), 1))
+            cap.release()
+        self.i = 0
+
+    def draw(self, view):
+        if not self.frames:
+            return
+        f = self.frames[self.i % len(self.frames)]
+        self.i += 1
+        h, w = f.shape[:2]
+        H, W = view.shape[:2]
+        y0, x0 = H - h - 8, W - w - 8
+        view[y0:y0 + h, x0:x0 + w] = f
+        cv2.rectangle(view, (x0 - 1, y0 - 1), (x0 + w, y0 + h), (0, 200, 255), 1)
+        cv2.putText(view, "reference", (x0, y0 - 6), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 200, 255), 1)
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--words", nargs="+", default=["hello", "alright", "fan", "cow", "thankyou"])
-    ap.add_argument("--reps", type=int, default=15)
+    ap.add_argument("--all", action="store_true", help="record every vocabulary word")
+    ap.add_argument("--reps", type=int, default=15, help="target takes per word (existing takes count)")
     ap.add_argument("--signer", default="me")
     ap.add_argument("--camera", type=int, default=0)
+    ap.add_argument("--reference-root", default=DEFAULT_REFERENCE_ROOT,
+                    help="INCLUDE dataset folder, for the reference clip of each word")
     a = ap.parse_args()
 
-    unknown = [w for w in a.words if w not in LABEL_TO_ID]
+    words = sorted(LABEL_TO_ID, key=LABEL_TO_ID.get) if a.all else a.words
+    unknown = [w for w in words if w not in LABEL_TO_ID]
     if unknown:
         sys.exit(f"[ERROR] Not in the model vocabulary: {unknown}. Check assets/ vocabulary for exact spelling.")
+
+    rows = pd.read_csv(MANIFEST).to_dict("records") if os.path.exists(MANIFEST) else []
+    have = pd.Series([r["label"] for r in rows if r["signer_id"] == f"user_{a.signer}"]).value_counts()
+    todo = [(w, a.reps - int(have.get(w, 0))) for w in words if a.reps - int(have.get(w, 0)) > 0]
+    print(f"[INFO] {len(words) - len(todo)} of {len(words)} words already have {a.reps} takes; "
+          f"{sum(n for _, n in todo)} takes left over {len(todo)} words")
+    if not todo:
+        return
+    refs = find_references(a.reference_root) if os.path.isdir(a.reference_root) else {}
+    if not refs:
+        print(f"[WARN] No reference videos under {a.reference_root}; recording without them")
 
     logging.disable(logging.INFO)
     cfg = RealTimeConfig.from_yaml("configs/realtime.yaml")
@@ -91,27 +154,27 @@ def main():
     if not cap.isOpened():
         sys.exit("[ERROR] Webcam not available. Close the browser tab / backend that is using it.")
 
-    rows = pd.read_csv(MANIFEST).to_dict("records") if os.path.exists(MANIFEST) else []
     saved = []  # (row, path) of this run, for undo
     last_msg, t_fps, n_fps, fps = "", time.time(), 0, 0.0
 
     quit_requested = False
-    for wi, word in enumerate(a.words):
+    for wi, (word, need) in enumerate(todo):
         if quit_requested:
             break
         out_dir = os.path.join("data", "user_recordings", a.signer, word)
         os.makedirs(out_dir, exist_ok=True)
+        ref = ReferencePlayer(refs.get(word))
+        done_before = a.reps - need
         count = 0
-        pause_until = time.time() + 3.0  # time to read the next word
-        while count < a.reps:
+        started = False  # waits for SPACE, so the reference clip can be watched first
+        pipe.segmenter.reset()
+        while count < need:
             ok, frame = cap.read()
             if not ok:
                 continue
-            if time.time() >= pause_until:
+            if started:
                 pipe.step(frame)
                 n_fps += 1
-            else:
-                pipe.segmenter.reset()
             if time.time() - t_fps >= 1.0:
                 fps, n_fps, t_fps = n_fps / (time.time() - t_fps), 0, time.time()
 
@@ -124,19 +187,20 @@ def main():
                 count += 1
                 pred = pipe.latest_prediction
                 guess = f"{pred.label} {pred.confidence:.0%}" if pred is not None else "-"
-                last_msg = f"saved #{count} ({row['duration_seconds']:.1f}s) | model abhi: {guess}"
+                last_msg = f"saved #{done_before + count} ({row['duration_seconds']:.1f}s) | model abhi: {guess}"
                 print(f"[{word}] {last_msg}")
                 pd.DataFrame(rows).to_csv(MANIFEST, index=False)
 
             view = cv2.flip(frame, 1)
+            ref.draw(view)
             signing = pipe.segmenter.in_segment
             cv2.rectangle(view, (0, 0), (640, 92), (0, 0, 0), -1)
-            cv2.putText(view, f"{word.upper()}   {count}/{a.reps}   (word {wi + 1}/{len(a.words)})",
+            cv2.putText(view, f"{word.upper()}   {done_before + count}/{a.reps}   (word {wi + 1}/{len(todo)})",
                         (10, 34), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (255, 255, 255), 2)
-            status = ("agla word padho..." if time.time() < pause_until
+            status = ("reference dekho, SPACE = shuru, s = skip" if not started
                       else "SIGNING..." if signing else "ready: sign karo, phir haath neeche")
             cv2.putText(view, status, (10, 62), cv2.FONT_HERSHEY_SIMPLEX, 0.6,
-                        (0, 0, 255) if signing else (0, 255, 0), 2)
+                        (0, 200, 255) if not started else (0, 0, 255) if signing else (0, 255, 0), 2)
             cv2.putText(view, f"{last_msg}   fps {fps:.0f}   [u]ndo [s]kip [q]uit", (10, 84),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.45, (200, 200, 200), 1)
             cv2.imshow("SignTalk recorder", view)
@@ -147,19 +211,25 @@ def main():
                 break
             elif key == ord("s"):
                 break
-            elif key == ord("u") and saved and saved[-1]["label"] == word:
+            elif key == ord(" ") and not started:
+                started = True
+                pipe.segmenter.reset()
+            elif key == ord("u") and saved and saved[-1]["label"] == word and count > 0:
                 row = saved.pop()
                 rows.remove(row)
                 os.remove(row["file_path"])
                 count -= 1
-                last_msg = f"undo: #{count + 1} deleted"
+                last_msg = f"undo: #{done_before + count + 1} deleted"
                 pd.DataFrame(rows).to_csv(MANIFEST, index=False)
 
     cap.release()
     cv2.destroyAllWindows()
     print(f"\n[OK] This run: {len(saved)} samples. Total in {MANIFEST}: {len(rows)}")
     if rows:
-        print(pd.DataFrame(rows)["label"].value_counts().to_string())
+        counts = pd.DataFrame(rows)["label"].value_counts()
+        print(f"{len(counts)} words recorded, {int((counts >= a.reps).sum())} with {a.reps}+ takes")
+    if quit_requested:
+        print("Baaki words ke liye wahi command dobara chalao; jo ho chuke hain wo skip honge.")
 
 
 if __name__ == "__main__":

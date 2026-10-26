@@ -18,8 +18,16 @@ export async function checkBackendHealth() {
   }
 }
 
+// Default: everything runs in the browser (src/engine). VITE_INFERENCE=server uses the FastAPI backend.
+export const LOCAL_INFERENCE = import.meta.env.VITE_INFERENCE !== 'server';
+
 export async function fetchVocabulary(): Promise<VocabularyItem[]> {
   try {
+    if (LOCAL_INFERENCE) {
+      const res = await fetch(`${import.meta.env.BASE_URL}models/vocab.json`);
+      if (!res.ok) throw new Error(`Failed to fetch vocabulary: ${res.status}`);
+      return await res.json();
+    }
     const res = await fetch(`${API_BASE}/api/vocabulary`);
     if (!res.ok) throw new Error(`Failed to fetch vocabulary: ${res.status}`);
     const data = await res.json();

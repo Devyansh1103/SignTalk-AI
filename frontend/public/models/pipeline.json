@@ -1,0 +1,43 @@
+{
+  "mediapipe": {
+    "pose_confidence": 0.5,
+    "hand_confidence": 0.35,
+    "hand_tracking_confidence": 0.35
+  },
+  "normalization": {
+    "min_scale_epsilon": 0.0001,
+    "z_scale_factor": 1.0,
+    "use_temporal_anchor_smoothing": true,
+    "anchor_smoothing_alpha": 0.25,
+    "reference_aspect": 1.7778
+  },
+  "quality": {
+    "weights": {
+      "pose": 0.4,
+      "dominant_hand": 0.4,
+      "non_dominant_hand": 0.15,
+      "face": 0.05
+    },
+    "good": 0.75,
+    "acceptable": 0.5
+  },
+  "segmentation": {
+    "active_max_y": 1.35,
+    "min_active_sec": 0.3,
+    "end_hold_sec": 0.5,
+    "pad_before_sec": 0.5,
+    "pad_after_sec": 0.5,
+    "max_segment_sec": 4.0,
+    "min_confidence": 0.5,
+    "min_margin": 0.05
+  },
+  "sequence_length": 45,
+  "max_consecutive_missing": 10,
+  "translation": {
+    "pause_threshold_sec": 0.9,
+    "min_confidence": 0.3,
+    "max_phrase_signs": 10
+  },
+  "max_events": 50,
+  "top_k": 3
+}

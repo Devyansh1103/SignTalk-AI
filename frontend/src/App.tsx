@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useCamera } from './hooks/useCamera';
 import { useRealtime } from './hooks/useRealtime';
-import { fetchVocabulary } from './services/api';
+import { useLocalRealtime } from './hooks/useLocalRealtime';
+import { fetchVocabulary, LOCAL_INFERENCE } from './services/api';
 import type { AccessibilitySettings, VocabularyItem } from './types/realtime';
 
 import { Header } from './components/layout/Header';
@@ -15,6 +16,9 @@ import { LiveTranscript } from './components/translation/LiveTranscript';
 import { DeveloperHUD } from './components/debug/DeveloperHUD';
 import { VocabularyModal } from './components/modals/VocabularyModal';
 import { PrivacyModal } from './components/modals/PrivacyModal';
+
+// Fixed per build, so the same hook runs on every render
+const useRecognition = LOCAL_INFERENCE ? useLocalRealtime : useRealtime;
 
 // Certified MVP-10 Vocabulary Fallback
 const DEFAULT_VOCABULARY: VocabularyItem[] = [
@@ -57,7 +61,7 @@ export function App() {
     stopCamera,
   } = useCamera();
 
-  // Real-Time WebSocket Hook
+  // Recognition: on-device (default) or via the WebSocket backend
   const {
     connectionStatus,
     latestMessage,
@@ -66,9 +70,9 @@ export function App() {
     pauseStreaming,
     resumeStreaming,
     resetSession,
-  } = useRealtime(videoRef, cameraStatus === 'running');
+  } = useRecognition(videoRef, cameraStatus === 'running');
 
-  // Load official vocabulary from backend on mount
+  // Load the full vocabulary on mount
   useEffect(() => {
     fetchVocabulary().then((items) => {
       if (items && items.length > 0) {
@@ -107,7 +111,7 @@ export function App() {
       } ${settings.largeText ? 'large-text' : ''}`}
     >
       {/* Top Header */}
-      <Header connectionStatus={connectionStatus} />
+      <Header connectionStatus={connectionStatus} local={LOCAL_INFERENCE} />
 
       {/* Main Translation Interface */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col gap-6">

@@ -132,6 +132,8 @@ def main():
     print(f"[OK] Best epoch {best[1]} saved to {OUT_DIR}/best_checkpoint.pt")
     print("To use it live (backend band karke):")
     print(f"  copy {OUT_DIR.replace('/', chr(92))}\\best_checkpoint.pt experiments\\stgcn\\checkpoints\\best_checkpoint.pt")
+    print("For the website (in-browser model), then also run:")
+    print("  python scripts\\export_onnx.py")
 
 
 if __name__ == "__main__":

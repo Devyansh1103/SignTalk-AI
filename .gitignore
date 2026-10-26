@@ -75,3 +75,9 @@ data/manifests/user_recordings.csv
 # Generated landmark data (231 MB) and logs
 data/processed/
 logs/
+
+# Tunnel binary and local deploy tools
+cloudflared*.exe
+
+# Frontend build output (frontend/public/models IS committed: the website serves those files)
+frontend/dist/

@@ -60,6 +60,16 @@ npm run dev
 ```
 Open `http://localhost:5173` in your browser.
 
+By default the frontend runs everything **in the browser** (MediaPipe JS + the ST-GCN on
+onnxruntime-web, `frontend/src/engine/`), so Step 1 is not needed. To use the FastAPI backend
+instead, start the dev server with `VITE_INFERENCE=server`.
+
+### Hosting the website (free, no server)
+The in-browser build is a static site: deploy the `frontend` folder to Vercel (Root Directory
+`frontend`, framework Vite) or any static host. The model files it serves live in
+`frontend/public/models/`. After a new checkpoint (retrain or `scripts/finetune_user.py`), run
+`python scripts/export_onnx.py` to update them, then push.
+
 ### Step 3: Interactive Signing
 - Allow webcam permissions when prompted.
 - Position your body within the camera guide boundary.

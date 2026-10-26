@@ -5,9 +5,10 @@ import { Hand, Sparkles } from 'lucide-react';
 
 interface Props {
   connectionStatus: ConnectionStatus;
+  local?: boolean;
 }
 
-export const Header: React.FC<Props> = ({ connectionStatus }) => {
+export const Header: React.FC<Props> = ({ connectionStatus, local }) => {
   return (
     <header className="w-full border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md sticky top-0 z-30 transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
@@ -33,7 +34,7 @@ export const Header: React.FC<Props> = ({ connectionStatus }) => {
         </div>
 
         {/* Live connection badge */}
-        <ConnectionBadge status={connectionStatus} />
+        <ConnectionBadge status={connectionStatus} local={local} />
       </div>
     </header>
   );

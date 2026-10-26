@@ -4,14 +4,16 @@ import { Wifi, WifiOff, RefreshCw, AlertCircle } from 'lucide-react';
 
 interface Props {
   status: ConnectionStatus;
+  /** On-device mode: the models load instead of a server connecting */
+  local?: boolean;
 }
 
-export const ConnectionBadge: React.FC<Props> = ({ status }) => {
+export const ConnectionBadge: React.FC<Props> = ({ status, local }) => {
   const getBadgeConfig = () => {
     switch (status) {
       case 'connected':
         return {
-          label: 'AI Connected',
+          label: local ? 'AI Ready' : 'AI Connected',
           className: 'bg-emerald-500/15 text-emerald-700 border-emerald-500/30 dark:text-emerald-400',
           dot: 'bg-emerald-500 animate-pulse',
           icon: <Wifi className="w-3.5 h-3.5" />,
@@ -25,7 +27,7 @@ export const ConnectionBadge: React.FC<Props> = ({ status }) => {
         };
       case 'connecting':
         return {
-          label: 'Connecting...',
+          label: local ? 'Loading AI models...' : 'Connecting...',
           className: 'bg-amber-500/15 text-amber-700 border-amber-500/30 dark:text-amber-400',
           dot: 'bg-amber-500 animate-bounce',
           icon: <RefreshCw className="w-3.5 h-3.5 animate-spin" />,
@@ -39,7 +41,7 @@ export const ConnectionBadge: React.FC<Props> = ({ status }) => {
         };
       case 'error':
         return {
-          label: 'Connection Error',
+          label: local ? 'AI failed to load' : 'Connection Error',
           className: 'bg-rose-500/15 text-rose-700 border-rose-500/30 dark:text-rose-400',
           dot: 'bg-rose-500',
           icon: <AlertCircle className="w-3.5 h-3.5" />,

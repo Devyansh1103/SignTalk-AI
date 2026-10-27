@@ -1,45 +1,47 @@
 true_label,pred_label,confidence,primary_category,explanation,quality_status,valid_frames,quality_score,sample_index
-loud,truck,0.6015,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'loud' and 'truck' share similar articulatory trajectory.,GOOD,45,0.9189,0
-loud,table,0.9211,SEMANTIC_OVERCONFIDENT_CONFUSION,High-confidence false prediction (conf=0.92): spatial ambiguity between 'loud' and 'table'.,GOOD,45,0.9433,1
-ugly,second,0.5789,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'ugly' and 'second' share similar articulatory trajectory.,GOOD,45,0.9133,14
-cheap,hello,0.6299,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'cheap' and 'hello' share similar articulatory trajectory.,GOOD,45,0.9067,30
-dog,secretary,0.2829,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'dog' and 'secretary' share similar articulatory trajectory.,GOOD,45,0.8022,43
-dress,pen,0.4817,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'dress' and 'pen' share similar articulatory trajectory.,GOOD,45,0.95,70
-dress,clothing,0.5778,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'dress' and 'clothing' share similar articulatory trajectory.,GOOD,45,0.89,71
-dress,clothing,0.332,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'dress' and 'clothing' share similar articulatory trajectory.,ACCEPTABLE,45,0.6078,72
-suit,kitchen,0.8265,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'suit' and 'kitchen' share similar articulatory trajectory.,GOOD,45,0.95,74
-tshirt,shoes,0.9935,SEMANTIC_OVERCONFIDENT_CONFUSION,High-confidence false prediction (conf=0.99): spatial ambiguity between 'tshirt' and 'shoes'.,GOOD,45,0.9467,83
-pocket,quiet,0.4885,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'pocket' and 'quiet' share similar articulatory trajectory.,ACCEPTABLE,45,0.5367,93
-red,colour,0.5628,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'red' and 'colour' share similar articulatory trajectory.,GOOD,45,0.95,97
-green,blue,0.4807,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'green' and 'blue' share similar articulatory trajectory.,ACCEPTABLE,45,0.5878,102
-blue,yellow,0.5056,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'blue' and 'yellow' share similar articulatory trajectory.,GOOD,45,0.9267,104
-blue,yellow,0.5364,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'blue' and 'yellow' share similar articulatory trajectory.,GOOD,45,0.95,105
-yellow,thursday,0.6271,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'yellow' and 'thursday' share similar articulatory trajectory.,GOOD,45,0.7522,108
-pink,red,0.6793,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'pink' and 'red' share similar articulatory trajectory.,GOOD,45,0.95,113
-white,minute,0.6129,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'white' and 'minute' share similar articulatory trajectory.,GOOD,45,0.8656,123
-colour,female,0.9103,SEMANTIC_OVERCONFIDENT_CONFUSION,High-confidence false prediction (conf=0.91): spatial ambiguity between 'colour' and 'female'.,GOOD,45,0.95,129
-wednesday,alright,0.4617,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'wednesday' and 'alright' share similar articulatory trajectory.,ACCEPTABLE,45,0.6667,136
-friday,cellphone,0.4311,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'friday' and 'cellphone' share similar articulatory trajectory.,ACCEPTABLE,45,0.5278,140
-saturday,friday,0.7632,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'saturday' and 'friday' share similar articulatory trajectory.,ACCEPTABLE,45,0.7489,142
-yesterday,thursday,0.6298,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'yesterday' and 'thursday' share similar articulatory trajectory.,GOOD,45,0.9467,149
-minute,night,0.3286,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'minute' and 'night' share similar articulatory trajectory.,ACCEPTABLE,45,0.56,159
-second,night,0.7985,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'second' and 'night' share similar articulatory trajectory.,GOOD,45,0.9133,161
-lamp,afternoon,0.7801,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'lamp' and 'afternoon' share similar articulatory trajectory.,GOOD,45,0.7711,174
-fan,afternoon,0.4967,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'fan' and 'afternoon' share similar articulatory trajectory.,GOOD,45,0.7556,176
-computer,chair,0.8716,SEMANTIC_OVERCONFIDENT_CONFUSION,High-confidence false prediction (conf=0.87): spatial ambiguity between 'computer' and 'chair'.,ACCEPTABLE,45,0.5133,180
-alright,bicycle,0.7133,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'alright' and 'bicycle' share similar articulatory trajectory.,GOOD,45,0.94,199
-pleased,pencil,0.5306,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'pleased' and 'pencil' share similar articulatory trajectory.,GOOD,45,0.95,217
-window,computer,0.7846,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'window' and 'computer' share similar articulatory trajectory.,ACCEPTABLE,45,0.7022,227
-kitchen,bathroom,0.9983,SEMANTIC_OVERCONFIDENT_CONFUSION,High-confidence false prediction (conf=1.00): spatial ambiguity between 'kitchen' and 'bathroom'.,GOOD,45,0.8367,234
-book,page,0.999,SEMANTIC_OVERCONFIDENT_CONFUSION,High-confidence false prediction (conf=1.00): spatial ambiguity between 'book' and 'page'.,GOOD,45,0.7867,245
-key,yesterday,0.5826,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'key' and 'yesterday' share similar articulatory trajectory.,GOOD,45,0.8933,250
-paper,year,0.845,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'paper' and 'year' share similar articulatory trajectory.,GOOD,45,0.91,256
-lock,saturday,0.6104,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'lock' and 'saturday' share similar articulatory trajectory.,ACCEPTABLE,45,0.6878,258
-box,bus,0.9183,SEMANTIC_OVERCONFIDENT_CONFUSION,High-confidence false prediction (conf=0.92): spatial ambiguity between 'box' and 'bus'.,GOOD,45,0.8789,264
-ring,wednesday,0.5352,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'ring' and 'wednesday' share similar articulatory trajectory.,GOOD,45,0.8389,270
-tool,box,0.403,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'tool' and 'box' share similar articulatory trajectory.,ACCEPTABLE,45,0.6589,271
-manager,box,0.4746,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'manager' and 'box' share similar articulatory trajectory.,GOOD,45,0.8356,297
-manager,week,0.3351,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'manager' and 'week' share similar articulatory trajectory.,GOOD,45,0.8433,298
-train,pleased,0.365,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'train' and 'pleased' share similar articulatory trajectory.,GOOD,45,0.9133,307
-bus,car,0.489,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'bus' and 'car' share similar articulatory trajectory.,GOOD,45,0.95,321
-trainticket,police,0.7613,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'trainticket' and 'police' share similar articulatory trajectory.,GOOD,45,0.8767,327
+loud,table,0.9853,SEMANTIC_OVERCONFIDENT_CONFUSION,High-confidence false prediction (conf=0.99): spatial ambiguity between 'loud' and 'table'.,GOOD,45,0.9433,1
+happy,radio,0.5867,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'happy' and 'radio' share similar articulatory trajectory.,GOOD,45,0.95,7
+happy,radio,0.7227,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'happy' and 'radio' share similar articulatory trajectory.,GOOD,45,0.95,8
+cheap,second,0.5319,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'cheap' and 'second' share similar articulatory trajectory.,GOOD,45,0.9067,30
+male,telephone,0.4964,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'male' and 'telephone' share similar articulatory trajectory.,GOOD,45,0.95,35
+dog,week,0.4789,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'dog' and 'week' share similar articulatory trajectory.,GOOD,45,0.8022,43
+dress,clothing,0.8068,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'dress' and 'clothing' share similar articulatory trajectory.,GOOD,45,0.95,70
+dress,clothing,0.7747,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'dress' and 'clothing' share similar articulatory trajectory.,GOOD,45,0.89,71
+dress,clothing,0.6371,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'dress' and 'clothing' share similar articulatory trajectory.,ACCEPTABLE,45,0.6078,72
+suit,shirt,0.4354,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'suit' and 'shirt' share similar articulatory trajectory.,GOOD,45,0.95,74
+shirt,chair,0.6192,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'shirt' and 'chair' share similar articulatory trajectory.,ACCEPTABLE,45,0.71,80
+tshirt,clothing,0.8715,SEMANTIC_OVERCONFIDENT_CONFUSION,High-confidence false prediction (conf=0.87): spatial ambiguity between 'tshirt' and 'clothing'.,ACCEPTABLE,45,0.7233,84
+red,colour,0.4909,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'red' and 'colour' share similar articulatory trajectory.,GOOD,45,0.95,97
+red,pink,0.914,SEMANTIC_OVERCONFIDENT_CONFUSION,High-confidence false prediction (conf=0.91): spatial ambiguity between 'red' and 'pink'.,GOOD,45,0.9367,98
+red,pink,0.8871,SEMANTIC_OVERCONFIDENT_CONFUSION,High-confidence false prediction (conf=0.89): spatial ambiguity between 'red' and 'pink'.,GOOD,45,0.95,99
+green,blue,0.7175,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'green' and 'blue' share similar articulatory trajectory.,ACCEPTABLE,45,0.5878,102
+blue,pencil,0.2585,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'blue' and 'pencil' share similar articulatory trajectory.,GOOD,45,0.9267,104
+blue,pencil,0.2523,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'blue' and 'pencil' share similar articulatory trajectory.,GOOD,45,0.95,105
+yellow,blue,0.485,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'yellow' and 'blue' share similar articulatory trajectory.,GOOD,45,0.95,107
+yellow,green,0.837,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'yellow' and 'green' share similar articulatory trajectory.,GOOD,45,0.7522,108
+white,minute,0.5135,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'white' and 'minute' share similar articulatory trajectory.,GOOD,45,0.8656,123
+colour,pink,0.8501,SEMANTIC_OVERCONFIDENT_CONFUSION,High-confidence false prediction (conf=0.85): spatial ambiguity between 'colour' and 'pink'.,GOOD,45,0.95,128
+colour,female,0.9377,SEMANTIC_OVERCONFIDENT_CONFUSION,High-confidence false prediction (conf=0.94): spatial ambiguity between 'colour' and 'female'.,GOOD,45,0.95,129
+wednesday,ring,0.7945,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'wednesday' and 'ring' share similar articulatory trajectory.,ACCEPTABLE,45,0.6667,136
+friday,cellphone,0.6772,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'friday' and 'cellphone' share similar articulatory trajectory.,ACCEPTABLE,45,0.5278,140
+saturday,friday,0.3275,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'saturday' and 'friday' share similar articulatory trajectory.,ACCEPTABLE,45,0.7489,142
+yesterday,thursday,0.2544,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'yesterday' and 'thursday' share similar articulatory trajectory.,GOOD,45,0.9467,149
+month,week,0.6652,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'month' and 'week' share similar articulatory trajectory.,ACCEPTABLE,45,0.6467,152
+year,student,0.3841,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'year' and 'student' share similar articulatory trajectory.,GOOD,45,0.7567,154
+minute,pen,0.5434,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'minute' and 'pen' share similar articulatory trajectory.,ACCEPTABLE,45,0.56,159
+afternoon,lamp,0.7232,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'afternoon' and 'lamp' share similar articulatory trajectory.,GOOD,45,0.9233,165
+clock,tool,0.979,SEMANTIC_OVERCONFIDENT_CONFUSION,High-confidence false prediction (conf=0.98): spatial ambiguity between 'clock' and 'tool'.,ACCEPTABLE,45,0.5667,172
+fan,friday,0.4805,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'fan' and 'friday' share similar articulatory trajectory.,GOOD,45,0.94,177
+cellphone,green,0.5359,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'cellphone' and 'green' share similar articulatory trajectory.,GOOD,45,0.95,179
+hello,goodnight,0.9306,SEMANTIC_OVERCONFIDENT_CONFUSION,High-confidence false prediction (conf=0.93): spatial ambiguity between 'hello' and 'goodnight'.,GOOD,45,0.95,194
+alright,bicycle,0.3436,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'alright' and 'bicycle' share similar articulatory trajectory.,GOOD,45,0.94,199
+window,computer,0.5122,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'window' and 'computer' share similar articulatory trajectory.,ACCEPTABLE,45,0.7022,227
+kitchen,bathroom,0.9997,SEMANTIC_OVERCONFIDENT_CONFUSION,High-confidence false prediction (conf=1.00): spatial ambiguity between 'kitchen' and 'bathroom'.,GOOD,45,0.8367,234
+pen,clothing,0.5529,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'pen' and 'clothing' share similar articulatory trajectory.,GOOD,45,0.9367,240
+photograph,monday,0.5543,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'photograph' and 'monday' share similar articulatory trajectory.,GOOD,45,0.8667,242
+soap,fish,0.4304,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'soap' and 'fish' share similar articulatory trajectory.,ACCEPTABLE,45,0.5867,243
+book,page,0.9996,SEMANTIC_OVERCONFIDENT_CONFUSION,High-confidence false prediction (conf=1.00): spatial ambiguity between 'book' and 'page'.,GOOD,45,0.7867,245
+key,clothing,0.3907,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'key' and 'clothing' share similar articulatory trajectory.,GOOD,45,0.9167,249
+letter,television,0.557,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'letter' and 'television' share similar articulatory trajectory.,ACCEPTABLE,45,0.57,253
+lock,telephone,0.6353,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'lock' and 'telephone' share similar articulatory trajectory.,ACCEPTABLE,45,0.6878,258
+train,white,0.3412,SEMANTIC_KINEMATIC_SIMILARITY,Signs 'train' and 'white' share similar articulatory trajectory.,GOOD,45,0.9133,307

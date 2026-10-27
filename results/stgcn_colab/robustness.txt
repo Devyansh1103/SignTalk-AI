@@ -1,0 +1,8 @@
+
+== old (v2)/best_checkpoint.pt
+INCLUDE test  top-1  85.5%   mirrored  24.4%   (332 clips)
+Own held-out  top-1  53.6%   [actor:0/2 afternoon:2/2 alright:1/2 animal:2/2 artist:2/2 author:0/2 bag:0/2 bathroom:2/2 
+
+== experiments/stgcn/checkpoints/best_checkpoint.pt
+INCLUDE test  top-1  86.1%   mirrored  85.2%   (332 clips)
+Own held-out  top-1  96.9%   [actor:2/2 afternoon:2/2 alright:2/2 animal:2/2 artist:2/2 author:2/2 bag:2/2 bathroom:2/2 

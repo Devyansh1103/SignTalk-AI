@@ -193,6 +193,7 @@ d:/SignAI/
 ---
 
 ## 5. What Phase 2 Will Implement First
+.
 
 Upon review and approval of this blueprint, **Phase 2 ("Dataset Acquisition & Ingestion")** will execute:
 1. Automated download and verification of **INCLUDE-50** (isolated signs) and **ISL-CSLTR** (continuous sentences).

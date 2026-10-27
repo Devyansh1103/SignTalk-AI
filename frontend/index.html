@@ -4,8 +4,21 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="SignTalk AI: Real-Time Indian Sign Language Translation and Communication Platform powered by Spatial-Temporal Graph Convolutional Networks." />
+    <meta name="description" content="SignTalk AI translates Indian Sign Language gestures into English and Hindi text in real time, right in your browser." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
     <title>SignTalk AI — Real-Time Indian Sign Language Translation</title>
+    <script>
+      // Apply the saved theme before first paint, so the page never flashes the wrong colours
+      try {
+        var t = localStorage.getItem('signtalk-theme');
+        if (t !== 'light' && t !== 'dark') t = matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+        document.documentElement.dataset.theme = t;
+      } catch (e) {
+        document.documentElement.dataset.theme = 'dark';
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>

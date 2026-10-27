@@ -22,6 +22,10 @@ export function useCamera() {
       return;
     }
 
+    // Switching cameras: release the previous one first
+    streamRef.current?.getTracks().forEach((track) => track.stop());
+    streamRef.current = null;
+
     try {
       const constraints: MediaStreamConstraints = {
         video: {
@@ -34,7 +38,14 @@ export function useCamera() {
         audio: false,
       };
 
-      const stream = await navigator.mediaDevices.getUserMedia(constraints);
+      let stream: MediaStream;
+      try {
+        stream = await navigator.mediaDevices.getUserMedia(constraints);
+      } catch (err: any) {
+        // A remembered camera that is no longer connected: fall back to the default one
+        if (!deviceId || (err.name !== 'OverconstrainedError' && err.name !== 'NotFoundError')) throw err;
+        stream = await navigator.mediaDevices.getUserMedia({ ...constraints, video: { width: { ideal: 640 }, height: { ideal: 480 }, frameRate: { ideal: 25 }, facingMode: 'user' } });
+      }
       streamRef.current = stream;
 
       if (videoRef.current) {

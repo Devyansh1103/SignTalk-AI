@@ -1,41 +1,29 @@
-import { useState, useEffect } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useCamera } from './hooks/useCamera';
+import { useCameraDevices } from './hooks/useCameraDevices';
 import { useRealtime } from './hooks/useRealtime';
 import { useLocalRealtime } from './hooks/useLocalRealtime';
 import { fetchVocabulary, LOCAL_INFERENCE } from './services/api';
 import type { AccessibilitySettings, VocabularyItem } from './types/realtime';
+import { useRoute } from './lib/useRoute';
+import { useTheme } from './lib/useTheme';
 
 import { Header } from './components/layout/Header';
 import { Footer } from './components/layout/Footer';
-import { CameraView } from './components/camera/CameraView';
-import { SessionControls } from './components/controls/SessionControls';
-import { AccessibilityControls } from './components/controls/AccessibilityControls';
-import { CurrentSign } from './components/translation/CurrentSign';
-import { TranslationPanel } from './components/translation/TranslationPanel';
-import { LiveTranscript } from './components/translation/LiveTranscript';
-import { DeveloperHUD } from './components/debug/DeveloperHUD';
-import { VocabularyModal } from './components/modals/VocabularyModal';
 import { PrivacyModal } from './components/modals/PrivacyModal';
+import { VocabularyModal } from './components/modals/VocabularyModal';
+import { HomePage } from './pages/HomePage';
+import { TranslatorPage } from './pages/TranslatorPage';
+import { AboutPage } from './pages/AboutPage';
+import { ContactPage } from './pages/ContactPage';
 
 // Fixed per build, so the same hook runs on every render
 const useRecognition = LOCAL_INFERENCE ? useLocalRealtime : useRealtime;
 
-// Certified MVP-10 Vocabulary Fallback
-const DEFAULT_VOCABULARY: VocabularyItem[] = [
-  { class_id: 0, label: 'hello', gloss: 'HELLO', english_translation: 'Hello', hindi_translation: 'नमस्ते' },
-  { class_id: 1, label: 'thankyou', gloss: 'THANK_YOU', english_translation: 'Thank you', hindi_translation: 'धन्यवाद' },
-  { class_id: 2, label: 'good', gloss: 'GOOD', english_translation: 'Good', hindi_translation: 'अच्छा' },
-  { class_id: 3, label: 'happy', gloss: 'HAPPY', english_translation: 'Happy', hindi_translation: 'खुश' },
-  { class_id: 4, label: 'monday', gloss: 'MONDAY', english_translation: 'Monday', hindi_translation: 'सोमवार' },
-  { class_id: 5, label: 'car', gloss: 'CAR', english_translation: 'Car', hindi_translation: 'गाड़ी' },
-  { class_id: 6, label: 'bird', gloss: 'BIRD', english_translation: 'Bird', hindi_translation: 'पक्षी' },
-  { class_id: 7, label: 'house', gloss: 'HOUSE', english_translation: 'House', hindi_translation: 'घर' },
-  { class_id: 8, label: 'time', gloss: 'TIME', english_translation: 'Time', hindi_translation: 'समय' },
-  { class_id: 9, label: 'teacher', gloss: 'TEACHER', english_translation: 'Teacher', hindi_translation: 'शिक्षक' },
-];
-
 export function App() {
-  // Accessibility & UX Settings
+  const route = useRoute();
+  const { theme, setTheme } = useTheme();
+
   const [settings, setSettings] = useState<AccessibilitySettings>({
     largeText: false,
     highContrast: false,
@@ -44,156 +32,60 @@ export function App() {
     mirrorPreview: true,
     showDebugMetrics: false,
   });
+  const [vocabOpen, setVocabOpen] = useState(false);
+  const [privacyOpen, setPrivacyOpen] = useState(false);
+  const [vocabulary, setVocabulary] = useState<VocabularyItem[]>([]);
 
-  // Modal State
-  const [isVocabOpen, setIsVocabOpen] = useState(false);
-  const [isPrivacyOpen, setIsPrivacyOpen] = useState(false);
-  const [vocabulary, setVocabulary] = useState<VocabularyItem[]>(DEFAULT_VOCABULARY);
+  const camera = useCamera();
+  const devices = useCameraDevices(camera.status === 'running');
+  // Lives here rather than on the translator page, so the models load once (and start loading on Home)
+  const recognition = useRecognition(camera.videoRef, camera.status === 'running');
 
-  // Camera Ingestion Hook
-  const {
-    videoRef,
-    status: cameraStatus,
-    errorMessage: cameraError,
-    startCamera,
-    pauseCamera,
-    resumeCamera,
-    stopCamera,
-  } = useCamera();
-
-  // Recognition: on-device (default) or via the WebSocket backend
-  const {
-    connectionStatus,
-    latestMessage,
-    transcript,
-    fps,
-    pauseStreaming,
-    resumeStreaming,
-    resetSession,
-  } = useRecognition(videoRef, cameraStatus === 'running');
-
-  // Load the full vocabulary on mount
   useEffect(() => {
     fetchVocabulary().then((items) => {
-      if (items && items.length > 0) {
-        setVocabulary(items);
-      }
+      if (items.length) setVocabulary(items);
     });
   }, []);
 
-  // Action Handlers
-  const handleStart = () => {
-    startCamera();
-  };
+  // Leaving the translator turns the camera off
+  const { stopCamera, status: cameraStatus } = camera;
+  useEffect(() => {
+    if (route !== 'translator' && cameraStatus !== 'idle' && cameraStatus !== 'stopped') stopCamera();
+  }, [route, cameraStatus, stopCamera]);
 
-  const handlePause = () => {
-    pauseCamera();
-    pauseStreaming();
-  };
-
-  const handleResume = () => {
-    resumeCamera();
-    resumeStreaming();
-  };
-
-  const handleReset = () => {
-    resetSession();
-  };
-
-  const handleStop = () => {
-    stopCamera();
-  };
+  const vocabByLabel = useMemo(() => new Map(vocabulary.map((v) => [v.label, v])), [vocabulary]);
+  const openPrivacy = useCallback(() => setPrivacyOpen(true), []);
 
   return (
-    <div
-      className={`min-h-screen flex flex-col justify-between transition-colors ${
-        settings.highContrast ? 'high-contrast' : ''
-      } ${settings.largeText ? 'large-text' : ''}`}
-    >
-      {/* Top Header */}
-      <Header connectionStatus={connectionStatus} local={LOCAL_INFERENCE} />
+    <div className={`min-h-screen flex flex-col ${settings.highContrast ? 'high-contrast bg-bg' : ''} ${settings.largeText ? 'large-text' : ''}`}>
+      <a href="#main" onClick={(e) => { e.preventDefault(); document.getElementById('main')?.focus(); }} className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:px-3 focus:py-2 focus:rounded-lg focus:bg-surface focus:text-ink">
+        Skip to content
+      </a>
+      <Header route={route} theme={theme} onThemeChange={setTheme} status={recognition.connectionStatus} local={LOCAL_INFERENCE} />
 
-      {/* Main Translation Interface */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col gap-6">
-        {/* Accessibility & Settings Toolbar */}
-        <AccessibilityControls
-          settings={settings}
-          onUpdateSettings={setSettings}
-          onOpenVocabulary={() => setIsVocabOpen(true)}
-          onOpenPrivacy={() => setIsPrivacyOpen(true)}
-        />
-
-        {/* Core Layout Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-          {/* Left Column: Camera View & Primary Controls (7 cols) */}
-          <div className="lg:col-span-7 flex flex-col gap-4">
-            <CameraView
-              videoRef={videoRef}
-              status={cameraStatus}
-              errorMessage={cameraError}
-              fps={fps}
-              mirror={settings.mirrorPreview}
-              onStartCamera={handleStart}
-            />
-
-            <SessionControls
-              cameraStatus={cameraStatus}
-              onStart={handleStart}
-              onPause={handlePause}
-              onResume={handleResume}
-              onReset={handleReset}
-              onStop={handleStop}
-            />
-
-            {settings.showDebugMetrics && (
-              <DeveloperHUD message={latestMessage} fps={fps} />
-            )}
-          </div>
-
-          {/* Right Column: AI Predictions, Translation & Live Transcript (5 cols) */}
-          <div className="lg:col-span-5 flex flex-col gap-4">
-            {/* Current Sign Recognition Card */}
-            <CurrentSign
-              prediction={latestMessage?.prediction}
-              smoothedLabel={latestMessage?.smoothed_label}
-              stateMachine={latestMessage?.state_machine || 'IDLE'}
-              isLargeText={settings.largeText}
-            />
-
-            {/* Natural Language Translation Panel */}
-            <TranslationPanel
-              translation={latestMessage?.translation}
-              signSequence={latestMessage?.sign_sequence || []}
-              isLargeText={settings.largeText}
-            />
-
-            {/* Session Transcript History */}
-            <LiveTranscript
-              transcript={transcript}
-              onClear={handleReset}
-              isLargeText={settings.largeText}
-            />
-          </div>
-        </div>
+      <main id="main" tabIndex={-1} className="flex-1 outline-none">
+        {route === 'home' && <HomePage classes={vocabulary.length} />}
+        {route === 'translator' && (
+          <TranslatorPage
+            settings={settings}
+            onSettingsChange={setSettings}
+            camera={camera}
+            devices={devices}
+            recognition={recognition}
+            vocab={vocabByLabel}
+            classes={vocabulary.length}
+            onOpenVocabulary={() => setVocabOpen(true)}
+            onOpenPrivacy={openPrivacy}
+          />
+        )}
+        {route === 'about' && <AboutPage classes={vocabulary.length} />}
+        {route === 'contact' && <ContactPage />}
       </main>
 
-      {/* Modals */}
-      <VocabularyModal
-        isOpen={isVocabOpen}
-        onClose={() => setIsVocabOpen(false)}
-        vocabulary={vocabulary}
-      />
+      <Footer onOpenPrivacy={openPrivacy} />
 
-      <PrivacyModal
-        isOpen={isPrivacyOpen}
-        onClose={() => setIsPrivacyOpen(false)}
-      />
-
-      {/* Footer */}
-      <Footer
-        onOpenVocabulary={() => setIsVocabOpen(true)}
-        onOpenPrivacy={() => setIsPrivacyOpen(true)}
-      />
+      <VocabularyModal open={vocabOpen} onClose={() => setVocabOpen(false)} vocabulary={vocabulary} />
+      <PrivacyModal open={privacyOpen} onClose={() => setPrivacyOpen(false)} />
     </div>
   );
 }

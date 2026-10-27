@@ -1,38 +1,29 @@
-import React from 'react';
-import { Shield, BookOpen } from 'lucide-react';
+import { Shield } from 'lucide-react';
+import { PROJECT } from '../../lib/project';
+import { GithubIcon } from '../ui/GithubIcon';
 
-interface Props {
-  onOpenVocabulary: () => void;
-  onOpenPrivacy: () => void;
-}
-
-export const Footer: React.FC<Props> = ({ onOpenVocabulary, onOpenPrivacy }) => {
+export function Footer({ onOpenPrivacy }: { onOpenPrivacy: () => void }) {
   return (
-    <footer className="w-full border-t border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-900/50 py-6 mt-12 transition-colors">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500 dark:text-slate-400">
-        <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 text-center sm:text-left">
-          <span>SignTalk AI — GLA University Academic Research Project</span>
-          <span className="hidden sm:inline">|</span>
-          <span>Spatial-Temporal Graph & Transformer Architecture</span>
-        </div>
-
-        <div className="flex items-center gap-4">
-          <button
-            onClick={onOpenVocabulary}
-            className="inline-flex items-center gap-1 hover:text-teal-600 dark:hover:text-teal-400 transition-colors"
-          >
-            <BookOpen className="w-3.5 h-3.5" />
-            <span>Supported Vocabulary</span>
-          </button>
-          <button
-            onClick={onOpenPrivacy}
-            className="inline-flex items-center gap-1 hover:text-teal-600 dark:hover:text-teal-400 transition-colors"
-          >
-            <Shield className="w-3.5 h-3.5" />
-            <span>Privacy Notice</span>
+    <footer className="border-t border-line mt-16">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col md:flex-row items-center justify-between gap-3 text-xs text-ink-3">
+        <p className="flex flex-wrap justify-center md:justify-start items-center gap-x-3 gap-y-1 text-center">
+          <span className="font-medium text-ink-2">{PROJECT.name}</span>
+          <span aria-hidden="true">|</span>
+          <span>{PROJECT.institution} Academic Project</span>
+          <span aria-hidden="true">|</span>
+          <span>Spatial-Temporal Graph Convolutional Network</span>
+        </p>
+        <div className="flex items-center gap-5">
+          <a href={PROJECT.repoUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 hover:text-ink">
+            <GithubIcon className="w-3.5 h-3.5" />
+            Project on GitHub
+          </a>
+          <button type="button" onClick={onOpenPrivacy} className="inline-flex items-center gap-1.5 hover:text-ink">
+            <Shield className="w-3.5 h-3.5" aria-hidden="true" />
+            Privacy
           </button>
         </div>
       </div>
     </footer>
   );
-};
+}

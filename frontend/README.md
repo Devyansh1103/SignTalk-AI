@@ -1,32 +1,20 @@
-# React + TypeScript + Vite
+# SignTalk AI — frontend v2
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Redesigned web app (Home, Live Translator, About, Contact; dark and light themes). It sits next to
+`../frontend`, which is unchanged. The recognition code (`src/engine`, `src/hooks`, `src/services`,
+`src/types`) is copied from `../frontend`. The AI models are served from `../frontend/public`, so
+both apps always use the same model.
 
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
-
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+```
+cd frontend-v2
+npm install
+npm run dev        # http://localhost:5174
+npm run build      # production build in dist/
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+- `VITE_INFERENCE=server` uses the FastAPI backend instead of in-browser inference, same as `../frontend`.
+- `VITE_CONTACT_ENDPOINT` is optional. It is a form service URL (for example Formspree) that accepts a
+  JSON POST of `{name, email, subject, message}`. Without it, the Contact form opens a prefilled GitHub
+  issue instead.
+- Pages use hash routes (`#/translator`), so any static host works without rewrite rules. On Vercel,
+  set the Root Directory to `frontend-v2`.

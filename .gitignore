@@ -67,6 +67,8 @@ backups/
 experiments/stgcn/checkpoints/*_f1bug.pt
 experiments/stgcn_user/
 experiments/stgcn/train_data/
+image.png
+*.zip
 
 # Personal webcam data (privacy: landmarks of the user's own signing)
 experiments/realtime_debug/
@@ -82,3 +84,6 @@ cloudflared*.exe
 
 # Frontend build output (frontend/public/models IS committed: the website serves those files)
 frontend/dist/
+
+# Python ignores lib/ above; the web app keeps code in frontend/src/lib
+!frontend/src/lib/

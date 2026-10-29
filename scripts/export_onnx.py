@@ -4,7 +4,7 @@ SignTalk AI: export the deployed ST-GCN to ONNX for the browser build (onnxrunti
 
 Writes to frontend/public/models/:
   stgcn.onnx     model (softmax output), checked against PyTorch on random and real inputs
-  vocab.json     the 141 classes with English / Hindi translations
+  vocab.json     the vocabulary classes with English / Hindi translations
   pipeline.json  the live settings from configs/realtime.yaml that the browser pipeline uses
 Re-run after every new checkpoint (retrain or fine-tune) so the website uses it too.
 

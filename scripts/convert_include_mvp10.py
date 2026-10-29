@@ -38,7 +38,7 @@ from src.data.stgcn_tensor import NUM_NODES, SEQUENCE_LENGTH, CHANNELS
 
 def _norm(name):
     """'55. Thank you' -> 'thankyou'"""
-    n = re.sub(r"^\s*\d+\s*[.\-_)]\s*", "", name).lower()
+    n = re.sub(r"^\s*(\d+|ex)\s*[.\-_)]\s*", "", name, flags=re.I).lower()
     return re.sub(r"[^a-z]", "", n)
 
 

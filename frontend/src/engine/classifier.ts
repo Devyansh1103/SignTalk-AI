@@ -1,7 +1,7 @@
 /**
  * SignTalk AI - ST-GCN classifier on onnxruntime-web. The model (public/models/stgcn.onnx,
  * written by scripts/export_onnx.py) takes x [1,3,45,93] + mask [1,1,45,93] and returns softmax
- * probabilities [1,141].
+ * probabilities [1, num_classes].
  */
 import * as ort from 'onnxruntime-web';
 import type { ModelInput } from './pipeline';

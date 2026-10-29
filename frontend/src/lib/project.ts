@@ -6,9 +6,9 @@ export const PROJECT = {
   programme: 'B.Tech CSE (AI/ML) Academic Project',
   repoUrl: 'https://github.com/Devyansh1103/SignTalk-AI',
   dataset: 'INCLUDE (Indian Lexicon Sign Language Dataset)',
-  // Measured with scripts/evaluate_robustness.py on the INCLUDE test split (results/stgcn_colab/robustness.txt)
-  testAccuracy: '86.1%',
-  testClips: 332,
+  // Measured with scripts/evaluate_robustness.py on the INCLUDE test split (results/stgcn_colab_v4/robustness.txt)
+  testAccuracy: '87.6%',
+  testClips: 645,
 };
 
 /**

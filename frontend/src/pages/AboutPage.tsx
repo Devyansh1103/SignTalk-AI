@@ -10,7 +10,7 @@ const STACK = [
 const PIPELINE = ['Video frame', 'MediaPipe landmarks', 'Sign segment', 'ST-GCN model', 'Sign + sentence'];
 
 export function AboutPage({ classes }: { classes: number }) {
-  const words = classes || 141;
+  const words = classes || 260;
   const features = [
     `Recognises ${words} Indian Sign Language words`,
     'English and Hindi output for every sign',

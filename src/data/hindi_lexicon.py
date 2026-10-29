@@ -61,6 +61,43 @@ HINDI_LEXICON = {
     "paint": "रंग", "letter": "पत्र", "paper": "कागज़", "lock": "ताला",
     "telephone": "टेलीफ़ोन", "bag": "थैला", "box": "डिब्बा", "gift": "उपहार",
     "card": "कार्ड", "ring": "अंगूठी", "tool": "औज़ार",
+    # Adjectives (Adjectives_3of8 .. 8of8)
+    "high": "ऊँचा", "low": "नीचा", "soft": "मुलायम", "hard": "सख़्त",
+    "deep": "गहरा", "shallow": "उथला", "clean": "साफ़", "dirty": "गंदा",
+    "strong": "मज़बूत", "weak": "कमज़ोर", "dead": "मृत", "alive": "जीवित",
+    "heavy": "भारी", "light": "हल्का", "famous": "प्रसिद्ध", "long": "लंबा",
+    "short": "छोटा", "tall": "ऊँचा", "wide": "चौड़ा", "narrow": "संकरा",
+    "biglarge": "बड़ा", "smalllittle": "छोटा", "slow": "धीमा", "fast": "तेज़",
+    "hot": "गरम", "cold": "ठंडा", "warm": "गुनगुना", "cool": "ठंडक",
+    "new": "नया", "old": "पुराना", "young": "जवान", "bad": "बुरा",
+    "wet": "गीला", "dry": "सूखा", "sick": "बीमार", "healthy": "स्वस्थ",
+    # People
+    "son": "बेटा", "daughter": "बेटी", "mother": "माँ", "father": "पिता",
+    "parent": "माता-पिता", "baby": "शिशु", "man": "आदमी", "woman": "औरत",
+    "brother": "भाई", "sister": "बहन", "family": "परिवार", "grandfather": "दादा",
+    "grandmother": "दादी", "husband": "पति", "wife": "पत्नी", "king": "राजा",
+    "queen": "रानी", "president": "राष्ट्रपति", "neighbour": "पड़ोसी", "boy": "लड़का",
+    "girl": "लड़की", "child": "बच्चा", "adult": "वयस्क", "friend": "दोस्त",
+    "player": "खिलाड़ी", "crowd": "भीड़",
+    # Places
+    "city": "शहर", "streetorroad": "सड़क", "trainstation": "रेलवे स्टेशन",
+    "restaurant": "रेस्टोरेंट", "court": "अदालत", "school": "स्कूल", "office": "दफ़्तर",
+    "university": "विश्वविद्यालय", "park": "पार्क", "storeorshop": "दुकान",
+    "library": "पुस्तकालय", "hospital": "अस्पताल", "temple": "मंदिर", "market": "बाज़ार",
+    "india": "भारत", "ground": "मैदान", "bank": "बैंक", "location": "जगह",
+    # Pronouns
+    "i": "मैं", "you": "तुम", "he": "वह", "she": "वह", "it": "यह", "we": "हम",
+    "youplural": "आप सब", "they": "वे",
+    # Seasons
+    "summer": "गर्मी", "spring": "वसंत", "winter": "सर्दी", "fall": "पतझड़",
+    "season": "मौसम", "monsoon": "मानसून",
+    # Society
+    "religion": "धर्म", "death": "मृत्यु", "medicine": "दवा", "money": "पैसा",
+    "bill": "बिल", "marriage": "शादी", "team": "टीम", "raceethnicity": "जाति",
+    "technology": "तकनीक", "energy": "ऊर्जा", "war": "युद्ध", "peace": "शांति",
+    "attack": "हमला", "election": "चुनाव", "newspaper": "अख़बार", "gun": "बंदूक",
+    "sport": "खेल", "exercise": "व्यायाम", "ball": "गेंद", "price": "क़ीमत",
+    "sign": "संकेत", "science": "विज्ञान", "god": "भगवान",
     # Other
     "house": "घर",
 }

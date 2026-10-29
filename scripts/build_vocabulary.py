@@ -24,8 +24,8 @@ DEFAULT10 = [("hello", "HELLO", "Hello"), ("thankyou", "THANK_YOU", "Thank you")
 
 
 def clean_name(folder):
-    """'55. Thank you' -> 'Thank you'"""
-    return re.sub(r"^\s*\d+\s*[.\-_)]\s*", "", folder).strip()
+    """'55. Thank you' -> 'Thank you', 'Ex. Monsoon' -> 'Monsoon'"""
+    return re.sub(r"^\s*(\d+|ex)\s*[.\-_)]\s*", "", folder, flags=re.I).strip()
 
 
 def norm_label(folder):

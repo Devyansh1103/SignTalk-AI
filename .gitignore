@@ -69,6 +69,7 @@ experiments/stgcn_user/
 experiments/stgcn/train_data/
 image.png
 *.zip
+*.docx
 
 # Personal webcam data (privacy: landmarks of the user's own signing)
 experiments/realtime_debug/

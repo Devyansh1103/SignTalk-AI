@@ -22,51 +22,53 @@ export function HomePage({ classes }: { classes: number }) {
   return (
     <>
       {/* Hero */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 lg:pt-16 pb-12 grid lg:grid-cols-2 gap-12 items-center">
-        <div>
-          <div className="relative w-fit mb-6">
-            <div className="absolute -inset-2 rounded-full bg-gradient-accent opacity-50 blur-xl" aria-hidden="true" />
-            <p className="relative inline-flex flex-wrap items-center gap-x-2 gap-y-1 px-3 py-1.5 rounded-full border border-line bg-surface text-xs text-ink-2">
-              <Zap className="w-3.5 h-3.5 text-accent-text" aria-hidden="true" />
-              Real-time <span aria-hidden="true">·</span> AI Powered <span aria-hidden="true">·</span> Indian Sign Language (ISL)
+      <section className="relative overflow-hidden">
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 lg:pt-16 pb-12 lg:min-h-150 lg:flex lg:items-center">
+          <div className="lg:max-w-xl">
+            <div className="relative w-fit mb-6">
+              <div className="absolute -inset-2 rounded-full bg-gradient-accent opacity-50 blur-xl" aria-hidden="true" />
+              <p className="relative inline-flex flex-wrap items-center gap-x-2 gap-y-1 px-3 py-1.5 rounded-full border border-line bg-surface text-xs text-ink-2">
+                <Zap className="w-3.5 h-3.5 text-accent-text" aria-hidden="true" />
+                Real-time <span aria-hidden="true">·</span> AI Powered <span aria-hidden="true">·</span> Indian Sign Language (ISL)
+              </p>
+            </div>
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-[1.05] text-ink">
+              Breaking Barriers <span className="block w-fit text-gradient">Through AI</span>
+            </h1>
+            <p className="mt-6 text-base sm:text-lg text-ink-2 max-w-xl leading-relaxed">
+              SignTalk AI translates Indian Sign Language gestures into English and Hindi text in real time, making communication more
+              inclusive and accessible.
             </p>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <a href={hrefFor('translator')} className={buttonClass('primary', 'lg')}>
+                <Play className="w-4 h-4 fill-current" aria-hidden="true" />
+                Try Live Translator
+                <ArrowRight className="w-4 h-4" aria-hidden="true" />
+              </a>
+              <button
+                type="button"
+                className={buttonClass('secondary', 'lg')}
+                onClick={() => document.getElementById('how-it-works')?.scrollIntoView({ block: 'start' })}
+              >
+                Learn More
+                <ArrowDown className="w-4 h-4" aria-hidden="true" />
+              </button>
+            </div>
+            <ul className="mt-10 grid grid-cols-3 gap-4 max-w-lg">
+              {[
+                { icon: Languages, text: 'Real-time translation' },
+                { icon: Hand, text: 'Indian Sign Language' },
+                { icon: Accessibility, text: 'Runs in your browser' },
+              ].map(({ icon: Icon, text }) => (
+                <li key={text} className="flex items-center gap-2.5 text-xs text-ink-2">
+                  <span className="w-9 h-9 rounded-full border border-line bg-surface flex items-center justify-center text-accent-text shrink-0">
+                    <Icon className="w-4 h-4" aria-hidden="true" />
+                  </span>
+                  {text}
+                </li>
+              ))}
+            </ul>
           </div>
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-[1.05] text-ink">
-            Breaking Barriers <span className="block w-fit text-gradient">Through AI</span>
-          </h1>
-          <p className="mt-6 text-base sm:text-lg text-ink-2 max-w-xl leading-relaxed">
-            SignTalk AI translates Indian Sign Language gestures into English and Hindi text in real time, making communication more
-            inclusive and accessible.
-          </p>
-          <div className="mt-8 flex flex-wrap gap-3">
-            <a href={hrefFor('translator')} className={buttonClass('primary', 'lg')}>
-              <Play className="w-4 h-4 fill-current" aria-hidden="true" />
-              Try Live Translator
-              <ArrowRight className="w-4 h-4" aria-hidden="true" />
-            </a>
-            <button
-              type="button"
-              className={buttonClass('secondary', 'lg')}
-              onClick={() => document.getElementById('how-it-works')?.scrollIntoView({ block: 'start' })}
-            >
-              Learn More
-              <ArrowDown className="w-4 h-4" aria-hidden="true" />
-            </button>
-          </div>
-          <ul className="mt-10 grid grid-cols-3 gap-4 max-w-lg">
-            {[
-              { icon: Languages, text: 'Real-time translation' },
-              { icon: Hand, text: 'Indian Sign Language' },
-              { icon: Accessibility, text: 'Runs in your browser' },
-            ].map(({ icon: Icon, text }) => (
-              <li key={text} className="flex items-center gap-2.5 text-xs text-ink-2">
-                <span className="w-9 h-9 rounded-full border border-line bg-surface flex items-center justify-center text-accent-text shrink-0">
-                  <Icon className="w-4 h-4" aria-hidden="true" />
-                </span>
-                {text}
-              </li>
-            ))}
-          </ul>
         </div>
         <HeroVisual />
       </section>

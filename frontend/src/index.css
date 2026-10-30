@@ -69,6 +69,7 @@
   --color-bad: var(--bad);
   --shadow-card: var(--shadow);
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --font-script: 'Caveat', 'Segoe Script', cursive;
 }
 
 @layer base {

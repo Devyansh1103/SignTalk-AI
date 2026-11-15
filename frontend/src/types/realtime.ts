@@ -44,6 +44,8 @@ export interface TranslationPayload {
   source_signs: string[];
   is_final: boolean;
   timestamp?: number;
+  /** True when the gloss -> sentence Transformer wrote the text, false/absent for word-by-word */
+  by_transformer?: boolean;
 }
 
 export interface ServerRealtimeMessage {

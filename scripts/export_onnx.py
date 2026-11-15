@@ -46,7 +46,8 @@ def main():
     x = torch.randn(1, 3, 45, 93)
     mask = torch.ones(1, 1, 45, 93)
     torch.onnx.export(model, (x, mask), a.out, input_names=["x", "mask"], output_names=["probs"],
-                      opset_version=17, do_constant_folding=True)
+                      opset_version=17, do_constant_folding=True,
+                      dynamo=False)  # TorchScript exporter, as before torch 2.9 made dynamo the default
     print(f"[OK] wrote {a.out} ({os.path.getsize(a.out) / 1e6:.1f} MB)")
 
     # Parity: random inputs plus real processed clips

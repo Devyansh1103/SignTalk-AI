@@ -34,7 +34,7 @@
   "sequence_length": 45,
   "max_consecutive_missing": 10,
   "translation": {
-    "pause_threshold_sec": 0.9,
+    "pause_threshold_sec": 2.5,
     "min_confidence": 0.3,
     "max_phrase_signs": 10
   },

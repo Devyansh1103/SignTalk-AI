@@ -1,0 +1,53 @@
+single words / fixed phrases / greetings reproduced exactly: 0.999 of 3558
+en: exact match 0.998 on 1896 unseen gloss sequences; 0.999 pass the confidence gate, exact among those 0.999
+hi: exact match 0.998 on 1896 unseen gloss sequences; 1.000 pass the confidence gate, exact among those 0.998
+unseen random gloss sequences rejected (<unk> or below the confidence gate): 0.958
+
+Examples (test, gloss | reference | prediction | min prob):
+  SHE CARD SOFT [hi] | उसका कार्ड मुलायम है। | उसका कार्ड मुलायम है। | 0.92
+  HE FAN RED [hi] | उसका पंखा लाल है। | उसका पंखा लाल है। | 0.92
+  WE DAUGHTER MEAN [hi] | हमारी बेटी निर्दयी है। | हमारी बेटी निर्दयी है। | 0.92
+  WOMAN SLOW [hi] | औरत धीमी है। | औरत धीमी है। | 0.92
+  YOU NEIGHBOUR LIBRARY [hi] | तुम्हारा पड़ोसी पुस्तकालय में है। | तुम्हारा पड़ोसी पुस्तकालय में है। | 0.92
+  THEY PENCIL SMALLLITTLE [hi] | उनकी पेंसिल छोटी है। | उनकी पेंसिल छोटी है। | 0.92
+  SHE GRANDFATHER GREEN HAT [en] | Her grandfather is wearing a green hat. | Her grandfather is wearing a green hat. | 0.92
+  I SECRETARY POOR [en] | My secretary is poor. | My secretary is poor. | 0.92
+  YOUPLURAL NEIGHBOUR INDIA [hi] | आपका पड़ोसी भारत में है। | आपका पड़ोसी भारत में है। | 0.92
+  FRIEND RED DRESS [en] | The friend is wearing a red dress. | The friend is wearing a red dress. | 0.92
+  GRANDFATHER BLUE SUIT [en] | Grandfather is wearing a blue suit. | Grandfather is wearing a blue suit. | 0.92
+  WE FAMILY GREY SUIT [en] | Our family is wearing a grey suit. | Our family is wearing a grey suit. | 0.92
+  FAMILY BLACK SHIRT [en] | The family is wearing a black shirt. | The family is wearing a black shirt. | 0.92
+  YOUPLURAL PHOTOGRAPH OLD [en] | Your photo is old. | Your photo is old. | 0.92
+  HE CHILD SCHOOL [hi] | उसका बच्चा स्कूल में है। | उसका बच्चा स्कूल में है। | 0.92
+  EVENING I LIBRARY [en] | In the evening I am in the library. | In the evening I am in the library. | 0.92
+  YOU PENCIL WHITE [hi] | तुम्हारी पेंसिल सफ़ेद है। | तुम्हारी पेंसिल सफ़ेद है। | 0.92
+  FAMILY FRIEND [en] | The family is a friend. | The family is a friend. | 0.92
+  BOY STRONG [en] | The boy is strong. | The boy is strong. | 0.92
+  I SECRETARY ORANGE TSHIRT [hi] | मेरा सचिव नारंगी टी-शर्ट पहन रहा है। | मेरा सचिव नारंगी टी-शर्ट पहन रहा है। | 0.92
+  YOU SCREEN NEW [hi] | तुम्हारी स्क्रीन नई है। | तुम्हारी स्क्रीन नई है। | 0.92
+  SHE BROTHER PRIEST [hi] | उसका भाई पुजारी है। | उसका भाई पुजारी है। | 0.92
+  YOUPLURAL WIFE SHORT [hi] | आपकी पत्नी नाटी है। | आपकी पत्नी नाटी है। | 0.92
+  HE BOAT GREY [hi] | उसकी नाव स्लेटी है। | उसकी नाव स्लेटी है। | 0.92
+  HE TRAIN GREY [en] | His train is grey. | His train is grey. | 0.92
+  I CLOCK CHEAP [hi] | मेरी घड़ी सस्ती है। | मेरी घड़ी सस्ती है। | 0.92
+  YOU SON SCHOOL [hi] | तुम्हारा बेटा स्कूल में है। | तुम्हारा बेटा स्कूल में है। | 0.92
+  YOU INDIA [hi] | तुम भारत में हो। | तुम भारत में हो। | 0.92
+  THEY FAMILY GREEN PANT [hi] | उनका परिवार हरी पैंट पहन रहा है। | उनका परिवार हरी पैंट पहन रहा है। | 0.92
+  THEY SHIRT TIGHT [hi] | उनकी कमीज़ तंग है। | उनकी कमीज़ तंग है। | 0.92
+
+Random glosses (prediction | min prob):
+  ACTOR LOCK WEDNESDAY | <unk> | 0.92
+  ACTOR LOOSE GRANDMOTHER | <unk> | 0.92
+  ADULT RACEETHNICITY | <unk> | 0.48
+  AFTERNOON BED SPRING SHOES YEAR | <unk> | 0.92
+  ALRIGHT NEW CARD FLAT PAGE | <unk> | 0.93
+  ANIMAL DRESS RELIGION MEDICINE | <unk> | 0.93
+  ARTIST PAPER YELLOW | <unk> | 0.92
+  ATTACK WEEK ANIMAL | <unk> | 0.92
+  AUTHOR PATIENT BICYCLE KING HAPPY | <unk> | 0.92
+  BABY WARM | The baby is warm. | 0.49
+  BABY YOU TSHIRT BED | <unk> | 0.92
+  BAD TOMORROW ANIMAL | <unk> | 0.92
+  BAD YOUPLURAL BANK PEACE HAPPY | <unk> | 0.92
+  BAG GOODNIGHT ORANGE | <unk> | 0.92
+  BALL EVENING PLAYER | <unk> | 0.92

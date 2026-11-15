@@ -14,8 +14,8 @@ Usage:
 import argparse, os, sys, time
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import numpy as np
+import torch  # before pandas: with the CUDA torch build on Windows, importing pandas first makes c10.dll fail to load
 import pandas as pd
-import torch
 import torch.nn as nn
 from torch.utils.data import ConcatDataset, DataLoader, Subset
 

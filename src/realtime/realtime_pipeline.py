@@ -517,8 +517,10 @@ class RealtimePipeline:
             latencies["deduplicator"] = (time.perf_counter() - t_dedup) * 1000.0
             self.profiler.record_stage("deduplicator", latencies["deduplicator"])
 
-        # Check for pause-based sentence finalization in translation layer
-        pause_trans = self.translator.check_pause(ts)
+        # Check for pause-based sentence finalization in translation layer. Not while a sign is in
+        # progress: it only reaches the translator once it has ended, which takes longer than the pause.
+        signing = self.segmenter is not None and self.segmenter.in_segment
+        pause_trans = None if signing else self.translator.check_pause(ts)
         if pause_trans is not None and pause_trans.text:
             self.latest_translation = pause_trans
             output_translation = pause_trans

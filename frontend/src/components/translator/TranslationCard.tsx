@@ -1,5 +1,5 @@
 import { Fragment, useState } from 'react';
-import { ArrowRight, Check, Copy, RotateCcw } from 'lucide-react';
+import { ArrowRight, Check, Copy, RotateCcw, Sparkles } from 'lucide-react';
 import type { TranslationPayload, VocabularyItem } from '../../types/realtime';
 import { Button } from '../ui/Button';
 
@@ -26,15 +26,32 @@ export function TranslationCard({ translation, sequence, vocab, largeText, onCle
 
   return (
     <section aria-labelledby="translation-title" className="card p-5">
-      <h2 id="translation-title" className="text-sm font-medium text-ink-2 mb-3">
-        Translated Sentence
-      </h2>
+      <div className="flex items-center justify-between gap-2 mb-3">
+        <h2 id="translation-title" className="text-sm font-medium text-ink-2">
+          Translated Sentence
+        </h2>
+        {english && (
+          <span
+            className={`inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded-full ${
+              translation?.by_transformer ? 'bg-accent-soft text-accent-text' : 'bg-surface-2 text-ink-3 border border-line'
+            }`}
+          >
+            {translation?.by_transformer && <Sparkles className="w-3 h-3" aria-hidden="true" />}
+            {translation?.by_transformer ? 'Sentence by Transformer' : 'Word by word'}
+          </span>
+        )}
+      </div>
 
       <div className="rounded-xl bg-surface-2 border border-line px-4 py-3 min-h-[4.25rem]" aria-live="polite">
         {english ? (
           <>
             <p className={`font-semibold text-ink ${largeText ? 'text-2xl' : 'text-xl'}`}>{english}</p>
             {hindi && <p className={`text-accent-text mt-0.5 ${largeText ? 'text-lg' : 'text-base'}`}>{hindi}</p>}
+            {translation && translation.tokens.length > 0 && (
+              <p className="text-[11px] text-ink-3 mt-2 font-mono tracking-wide">
+                {translation.tokens.map((t) => (vocab.get(t)?.gloss ?? t.toUpperCase())).join('  ·  ')}
+              </p>
+            )}
           </>
         ) : (
           <p className="text-sm text-ink-3 py-2">Sign one or more words; the sentence appears here.</p>

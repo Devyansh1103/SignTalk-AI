@@ -160,7 +160,7 @@ sequence:
 translation:
   enabled: true
   mode: "gloss_to_text"    # "gloss_to_text" (linguistic templates/lexicon) or "visual_transformer"
-  pause_threshold_sec: 0.9 # Temporal silence required to commit phrase to transcript (was 1.5)
+  pause_threshold_sec: 2.5 # Hands-down time after the last sign that ends the phrase (signing in progress never ends it)
   min_confidence: 0.30     # Gating threshold for sign tokens in translation
   max_phrase_signs: 10     # Max signs per utterance before auto-committing
   transformer_checkpoint: "experiments/transformer/checkpoints/best_checkpoint.pt"

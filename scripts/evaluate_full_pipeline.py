@@ -27,8 +27,8 @@ from typing import Optional, Dict, Any, List
 sys.path.insert(0, os.getcwd())
 
 import yaml
+import torch  # before pandas: with the CUDA torch build on Windows, importing pandas first makes c10.dll fail to load
 import pandas as pd
-import torch
 from torch.utils.data import DataLoader
 
 from src.data.sign_sequence_dataset import SignSequenceDataset

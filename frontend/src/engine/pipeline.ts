@@ -90,6 +90,8 @@ export interface Translation {
   timestamp: number;
   status: string;
   is_final: boolean;
+  /** Set by the realtime hook when the sentence Transformer wrote text / hindi_text */
+  by_transformer?: boolean;
 }
 
 export interface Prediction {
@@ -521,7 +523,9 @@ export class SignPipeline {
       this.pendingFinal = null;
       return t;
     }
-    const pause = this.translator.checkPause(now);
+    // No pause while a sign is in progress: the next sign only reaches the translator once it has
+    // ended, which takes longer than the pause, so every phrase used to close after one sign
+    const pause = this.segmenter.inSegment ? null : this.translator.checkPause(now);
     if (pause && pause.text) {
       this.latestTranslation = { ...pause, is_final: false };
       return pause;

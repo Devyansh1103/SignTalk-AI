@@ -6,9 +6,10 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import type { ServerRealtimeMessage, ConnectionStatus, FinalizedPhrase } from '../types/realtime';
-import { SignPipeline, type PipelineSettings, type VocabEntry } from '../engine/pipeline';
+import { SignPipeline, type PipelineSettings, type VocabEntry, type Translation } from '../engine/pipeline';
 import { LandmarkExtractor } from '../engine/landmarks';
 import { SignClassifier } from '../engine/classifier';
+import { SentenceTranslator } from '../engine/sentence';
 
 const MODEL_BASE = `${import.meta.env.BASE_URL}models`;
 // The backend received 640x480 frames, and aspect correction + the parity tests assume them
@@ -19,6 +20,8 @@ interface Engine {
   pipeline: SignPipeline;
   extractor: LandmarkExtractor;
   classifier: SignClassifier;
+  /** Gloss -> sentence Transformer; null if it failed to load (word-by-word text is used then). */
+  sentence: SentenceTranslator | null;
 }
 
 async function loadEngine(): Promise<Engine> {
@@ -26,7 +29,7 @@ async function loadEngine(): Promise<Engine> {
     fetch(`${MODEL_BASE}/pipeline.json`).then((r) => r.json() as Promise<PipelineSettings & { mediapipe: Record<string, number> }>),
     fetch(`${MODEL_BASE}/vocab.json`).then((r) => r.json() as Promise<VocabEntry[]>),
   ]);
-  const [extractor, classifier] = await Promise.all([
+  const [extractor, classifier, sentence] = await Promise.all([
     LandmarkExtractor.create({
       poseConfidence: settings.mediapipe.pose_confidence,
       handConfidence: settings.mediapipe.hand_confidence,
@@ -34,8 +37,27 @@ async function loadEngine(): Promise<Engine> {
       delegate: 'GPU',
     }),
     SignClassifier.create(settings.sequence_length),
+    SentenceTranslator.create().catch((e) => {
+      console.warn('Sentence model not loaded, using word-by-word text:', e);
+      return null;
+    }),
   ]);
-  return { pipeline: new SignPipeline(settings, vocab), extractor, classifier };
+  return { pipeline: new SignPipeline(settings, vocab), extractor, classifier, sentence };
+}
+
+type SentenceCache = Map<string, { en: string; hi: string } | null>;
+
+/** The phrase as a Transformer sentence when the model is confident, else unchanged. */
+async function withSentence(model: SentenceTranslator, cache: SentenceCache, t: Translation): Promise<Translation> {
+  const key = t.tokens.join(' ');
+  if (!cache.has(key)) {
+    // One run at a time: an onnxruntime session can't run two inferences at once
+    const en = await model.translate(t.tokens, 'en');
+    const hi = en ? await model.translate(t.tokens, 'hi') : null;
+    cache.set(key, en && hi ? { en, hi } : null);
+  }
+  const s = cache.get(key);
+  return s ? { ...t, text: s.en, hindi_text: s.hi, by_transformer: true } : t;
 }
 
 export function useLocalRealtime(videoRef: React.RefObject<HTMLVideoElement | null>, isCameraRunning: boolean) {
@@ -48,6 +70,7 @@ export function useLocalRealtime(videoRef: React.RefObject<HTMLVideoElement | nu
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const runningRef = useRef(false);
   const lastFinalizedTimestampRef = useRef<number | null>(null);
+  const sentenceCacheRef = useRef<SentenceCache>(new Map());
 
   useEffect(() => {
     const canvas = document.createElement('canvas');
@@ -100,7 +123,11 @@ export function useLocalRealtime(videoRef: React.RefObject<HTMLVideoElement | nu
     }
     latencies.end_to_end = performance.now() - t0;
 
-    const translation = pipeline.translationFor(now);
+    let translation = pipeline.translationFor(now);
+    // A single sign keeps its dictionary translation; the Transformer is for phrases
+    if (translation && translation.status === 'SUCCESS' && translation.tokens.length > 1 && engine.sentence) {
+      translation = await withSentence(engine.sentence, sentenceCacheRef.current, translation);
+    }
     const p = pipeline.latestPrediction;
     const msg: ServerRealtimeMessage = {
       type: 'prediction',

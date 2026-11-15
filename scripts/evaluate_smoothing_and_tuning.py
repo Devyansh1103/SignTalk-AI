@@ -22,8 +22,8 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 import numpy as np
+import torch  # before pandas: with the CUDA torch build on Windows, importing pandas first makes c10.dll fail to load
 import pandas as pd
-import torch
 
 from src.realtime.confidence_filter import ConfidenceFilter
 

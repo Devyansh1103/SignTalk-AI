@@ -9,8 +9,6 @@ export function Footer({ onOpenPrivacy }: { onOpenPrivacy: () => void }) {
         <p className="flex flex-wrap justify-center md:justify-start items-center gap-x-3 gap-y-1 text-center">
           <span className="font-medium text-ink-2">{PROJECT.name}</span>
           <span aria-hidden="true">|</span>
-          <span>{PROJECT.institution} Academic Project</span>
-          <span aria-hidden="true">|</span>
           <span>Spatial-Temporal Graph Convolutional Network</span>
         </p>
         <div className="flex items-center gap-5">

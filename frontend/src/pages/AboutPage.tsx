@@ -25,17 +25,21 @@ export function AboutPage({ classes }: { classes: number }) {
       <div className="grid lg:grid-cols-2 gap-10 items-start">
         <div>
           <p className="text-xs font-semibold uppercase tracking-widest text-accent-text mb-2">About</p>
-          <h1 className="text-4xl font-bold tracking-tight text-ink">Our Project</h1>
+          <h1 className="text-4xl font-bold tracking-tight text-ink">Built for Everyone</h1>
           <div className="mt-5 flex flex-col gap-4 text-ink-2 leading-relaxed">
             <p>
-              SignTalk AI is a {PROJECT.programme.replace(' Academic Project', '')} academic project at {PROJECT.institution}. It
-              translates Indian Sign Language (ISL) signs, captured with an ordinary webcam, into English and Hindi text in real
-              time.
+              SignTalk AI translates Indian Sign Language (ISL) signs, captured
+              with an ordinary webcam, into English and Hindi text in real time. It
+              is free, runs entirely in your browser, and needs no account or
+              special hardware.
             </p>
             <p>
-              Deaf and hard-of-hearing people who sign in ISL often depend on an interpreter to talk with people who do not know
-              the language, and interpreters are not always available. SignTalk AI is a step towards everyday tools that let both
-              sides understand each other directly.
+              Deaf and hard-of-hearing people who sign in ISL often depend on
+              an interpreter to talk with people who do not know the language,
+              and interpreters are not always available. SignTalk AI is for anyone
+              on either side of that conversation: people who sign, and the family,
+              friends, colleagues and strangers they talk to, so both sides can
+              understand each other directly.
             </p>
           </div>
         </div>
